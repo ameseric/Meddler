@@ -21,7 +21,7 @@ local player_turn = false
 local turn_count = 0
 local npc_list = {}
 
-package.path = package.path .. ';Meddlers/submodules/?.lua' .. ';Meddlers/loader_modules/?.lua'
+package.path = package.path .. ';Meddler/submodules/?.lua' .. ';Meddler/loader_modules/?.lua'
 
 
 
