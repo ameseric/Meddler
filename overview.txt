@@ -1,0 +1,100 @@
+
+! - external functions, to be called by outside or inside scripts
+		Mostly external.
+% - internal script, but not a dedicated helper- may be used within object by multiple scripts.
+		Internal, but not dedicated.
+@ - internal script, helper, no external calling allowed
+		Internal, dedicated.
+# - value of the table, not a function. Internal or external.
+		'External' single value.
+& - Internal single value, i.e. internal global variable. Declared with 'local', but not part of table.
+
+$ - special function, reserved for love.*'s.
+		Special, 'system' call.
+
+When in doubt, view the actual code. It can't be 'wrong'.
+
+main.lua
+	#_debug
+	#TS
+	#disp
+	-----
+	&world_width
+	&world_height
+	&scale
+	&setting_player
+	&txt_input
+	&img_dir
+	----------
+	$load
+		@load_libraries
+		@load_images
+		@game_setup
+		@setup_flags
+	$draw
+		@debug_GUI
+	$update
+	$keypressed
+		@change_scale
+		@input_loop - for player to enter text. WIP.
+	----------
+	%draw_player_options
+	%time_passes
+	%input_loop
+	----------
+	!timestamp
+	!set_color
+	!set_font
+	!lprint
+
+
+
+
+
+	genesis
+		!create
+			@random_tile_type
+			@border_debug
+			@check_neighbor_tiles
+			@center_debug
+
+	tile
+		#holds
+		#is_passable
+		#type
+		-----
+		!new
+		!set_ocpied
+		!get_type
+		!passable
+		!get_resident
+
+	meddler
+		!new
+
+	display
+		#x_pix_pos
+		#y_pix_pos
+		#tile_width
+		#tile_height
+		#pix_width
+		#pix_height
+		#scale
+		------
+		!setup
+		!move
+		!in_bounds
+		!update_scale
+		!x_tile_pos
+		!y_tile_pos
+
+	player
+		-nada
+
+
+
+Notes
+
+	npcs.lua is a loader list.
+	powers.lua is just a table of every possible power, not an 'object'.
+	tile_rules.lua is a rules script, not an 'object'.
