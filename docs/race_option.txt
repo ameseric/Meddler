@@ -1,0 +1,72 @@
+
+base - desc - desc
+
+physical
+	base covering
+		skin - no cost , no benefits
+		fur	-	1 cost , +1 body
+		scale - 2 cost , +2 body
+		arthopod - 3 cost , +3 body
+	head
+		desc 1
+			normal	-	no cost
+			torso	-	1 cost , +1 body
+		desc 2
+			multi-eyed	-	1 cost , +1 mind
+			no mouth	-	1 cost , resource cost -25%
+			multi-headed	1 cost , resource +25% , +3 mind
+			blind	-		0 cost , +1 mind , -1 str , -1 life
+			horned	-		2 cost , +1 head , +1 str
+	body
+		desc 1
+			thin	-	1 cost , +1 speed , -1 str
+			medium - none
+			large - 	1 cost , +1 str , -1 speed
+		desc 2
+			muscular	-	1 cost , +1 str
+			segmented	-	1 cost , +1 speed			
+
+	upper limbs
+		desc 1
+			short
+			normal
+			long
+			none
+		desc 2
+			arms
+			tentacles
+			wings		move cost always 1 per tile
+		desc 3
+			multi-limbed
+			something?
+
+	lower limbs
+		desc 1
+			short
+			normal
+			long
+			none (slither)
+		desc 2
+			legs
+			tentacles
+			arthropod
+		desc 3
+			multi-limbed	2 cost , + speed
+
+
+
+mental (pick 1)
+	zealous
+	relaxed
+	greedy
+	empathetic
+
+
+culture (pick 2)
+	sacrificial
+	caste
+	scholars
+	undead
+	travelers
+	militant
+

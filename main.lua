@@ -46,7 +46,7 @@ function love.load()							--initial values and files to load for gameplay
 end
 --=== Helpers =====
 	function load_libraries()
-		rules = require 'tile_rules';
+		rules = require 'tile_rules';	--race_rules = require 'race_rules'
 		genesis = require "genesis";	meddler = require "meddler"
 		atlas 	= require "atlas";
 		tile 	= require "tile"
