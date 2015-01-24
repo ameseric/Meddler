@@ -9,19 +9,19 @@
 --]]
 
 --===== Globals =========
-TS = 32
-disp = {}
+	TS = 32
+	disp = {}
 
-local img_dir = "images/"
-local world_width , world_height = 100 , 100
-local scale = 2
-local setting_game_options , loading_game , name_entered , first_confirmation , second_confirmation , temp_str
-local txt_input , reading_keys = "" , false
-local player_turn = false
-local turn_count = 0
-local npc_list = {}
+	local img_dir = "images/"
+	local world_width , world_height = 100 , 100
+	local scale = 2
+	local setting_game_options , loading_game , name_entered , first_confirmation , second_confirmation , temp_str
+	local txt_input , reading_keys = "" , false
+	local player_turn = false
+	local turn_count = 0
+	local npc_list = {}
 
-package.path = package.path .. ';Meddler/submodules/?.lua' .. ';Meddler/loader_modules/?.lua'
+	package.path = package.path .. ';Meddler/submodules/?.lua' .. ';Meddler/loader_modules/?.lua'
 
 
 
@@ -46,6 +46,7 @@ function love.load()							--initial values and files to load for gameplay
 end
 --=== Helpers =====
 	function load_libraries()
+		rules = require 'tile_rules';
 		genesis = require "genesis";	meddler = require "meddler"
 		atlas 	= require "atlas";
 		tile 	= require "tile"
@@ -133,18 +134,17 @@ function love.update( dt )
 
 	else
 		local build = disp:move()
+		if not player_turn then
+			npcs_turn()
+			time_passes()
+			update_turn_stats()
+			player_turn = true
+			build = true
+		end
 		if build then
 			atlas:build_batch()
 		end
 
-		if not player_turn then
-			npcs_turn()
-		--	time_passes()
-			update_turn_stats()
-			player_turn = true
-		--end
-		--]]
-		end
 	end
 end
 --=== Helpers =====
@@ -171,12 +171,20 @@ end
 		for k,v in pairs( npc_list ) do
 			print( v.name )
 		end
-	end--[[
-	function time_passes( ... ) --might want to have a seperate object for time passing...
+	end
+	function time_passes() --might want to have a seperate object for time passing...
 								--easier to iterate through? Like a manager?
-		races_turn_by_ini()
+		--races_turn_by_ini()
 		natural_events()
-	end--]]
+	end
+		function natural_events()
+			for i,row in ipairs( atlas.world ) do
+				for j,tilee in ipairs( row ) do
+					tilee:time_passes()
+				end
+			end
+		end
+
 	function update_turn_stats()
 		turn_count = turn_count + 1
 	end
@@ -239,38 +247,37 @@ end
 
 
 --========== Utility Functions ================
-
-function debug_GUI()
-	lprint("FPS: "..love.timer.getFPS(), 10, 20)
-end
+	function debug_GUI()
+		lprint("FPS: "..love.timer.getFPS(), 10, 20)
+	end
 
 
 
 
 --========= Love Wrapper Functions ===================
-function timestamp() return love.timer.getTime() end
+	function timestamp() return love.timer.getTime() end
 
-function set_color( R , G , B , A )
-	if R == 'white' then
-		love.graphics.setColor( 255 , 255 , 255 , G )
-	elseif R == 'black' then
-		love.graphics.setColor( 0 , 0 , 0 , G )
-	elseif R == 'green' then
-		love.graphics.setColor( 0 , 255 , 0 , G )
-	elseif R == 'red' then
-		love.graphics.setColor( 255 , 0 , 0 , G )
-	elseif R == 'blue' then
-		love.graphics.setColor( 0 , 150 , 230 , G )
-	elseif R == 'grey' then
-		love.graphics.setColor( 200 , 200 , 200 , G )
-	else
-		love.graphics.setColor( R , G , B , A )
+	function set_color( R , G , B , A )
+		if R == 'white' then
+			love.graphics.setColor( 255 , 255 , 255 , G )
+		elseif R == 'black' then
+			love.graphics.setColor( 0 , 0 , 0 , G )
+		elseif R == 'green' then
+			love.graphics.setColor( 0 , 255 , 0 , G )
+		elseif R == 'red' then
+			love.graphics.setColor( 255 , 0 , 0 , G )
+		elseif R == 'blue' then
+			love.graphics.setColor( 0 , 150 , 230 , G )
+		elseif R == 'grey' then
+			love.graphics.setColor( 200 , 200 , 200 , G )
+		else
+			love.graphics.setColor( R , G , B , A )
+		end
 	end
-end
 
-function set_font( font ) love.graphics.setFont( font ) end
+	function set_font( font ) love.graphics.setFont( font ) end
 
-function lprint( text , x , y ) love.graphics.print( text , x , y ) end
+	function lprint( text , x , y ) love.graphics.print( text , x , y ) end
 
 
 

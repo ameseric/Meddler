@@ -32,10 +32,9 @@ end
 --========== Helpers ============
 	function random_tile_type()
 		local int = math.random( 0 , 100 )
-		for tile_name , tile_tble in pairs( rules.a ) do
-			--print( int , tile_name , tile_tble.prob )
+		for i , tile_tble in pairs( rules.a ) do
 			if int <= tile_tble.prob then
-				return tile_name
+				return tile_tble.type
 			end
 		end
 	end

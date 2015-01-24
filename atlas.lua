@@ -1,13 +1,14 @@
 
---Object for holding the tile world and functions
+--[[
+	Map manager/object pertaining to drawing.
+	Map functions dealing with time passing and game mechanics
+		are not covered here.
+]]
 
-atlas = {}
-atlas.sprite_batch = nil
-atlas.world = nil
-
-package.path = "Meddlers/submodules/?.lua"
-rules = require "tile_rules"
-
+atlas = {
+	sprite_batch = nil
+	,world = nil
+}
 
 function atlas:set_world( world , x , y , scale )
 	self.world = world
@@ -34,7 +35,9 @@ function atlas:build_batch()
 			local i = x + disp:x_tile_pos()
 			local j = y + disp:y_tile_pos()
 			if self:in_bounds( i , j ) then
-				self.sprite_batch:add( rules.a[ self.world[i][j].type ].quad , i*TS , j*TS )
+				local type = self.world[i][j].type
+				local quad = rules.total_set[ type ].quad
+				self.sprite_batch:add( quad , i*TS , j*TS )
 			end
 		end
 	end
@@ -56,14 +59,15 @@ end
 
 
 --===== Helpers ======
+	function atlas:world_width_pix()
+		return self.world_width_tile * TS * self.scale
+	end
 
-function atlas:world_width_pix()
-	return self.world_width_tile * TS * self.scale
-end
+	function atlas:world_height_pix()
+		return self.world_height_tile * TS * self.scale
+	end
 
-function atlas:world_height_pix()
-	return self.world_height_tile * TS * self.scale
-end
+
 
 
 

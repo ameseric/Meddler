@@ -9,7 +9,6 @@ local tile = {
 	,is_passable = false
 	,type = "nope"
 }
-rules = require "tile_rules"
 
 
 
@@ -17,12 +16,13 @@ function tile:new( type )
 	new_tile = {}
 	setmetatable( new_tile, self )
 	self.__index = self
-
 	new_tile.type = type
-	new_tile.is_passable = rules.a[ type ].is_passable
-	--etc.
-
 	new_tile.is_ocpied = false
+
+	for k,v in pairs( rules.total_set[type] ) do --watch out for tables
+		new_tile[k] = v
+	end
+
 	return new_tile
 end
 
@@ -34,6 +34,20 @@ function tile:set_ocpied( npc, clear )
 		self.holds = npc
 	end
 		
+end
+
+function tile:time_passes()
+	self.lifetime = self.lifetime - self.rate; --change, only for testing
+	if self.lifetime < 0 and self.lifetime > -99 then
+		print( "First: " , self.lifetime , self.type , self.next_life )
+
+		--self = tile:new( self.next_life )
+		for k,v in pairs( rules.total_set[self.next_life] ) do
+			if type(v) ~= 'function' then
+				self[k] = v
+			end
+		end
+	end
 end
 
 

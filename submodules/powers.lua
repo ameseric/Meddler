@@ -5,8 +5,59 @@
 ]]
 
 
-all_powers = {}
+powers = {
 
+
+--[[
+	'Bright'	--0,4,0
+	,'Free'		--1,3,0
+	,'Weary'	--2,2,0
+	,'Feared'	--3,1,0
+	,'Dark'		--4,0,0
+	,'Tortured'	--3,0,1
+	,'Mad'		--2,0,2
+	,'Cosmic'	--1,0,3
+	,'Unknowable'--0,0,4
+	,'Old'		--0,1,3
+	,'Primal'	--0,2,2
+	,'Benevolent'--0,3,1
+	,'Grey'		--1,2,1
+	,'Chained'	--2,1,1
+	,'Knowing'	--1,1,2
+	]]
+
+--=== Basic Powers, available to all Meddlers at start of game =======
+
+	Bless = function bless( tile )
+				tile.output_rate = tile.output_rate * 2
+			end
+
+	,Blast = function blast( tile )
+				tile.type = 'scorched'
+				local target = tile:get_resident()
+				if target then
+					target:damage( 50 )
+				end
+			end
+
+	,Raise = function raise( tile )
+				if tile.type == 'water' then
+					tile.type == 'plain'
+				elseif tile.type == 'plain' or tile.type == 'forest' then
+					tile.type == 'mountain'
+				end
+			end
+
+	
+
+
+
+
+
+
+
+
+--[[
 function powers.Harvest( city , atlas.world , med )
 	local x , y = city.location
 	powers.inf( 10 , med )
@@ -43,6 +94,10 @@ end
 function powers.inf( cost , med )
 	med.influence = med.influence - cost
 end
+--]]
 
 
-return all_powers
+}
+
+
+return powers
