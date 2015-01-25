@@ -10,6 +10,8 @@ race = {
 	,mind = 0
 	,head = 0
 	,lower_limb = 0
+	---------------
+	,
 }
 
 
@@ -28,7 +30,7 @@ function race:new( stats )
 end
 ---=== Helpers =======
 	function generate_random_race( o )
-		
+
 
 
 

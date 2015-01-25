@@ -48,8 +48,8 @@ end
 	function load_libraries()
 		rules = require 'tile_rules';	--race_rules = require 'race_rules'
 		genesis = require "genesis";	meddler = require "meddler"
-		atlas 	= require "atlas";
-		tile 	= require "tile"
+		atlas 	= require "atlas";		--race = require 'race'
+		tile 	= require "tile";
 		disp 	= require "display"
 	end
 
@@ -57,6 +57,10 @@ end
 		local natural_tiles = love.graphics.newImage( img_dir.."natural_tiles.png" )
 		natural_tiles:setFilter( 'nearest' )
 		atlas:set_batch( natural_tiles , (disp.tile_height+2) * (disp.tile_width+2) ) --extra 2 for buffer to show partial tiles
+
+		local gui_image = love.graphics.newImage( img_dir.."main_gui.png" )
+		gui_image:setFilter( 'nearest' )
+		display:setup_gui( gui_image )
 	end
 
 	function standard_setup()
@@ -101,6 +105,7 @@ function love.draw()
 
 	else
 		atlas:draw()
+		display:draw_gui()
 		if _debug then debug_GUI() end
 		lprint( "Turn: "..turn_count , disp.pix_width - (disp.pix_width/10) , 50 )
 	end

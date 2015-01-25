@@ -37,11 +37,8 @@ function tile:set_ocpied( npc, clear )
 end
 
 function tile:time_passes()
-	self.lifetime = self.lifetime - self.rate; --change, only for testing
-	if self.lifetime < 0 and self.lifetime > -99 then
-		print( "First: " , self.lifetime , self.type , self.next_life )
-
-		--self = tile:new( self.next_life )
+	self.lifetime = self.lifetime - 1; --change, only for testing
+	if self.lifetime == 0 then
 		for k,v in pairs( rules.total_set[self.next_life] ) do
 			if type(v) ~= 'function' then
 				self[k] = v
