@@ -5,8 +5,6 @@
 ]]
 
 genesis = {}
-rules = require "tile_rules"
-
 
 function genesis:create( width , height )
 	local world = {}
@@ -15,14 +13,14 @@ function genesis:create( width , height )
 		world[ x ] = {}
 		for y = 0,height-1 do
 			local type = random_tile_type()
-			world[ x ][ y ] = tile:new( type )
+			world[ x ][ y ] = tiles:new( type )
 			
 			if border_debug( x , y , width , height ) then
-				world[ x ][ y ] = tile:new( 'mountain' )
+				world[ x ][ y ] = tiles:new( 'Mountain' )
 			end
 
 			if center_debug( x , y , width , height ) then
-				world[ x ][ y ] = tile:new( 'mountain' )
+				world[ x ][ y ] = tiles:new( 'Mountain' )
 			end
 		end
 	end

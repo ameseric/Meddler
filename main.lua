@@ -49,7 +49,7 @@ end
 		rules = require 'tile_rules';	--race_rules = require 'race_rules'
 		genesis = require "genesis";	meddler = require "meddler"
 		atlas 	= require "atlas";		--race = require 'race'
-		tile 	= require "tile";
+		tiles 	= require "tile";
 		disp 	= require "display"
 	end
 
@@ -60,12 +60,12 @@ end
 
 		local gui_image = love.graphics.newImage( img_dir.."main_gui.png" )
 		gui_image:setFilter( 'nearest' )
-		display:setup_gui( gui_image )
+		display:setup_gui( gui_image , natural_tiles )
 	end
 
 	function standard_setup()
 		--Random Settings (global fonts )
-		font_large = love.graphics.setNewFont( 25 )
+		font_large = love.graphics.setNewFont( 22 )
 		font_med = love.graphics.setNewFont( 18 )
 		love.keyboard.setKeyRepeat( true )
 	end
@@ -104,7 +104,7 @@ function love.draw()
 		draw_player_options()
 
 	else
-		atlas:draw()
+		atlas:draw( scale )
 		display:draw_gui()
 		if _debug then debug_GUI() end
 		lprint( "Turn: "..turn_count , disp.pix_width - (disp.pix_width/10) , 50 )
@@ -184,8 +184,8 @@ end
 	end
 		function natural_events()
 			for i,row in ipairs( atlas.world ) do
-				for j,tilee in ipairs( row ) do
-					tilee:time_passes()
+				for j,tile in ipairs( row ) do
+					tile:time_passes()
 				end
 			end
 		end
@@ -231,15 +231,22 @@ function love.keypressed(key, isrepeat) --might actually needs to move subs into
 end
 --=== Helpers ====
 	function change_scale( num )
+		disp:update_scale( scale , scale + num )
 		scale = scale + num
-		disp:update_scale( scale )
-		atlas:update_scale( scale )
+		atlas:update_scale()
 	end
 	function love.textinput( t )
 		txt_input = txt_input .. t
 	end
 
 function love.mousepressed( x , y , button )
+		
+	if is_button then
+		--stuff
+	else
+		local tile = atlas:get_tile( x , y , 'translate' )
+		disp:gui_select( tile )
+	end
 end
 
 function love.mousereleased( x , y , button )
@@ -254,6 +261,14 @@ end
 --========== Utility Functions ================
 	function debug_GUI()
 		lprint("FPS: "..love.timer.getFPS(), 10, 20)
+	end
+
+	function tile_to_pixel( unit ) 
+		return unit * TS * scale
+	end
+
+	function pixel_to_tile( unit ) 
+		return math.floor( unit / (TS*scale) )
 	end
 
 

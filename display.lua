@@ -30,16 +30,14 @@ gui = require "gui"
 	function display:setup( scale )
 		local width , height = love.window.getDesktopDimensions()
 
-		self.scale = scale
-
 		width = math.floor( (width / ( TS * scale ))*0.75)
 		height = math.floor( (height / ( TS * scale ))*0.75)
 
 		self.tile_width = width
-		self.pix_width = width * TS * scale
+		self.pix_width = tile_to_pixel( width )
 
 		self.tile_height = height
-		self.pix_height = height * TS * scale
+		self.pix_height = tile_to_pixel( height )
 
 		love.window.setMode( self.pix_width , self.pix_height )
 	end
@@ -82,12 +80,10 @@ gui = require "gui"
 		end
 
 
-	function display:update_scale( new_scale , ratio )
-		local ratio = self.scale / new_scale
-		local delta = new_scale - self.scale
+	function display:update_scale( scale , new_scale )
+		local ratio = scale / new_scale
+		local delta = new_scale - scale
 
-		self.scale = new_scale
-		
 		self.tile_width = math.ceil( self.tile_width * ratio )
 		self.x_pix_pos = ( self.x_pix_pos / ratio ) + ( (1-ratio) * self.pix_width * (1/ratio) * 0.5 ) --want to use old self.pix_(width/height)
 
@@ -100,22 +96,26 @@ gui = require "gui"
 
 
 --====== GUI calls =========
-	function display:setup_gui( gui_main )
-		gui:setup( gui_main , self.pix_width , self.pix_height , self.scale )
+	function display:setup_gui( gui_main , tileset )
+		gui:setup( gui_main , tileset , self.pix_width , self.pix_height )
 	end
 
 	function display:draw_gui()
-		gui:draw(  )
+		gui:draw()
+	end
+
+	function display:gui_select( tile )
+		gui:select( tile )
 	end
 
 
 
 
 function display:x_tile_pos()
-	return math.floor( self.x_pix_pos / (TS*self.scale) )
+	return pixel_to_tile( self.x_pix_pos )
 end
 function display:y_tile_pos()
-	return math.floor( self.y_pix_pos / (TS*self.scale) )
+	return pixel_to_tile( self.y_pix_pos )
 end
 
 

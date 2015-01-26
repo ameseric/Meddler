@@ -10,13 +10,11 @@ atlas = {
 	,world = nil
 }
 
-function atlas:set_world( world , x , y , scale )
+function atlas:set_world( world , x , y )
 	self.world = world
 
 	self.world_width_tile = x
 	self.world_height_tile = y
-
-	self.scale = scale
 
 end
 
@@ -36,7 +34,7 @@ function atlas:build_batch()
 			local j = y + disp:y_tile_pos()
 			if self:in_bounds( i , j ) then
 				local type = self.world[i][j].type
-				local quad = rules.total_set[ type ].quad
+				local quad = rules:get_quad( type )
 				self.sprite_batch:add( quad , i*TS , j*TS )
 			end
 		end
@@ -44,12 +42,11 @@ function atlas:build_batch()
 	self.sprite_batch:unbind()
 end
 
-function atlas:draw()
-	love.graphics.draw( self.sprite_batch , -disp.x_pix_pos , -disp.y_pix_pos , 0 , self.scale , self.scale ) --for buffer
+function atlas:draw( scale )
+	love.graphics.draw( self.sprite_batch , -disp.x_pix_pos , -disp.y_pix_pos , 0 , scale , scale ) --for buffer
 end
 
-function atlas:update_scale( num )
-	self.scale = num
+function atlas:update_scale()
 	self:build_batch()
 end
 
@@ -57,14 +54,22 @@ function atlas:in_bounds( x , y )
 	return x >= 0 and x < self.world_width_tile and y >= 0 and y < self.world_height_tile
 end
 
+function atlas:get_tile( x , y , translate )
+	if translate then
+		x = pixel_to_tile( x + disp.x_pix_pos )
+		y = pixel_to_tile( y + disp.y_pix_pos )
+	end
+	return self.world[ x ][ y ]
+end
+
 
 --===== Helpers ======
 	function atlas:world_width_pix()
-		return self.world_width_tile * TS * self.scale
+		return tile_to_pixel( self.world_width_tile)
 	end
 
 	function atlas:world_height_pix()
-		return self.world_height_tile * TS * self.scale
+		return tile_to_pixel( self.world_height_tile)
 	end
 
 

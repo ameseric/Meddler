@@ -2,17 +2,17 @@
 
 --[[
 
-forest -> plain
-plain -> forest
-mountain -> hills
-hills -> plain
+Forest -> Plain
+Plain -> Forest
+Mountain -> hills
+hills -> Plain
 
 Add
 	hills
-	budding plain
-	chopped forest
-	water frames
-	desolate
+	budding Plain
+	chopped Forest
+	Water frames
+	Desolate
 	cursed
 	
 	?quarry
@@ -24,36 +24,36 @@ Add
 
 
 rules = {}
-rules.a = { --order matters! That's how the tile sprite are read, so don't change it!
-			{ 	type = 'plain'
+rules.a = { --order matters! That's how the tile sprites are read, so don't change it!
+			{ 	type = 'Plain'
 				,is_passable = true
 				,move_cost = 1
 				,prob = 50
 				,resource = 'food'
 				,rate = 5
 				,lifetime = 10
-				,next_life = 'desolate' --desolate
+				,next_life = 'Desolate' --Desolate
 
 			}
-			,{ 	type = 'forest'
+			,{ 	type = 'Forest'
 				,is_passable = true
 				,move_cost = 2
 				,prob = 20
 				,resource = 'wood'
 				,rate = 4
 				,lifetime = 10
-				,next_life = 'cleared plain'
+				,next_life = 'Cleared Plain'
 			}
-			,{ 	type = 'mountain'
+			,{ 	type = 'Mountain'
 				,is_passable = true
 				,move_cost = 3
 				,prob = 15
 				,resource = 'stone'
 				,rate = 2
 				,lifetime = 60
-				,next_life = 'water'
+				,next_life = 'Water'
 			}
-			,{ 	type = 'water'
+			,{ 	type = 'Water'
 				,is_passable = false
 				,move_cost = 1
 				,prob = 5
@@ -62,7 +62,7 @@ rules.a = { --order matters! That's how the tile sprite are read, so don't chang
 				,lifetime = -1
 				,next_life = 'none'
 			}
-			,{ 	type = 'desolate'
+			,{ 	type = 'Desolate'
 				,is_passable = true
 				,move_cost = 1
 				,prob = 0
@@ -71,25 +71,25 @@ rules.a = { --order matters! That's how the tile sprite are read, so don't chang
 				,lifetime = -1
 				,next_life = 'none'
 			}
-			,{ 	type = 'deep forest'
+			,{ 	type = 'Deep Forest'
 				,is_passable = true
 				,move_cost = 3
 				,prob = 10
 				,resource = 'wood'
 				,rate = 2
 				,lifetime = 15
-				,next_life = 'forest'
+				,next_life = 'Forest'
 			}
-			,{ 	type = 'cleared plain'
+			,{ 	type = 'Cleared Plain'
 				,is_passable = true
 				,move_cost = 1
 				,prob = 0
 				,resource = 'wood'
 				,rate = 6
 				,lifetime = 10
-				,next_life = 'plain'
+				,next_life = 'Plain'
 			}
-			,{ 	type = 'village'
+			,{ 	type = 'Village'
 				,is_passable = true
 				,move_cost = 1
 				,prob = 0
@@ -101,6 +101,14 @@ rules.a = { --order matters! That's how the tile sprite are read, so don't chang
 		}
 
 rules.total_set = {}
+
+function rules:get_rules( type )
+	return self.total_set[ type ]
+end
+
+function rules:get_quad( type )
+	return self.total_set[ type ].quad
+end
 
 
 local count , itr = 0 , 0
