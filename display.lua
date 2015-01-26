@@ -100,12 +100,12 @@ gui = require "gui"
 		gui:setup( gui_main , tileset , self.pix_width , self.pix_height )
 	end
 
-	function display:draw_gui()
-		gui:draw()
+	function display:draw_gui( scale )
+		gui:draw( scale )
 	end
 
-	function display:gui_select( tile )
-		gui:select( tile )
+	function display:gui_select( tile , x , y )
+		gui:select( tile , x , y )
 	end
 
 

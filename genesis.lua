@@ -12,7 +12,7 @@ function genesis:create( width , height )
 	for x = 0,width-1 do
 		world[ x ] = {}
 		for y = 0,height-1 do
-			local type = random_tile_type()
+			local type = random_tile_type( world , x , y )
 			world[ x ][ y ] = tiles:new( type )
 			
 			if border_debug( x , y , width , height ) then
@@ -28,7 +28,23 @@ function genesis:create( width , height )
 	return world
 end
 --========== Helpers ============
-	function random_tile_type()
+	function random_tile_type( world , x , y )
+		local seed = math.random( 1 , 8 )
+
+		if #world > 0 and #world[x] > 0 then
+			local type_a = world[x-1][y].type
+			local type_b = world[x][y-1].type
+
+			if type_a == type_b and type_a == 'Forest' then
+				return "Deep Forest"
+			elseif seed == 1 then
+				return type_a
+			elseif seed == 2 then
+				return type_b
+			end
+		end
+
+
 		local int = math.random( 0 , 100 )
 		for i , tile_tble in pairs( rules.a ) do
 			if int <= tile_tble.prob then

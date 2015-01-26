@@ -59,7 +59,7 @@ function atlas:get_tile( x , y , translate )
 		x = pixel_to_tile( x + disp.x_pix_pos )
 		y = pixel_to_tile( y + disp.y_pix_pos )
 	end
-	return self.world[ x ][ y ]
+	return self.world[ x ][ y ] , x , y
 end
 
 

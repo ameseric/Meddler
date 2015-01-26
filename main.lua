@@ -105,7 +105,7 @@ function love.draw()
 
 	else
 		atlas:draw( scale )
-		display:draw_gui()
+		display:draw_gui( scale )
 		if _debug then debug_GUI() end
 		lprint( "Turn: "..turn_count , disp.pix_width - (disp.pix_width/10) , 50 )
 	end
@@ -244,8 +244,8 @@ function love.mousepressed( x , y , button )
 	if is_button then
 		--stuff
 	else
-		local tile = atlas:get_tile( x , y , 'translate' )
-		disp:gui_select( tile )
+		local tile , x , y = atlas:get_tile( x , y , 'translate' )
+		disp:gui_select( tile , ttp(x) , ttp(y)  )
 	end
 end
 
@@ -267,8 +267,16 @@ end
 		return unit * TS * scale
 	end
 
+	function ttp( unit )
+		return tile_to_pixel( unit )
+	end
+
 	function pixel_to_tile( unit ) 
 		return math.floor( unit / (TS*scale) )
+	end
+
+	function ptt( unit )
+		return pixel_to_tile( unit )
 	end
 
 
