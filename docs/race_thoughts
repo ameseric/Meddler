@@ -1,0 +1,111 @@
+
+
+ Races
+
+ Races have 2 categories of parameters - units stats and race parameters.
+ 	Unit stats only affect the selected unit, while race parameteres show the global state of the race.
+
+Global Parameters
+	Order			-	Determines whether the race still listens to its patron Meddler. 0 -> 50 (200)
+	Boldness		-	Determines aggressiveness of race- willingness to battle, speed of expansion.
+	Industry		-	Determines structure build speed. 1 -> 5 (8)
+	Reproduction	-	Determines unit build speed. 1 -> 5 (8)
+
+
+
+ A unit of a race is 100 members of that race, represented on the map as a single unit on a single tile.
+ Each unit has the following parameters, generated from the race base-stats, to determine game usage.
+ 	Life		( Health Points )
+ 	Head		( Psy Attack )
+ 	Mind		( Psy Defense )
+ 	Upper Limb	( Phys Attack )
+ 	Torso		( Phys Defense )
+ 	Lower Limb	( Speed / tile movement )
+
+ 	Stability	( Range modifier ) ???
+
+
+What can races do?
+	The purpose of any race is to add to the Eminence of their patron (Meddler) or otherwise spread their influence.
+	This is accomplished in a number of ways.
+
+	1) Worship
+				Temples and other sites of worship built by a race add to the Eminence of a Meddler every turn.
+				Other forms of worship are pilgramiges, or carrying out a 'Decree' from a Meddler.
+
+	2) Collect resources
+				This does not directly affect a Meddler, but it enables the race to build more 'things', enabling expansion
+				and the creation of more units to carry out the Meddler's edicts. Divided into Stone, Wood, and Food.
+
+	3) Build
+				Basic Races can build Villages, Forts, Temples, Lumber Camps, Mines, and Farms. Each of the latter three simply increase
+				the resource output of a given tile. Every tile adajacent to a Village is automatically collected and inserted into
+				the race's global resource 'bank'. Resource collection buildings can only be built within 20 tiles of a Village/Town/City.
+				They are free to create.
+
+				Villages change over time. Every resource collected within their 20-tile radius counts towards their expansion.
+				After 100 Stone and Wood, a Village -> Town. After another 500 Stone and Wood, Town -> City. The first city created by the
+				race becomes the Capital, which can create unique units.
+				Villages cost 50 Stone and 50 Wood to build.
+
+				Temples can be contructed anywhere, and allow the patron Meddler to act within their 20-tile radius. They also generate, by
+				default, +2 eminence per turn. 
+
+				Forts and Cities are the only buildings able to counter-attack any aggressors. Forts have the highest attack, and can produce
+				special military units. Any buildings adjacent to a Fort cannot be attacked until the Fort is destroyed.
+
+	4) Create Unit
+				There are two types of Units - Squads, and Heros.
+
+				Each Squad unit is treated as a single unit, but portrays X amount of people. The 'life' of the squad unit shows how many
+				people remain alive in the squad. Squads can be stacked 10 times.
+
+				A Hero is a single person, but is equivalent to the X amount of people within a single Squad Unit. In this world, 1 'man'
+				can defeat 100 of his contemporaries, since that man is a 'Hero' and blessed at birth by a patron Meddler. Heroes can stack
+				to a party of 6.
+
+				Units are generated naturally by races as the resources become available, but Heroes must be 'created' by a Meddler.
+
+
+				Squad Unit Types (Subject to change)
+
+					Might just use titles, no names, otherwise need naming convention for X amount of races w/ customization.
+
+					Light Infantry
+							+20% Upper limb
+					Heavy Infantry
+							+20% Upper limb
+							+20% Torso
+							-40% Lower Limb
+					Light Calvary
+							+40% Lower Limb
+					Heavy Calvary
+							+20% Lower Limb
+							+20% Torso
+					Light Archers
+							None, but get to go first.
+					Heavy Archers
+							Always deal damage first.
+							+20% Torso
+
+
+					Any unit above can deal physical or magical damage.
+					Modifiers can be purchased to offset phys/psy weaknesses.
+
+					Elements are not damage types, but modifiers.
+					So two types of damage: Physical and Psychic
+						With four modifiers: None , Fire , Ice , Lightning
+
+					Infantry -> Calvary
+						+25% damage
+					Calvary -> Archers
+						+25% damage
+					Archers -> Infantry
+						+25% damage
+
+					Mages have no damage bonuses / penalties.
+
+
+					units stat calculations:
+						base * class mod
+

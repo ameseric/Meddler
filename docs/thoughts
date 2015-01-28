@@ -1,0 +1,101 @@
+
+
+Thought strategies:
+	Pure Bright player would keep investing in races, ending up with a 15pt to cushion, while buffing as needed.
+
+	Pure Dark player would make a cheap race for the game, and keep sacrificing them for eminenece. Use the eminence to curse and destruct foes.
+
+	Pure Progenitor changes the world to favor his races over the others, and uses the mysteries of the land to his advantage.
+
+	Default NPCs are Argaught and Omnisila?
+		Argaught is the Seed, creating underground worlds for his amusement that contain artifacts of power. Units can collect these.
+		Omnisila is the Ruiner, preparing the world for extinction and the next life to come.
+
+
+Lv1 -> Lv2 (1 years / 2 turns)
+Lv2 -> Lv3 (2 years / 4 turns)
+Lv3 -> Lv4 (4 years / 8 turns)
+Lv4 -> Lv5 (6 years / 12 turns)
+
+
+
+The 'operation' range for Meddlers is within 20 tiles of their temples, which are built by their races.
+This does not affect world-class spells.
+
+
+
+Give
+	Life
+		Lv1 - Create Race (5pts)
+		Lv2 - Terraform
+		Lv3 - Create Race (10pts)
+		Lv4 - 
+		Lv5 - Create Race (15pts)
+
+	BLessings
+		Lv1 - +10% stats / +50% resource (2 years)
+		Lv2 - +20% stats / +100% resource (2 years)
+		Lv3 - +30% stats / +100% resource (2 years)
+
+
+
+Take
+	Life
+		Lv1 - Sacrifice Unit (5 emi)
+		Lv2 - Drain Tile (2 emi)
+		Lv3 - 
+
+	Blessings
+		Lv1 - 
+
+
+	Land
+		Could do 
+
+
+
+
+Change
+	Life
+
+
+	Land
+
+
+	Law
+		Gravity? No. Boundaries? What game rules could I change? Number of turns?
+
+
+
+
+	And what kind of powers do I restrict to Meddler creation?
+
+
+
+
+
+
+
+
+
+npcs.affinities = {
+	'Bright'	--0,4,0
+		Eternal Sunlight
+
+	,'Free'		--1,3,0
+
+
+	,'Weary'	--2,2,0
+	,'Feared'	--3,1,0
+	,'Dark'		--4,0,0
+	,'Tortured'	--3,0,1
+	,'Mad'		--2,0,2
+	,'Cosmic'	--1,0,3
+	,'Unknowable'--0,0,4
+	,'Old'		--0,1,3
+	,'Primal'	--0,2,2
+	,'Benevolent'--0,3,1
+	,'Grey'		--1,2,1
+	,'Chained'	--2,1,1
+	,'Knowing'	--1,1,2
+}

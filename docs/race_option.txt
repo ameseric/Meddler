@@ -1,6 +1,9 @@
 
 base - desc - desc
 
+The aesthetic of a race's buildings is determined by the culture choice and by the Meddler's affinity.
+
+
 physical
 	base covering
 		skin - no cost , no benefits
@@ -55,16 +58,17 @@ physical
 
 
 
-mental (pick 1)
-	zealous
-	relaxed
-	greedy
-	empathetic
+mental (pick 1) (Affects Order , Boldness , Industry , and Reproduction )
+	zealous		-	+100% Boldness
+	relaxed		-	-50% Industry , +150% Reproduction Rate
+	greedy		-	+1 to resource rate
+	focused		-	-50% Reproduction Rate , +150% Industry
+	pious		-	Order +200% , -50% Boldness
 
 
 culture (pick 2)
-	sacrificial
-	caste
+	sacrificial		-	increases eminence gained from Take-Life, and halves Order penalty
+	caste			-	
 	scholars
 	undead
 	travelers
