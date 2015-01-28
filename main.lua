@@ -12,14 +12,18 @@
 	TS = 32
 	disp = {}
 
-	local img_dir = "images/"
+	local img_dir , sound_dir = "images/" , "sounds/"
 	local world_width , world_height = 100 , 100
 	local scale = 2
 	local setting_game_options , loading_game , name_entered , first_confirmation , second_confirmation , temp_str
 	local txt_input , reading_keys = "" , false
-	local player_turn = false
 	local turn_count = 0
-	local npc_list = {}
+	local npc_list , sounds = {} , {}
+	local player = nil
+
+	player_turn = false
+
+	top_layer , give_tree , take_tree , alter_tree = true , false , false , false --be careful, global state flags!
 
 	package.path = package.path .. ';Meddler/submodules/?.lua' .. ';Meddler/loader_modules/?.lua'
 
@@ -27,25 +31,10 @@
 
 --========== Core Love Functions ===============
 
-function love.load()							--initial values and files to load for gameplay
 
-	setup_flags()
 
-	load_libraries()
-	disp:setup( scale )
-	load_images()
-	standard_setup() --includes world creation and font settings
-
-	if loading_game then
-		--load_game()
-	else
-		set_new_game() --this includes world gen, which will have to be moved for player
-						--setup options later...
-	end
-
-end
 --=== Helpers =====
-	function load_libraries()
+	local function load_libraries()
 		rules = require 'tile_rules';	--race_rules = require 'race_rules'
 		genesis = require "genesis";	meddler = require "meddler"
 		atlas 	= require "atlas";		--race = require 'race'
@@ -53,24 +42,35 @@ end
 		disp 	= require "display"
 	end
 
-	function load_images()
-		local natural_tiles = love.graphics.newImage( img_dir.."natural_tiles.png" )
-		natural_tiles:setFilter( 'nearest' )
-		atlas:set_batch( natural_tiles , (disp.tile_height+2) * (disp.tile_width+2) ) --extra 2 for buffer to show partial tiles
+	--==== Helpers ======
+		local function load_images()
+			local natural_tiles = love.graphics.newImage( img_dir.."natural_tiles.png" )
+			natural_tiles:setFilter( 'nearest' )
+			atlas:set_batch( natural_tiles , (disp.tile_height+2) * (disp.tile_width+2) ) --extra 2 for buffer to show partial tiles
 
-		local gui_image = love.graphics.newImage( img_dir.."main_gui.png" )
-		gui_image:setFilter( 'nearest' )
-		display:setup_gui( gui_image , natural_tiles )
-	end
+			local gui_image = love.graphics.newImage( img_dir.."main_gui.png" )
+			gui_image:setFilter( 'nearest' )
+			display:setup_gui( gui_image , natural_tiles )
+		end
 
-	function standard_setup()
+		local function load_sounds()
+			sounds.bgm = love.audio.newSource( sound_dir.."rolling_hills.mp3" , "stream" )
+		end
+	local function setup_environment()
+
+		load_images()
+		load_sounds()
+
 		--Random Settings (global fonts )
-		font_large = love.graphics.setNewFont( 22 )
-		font_med = love.graphics.setNewFont( 18 )
+		font_title = love.graphics.setNewFont( 32 )
+		font_large = love.graphics.setNewFont( 26 )
+		font_med = love.graphics.setNewFont( 22 )
+		font_small = love.graphics.setNewFont( 18 )
 		love.keyboard.setKeyRepeat( true )
 	end
 
-	function set_new_game()
+
+	local function set_new_game()
 		setting_game_options = true
 		reading_keys = true
 
@@ -88,7 +88,7 @@ end
 		end
 	end
 
-	function setup_flags()
+	local function setup_flags()
 		for i , v in ipairs( arg ) do
 			if v == '-d' or '--debug' then _debug = true
 			elseif v == '-ng' or '--newgame' then print("Not implemented!")
@@ -96,24 +96,25 @@ end
 		end
 	end
 
+function love.load()							--initial values and files to load for gameplay
+	setup_flags()
+	load_libraries()
+	disp:setup( scale )
+	setup_environment() --load images , sounds , and fonts
 
-
-
-function love.draw()
-	if setting_game_options then
-		draw_player_options()
-
+	if loading_game then
+		--load_game()
 	else
-		atlas:draw( scale )
-		display:draw_gui( scale )
-		if _debug then debug_GUI() end
-		lprint( "Turn: "..turn_count , disp.pix_width - (disp.pix_width/10) , 50 )
+		set_new_game() --this includes world gen, which will have to be moved for player
+						--setup options later...
 	end
 end
+
+
+
 --==== Helpers =======
-	function draw_player_options( option )
-		
-		set_color( 'grey' )
+	function draw_player_options()
+		set_color( 'l_grey' )
 
 		if not name_entered then
 			if first_confirmation and not second_confirmation then
@@ -126,11 +127,67 @@ end
 
 		set_color( 'white' )
 	end
+function love.draw()
+	if setting_game_options then
+		draw_player_options()
+
+	else
+		atlas:draw( scale )
+		display:draw_gui( scale )
+		if _debug then debug_GUI() end
+		lprint( "Turn: "..turn_count , disp.pix_width - (disp.pix_width/10) , 50 )
+	end
+end
 
 
 
 
 
+--=== Helpers =====
+	local function update_setup_flags()
+		if second_confirmation then
+			first_confirmation = false; second_confirmation = false
+			name_entered = true
+			print( temp_str )
+		end
+
+		if name_entered then --and other stuff, later
+			setting_game_options = false
+			reading_keys = false
+			just_started_game = true
+			player_turn = true
+			player = meddler:new( true , temp_str )
+		end
+	end--[[
+	function player_turn()
+		--list_options
+		--get_input
+		--resolve_actions
+		
+	end--]]
+	local function npcs_turn()
+		for k,v in pairs( npc_list ) do
+			print( v.name )
+		end
+	end
+	--==== Helpers ====
+			local function natural_events()
+				for i,row in ipairs( atlas.world ) do
+					for j,tile in ipairs( row ) do
+						tile:time_passes()
+					end
+				end
+			end
+	---------------------
+	local function time_passes()
+		--races_turn_by_ini()
+		natural_events()
+	end
+
+	local function update_turn_stats()
+		turn_count = turn_count + 1
+	end
+-----------------------
 function love.update( dt )
 
 
@@ -138,9 +195,14 @@ function love.update( dt )
 		update_setup_flags()
 
 	else
+		if just_started_game then
+			love.audio.play( sounds.bgm )
+			just_started_game = false
+		end
+
 		local build = disp:move()
 		if not player_turn then
-			npcs_turn()
+			--npcs_turn()
 			time_passes()
 			update_turn_stats()
 			player_turn = true
@@ -152,47 +214,6 @@ function love.update( dt )
 
 	end
 end
---=== Helpers =====
-	function update_setup_flags()
-		if second_confirmation then
-			first_confirmation = false; second_confirmation = false
-			name_entered = true
-			print( temp_str )
-		end
-
-		if name_entered then --and other stuff, later
-			setting_game_options = false;
-			reading_keys = false
-			player_turn = true
-		end
-	end--[[
-	function player_turn()
-		--list_options
-		--get_input
-		--resolve_actions
-		
-	end--]]
-	function npcs_turn()
-		for k,v in pairs( npc_list ) do
-			print( v.name )
-		end
-	end
-	function time_passes() --might want to have a seperate object for time passing...
-								--easier to iterate through? Like a manager?
-		--races_turn_by_ini()
-		natural_events()
-	end
-		function natural_events()
-			for i,row in ipairs( atlas.world ) do
-				for j,tile in ipairs( row ) do
-					tile:time_passes()
-				end
-			end
-		end
-
-	function update_turn_stats()
-		turn_count = turn_count + 1
-	end
 
 
 
@@ -200,10 +221,16 @@ end
 
 
 --========= Keyboard and Mouse IO ===============
-function love.keypressed(key, isrepeat) --might actually needs to move subs into seperate 'text processing'
-	if _debug then print( key ) end
-
-	if reading_keys then --for text input
+--=== Helpers ====
+	local function change_scale( num )
+		disp:update_scale( scale , scale + num )
+		scale = scale + num
+		atlas:update_scale()
+	end
+	function love.textinput( t )
+		txt_input = txt_input .. t
+	end
+	local function process_text_keys( key )
 		if key == 'backspace' then
 			txt_input = txt_input:sub( 0 , #txt_input-1 )
 		elseif key == 'return' then
@@ -217,27 +244,81 @@ function love.keypressed(key, isrepeat) --might actually needs to move subs into
 				first_confirmation = false
 				txt_input = temp_str
 			end
+		end	
+	end
+	local function change_tree_flags( t , l )
+		if t == 'g' then
+			give_tree = true
+			alter_tree = false
+			take_tree = false
+			top_layer = false
+		elseif t == 't' then
+			give_tree = false
+			take_tree = true
+			alter_tree = false
+			top_layer = false
+		elseif t == 'a' then
+			give_tree = false
+			take_tree = false
+			alter_tree = true
+			top_layer = false
+		elseif t == 'back' then
+			give_tree =  false
+			take_tree = false
+			alter_tree = false
+			top_layer = true
 		end
+	end
+	local function end_player_turn()
+		player_turn = false
+		change_tree_flags( 'back' )
+	end
 
-	else --for game controls
+function love.keypressed(key, isrepeat) --might actually needs to move subs into seperate 'text processing'
+	if _debug then print( key ) end
+
+	if reading_keys then --for text input
+		process_text_keys( key )
+
+	elseif player_turn then
 		if key == '-' and scale > 1 then
 			change_scale( scale * -0.5 )
 		elseif key == '=' and scale < 4 then
 			change_scale( scale )
+
 		elseif key == 'return' and player_turn then
 			player_turn = false
+		elseif top_layer then
+			change_tree_flags( key )
+		elseif (give_tree or take_tree or alter_tree) then
+			if (key == 'n' or key == 'esc' or key == 'backspace') then
+				change_tree_flags( 'back' )
+			elseif give_tree then
+				if key == 'l' or key == 'b' then
+					end_player_turn()
+					--if key == 'l' then create_race()
+					--elseif key == 'b' then bless() end
+				end
+			elseif take_tree then
+				if key == 'l' or key == 'b' or key == 'g' then
+					end_player_turn()
+					--if key == 'l' then sacrifice()
+					--elseif key == 'b' then curse()
+					--elseif key == 'g' then take_land() end
+				end
+			elseif alter_tree then
+				if key == 'l' or key == 'g' or key == 'a' then
+					end_player_turn()
+					--if key == 'l' then change_life()
+					--elseif key == 'g' then change_land()
+					--elseif key == 'a' then change_law()
+					--end
+				end
+			end
 		end
 	end	
 end
---=== Helpers ====
-	function change_scale( num )
-		disp:update_scale( scale , scale + num )
-		scale = scale + num
-		atlas:update_scale()
-	end
-	function love.textinput( t )
-		txt_input = txt_input .. t
-	end
+
 
 function love.mousepressed( x , y , button )
 		
@@ -296,8 +377,10 @@ end
 			love.graphics.setColor( 255 , 0 , 0 , G )
 		elseif R == 'blue' then
 			love.graphics.setColor( 0 , 150 , 230 , G )
-		elseif R == 'grey' then
+		elseif R == 'l_grey' then
 			love.graphics.setColor( 200 , 200 , 200 , G )
+		elseif R == 'grey' then
+			love.graphics.setColor( 80 , 80 , 80 , G )
 		else
 			love.graphics.setColor( R , G , B , A )
 		end

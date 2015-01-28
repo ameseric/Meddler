@@ -4,14 +4,17 @@
 
 race = {
 	name = "Precursor"
-	,life = 0
+	,Life = 0
 	,upper_limb = 0
 	,torso = 0
 	,mind = 0
 	,head = 0
 	,lower_limb = 0
 	---------------
-	,
+	,Order = 100
+	,Culture = ''
+	,Mental = ''
+	
 }
 
 

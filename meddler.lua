@@ -6,12 +6,21 @@ wrapper = require 'npcs'
 npcs = wrapper.meddlers
 affs = wrapper.affinities
 
-meddler = {
+local meddler = {
 	name = "Nihil"
+	,eminence = 100
 }
 
 
 
+--===== Helpers =======
+	local function load_npc_meddler( new_meddler )
+		local int = math.random( 1 , #npcs )
+		local npc = npcs[ int ]
+		for type , data in pairs( npc ) do
+			new_meddler[ type ] = data
+		end
+	end
 
 function meddler:new( is_player , name )
 	new_meddler = {}
@@ -19,6 +28,7 @@ function meddler:new( is_player , name )
 	self.__index = self
 
 	new_meddler.is_player = is_player
+	new_meddler.affs = { give=1 , take=1 , change=1 }
 
 	if not is_player then
 		load_npc_meddler( new_meddler )
@@ -28,14 +38,7 @@ function meddler:new( is_player , name )
 
 	return new_meddler
 end
---====== Helpers ======
-	function load_npc_meddler( new_meddler )
-		local int = math.random( 1 , #npcs )
-		local npc = npcs[ int ]
-		for type , data in pairs( npc ) do
-			new_meddler[ type ] = data
-		end
-	end
+
 
 
 

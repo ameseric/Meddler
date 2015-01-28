@@ -19,11 +19,10 @@
 
 display = {
 	x_pix_pos = 0
-	,y_pix_pos = 0	
+	,y_pix_pos = 0
 }
 
-gui = require "gui"
-
+local gui = require 'gui'
 
 
 --===== Main Functions =======
