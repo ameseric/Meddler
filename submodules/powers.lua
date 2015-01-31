@@ -5,7 +5,81 @@
 ]]
 
 
-powers = {
+local function Bless( tile )
+	if not tile then
+		dialogue( "Cannot bless. No tile selected." )
+	else
+		tile.rate = math.ceil( tile.rate * 1.5 )
+		tile.timer = 4
+	end
+end
+
+local function create_race()
+	print( "Creating race..." )
+	creating_race = true
+end
+
+
+local function Sacrifice( tile , meddler )
+	if not tile then
+		dialogue( "Cannot sacrifice. No unit selected." )
+	else
+		local unit = tile:get_resident()
+		if not unit then
+			dialogue( "Cannot sacrifice. No unit selected.")
+		else
+			tile:set_ocpied()
+			meddler:change_emi( 5 )
+		end
+	end
+end
+
+
+local function Curse( tile )
+	if not tile then
+		dialogue( "Cannot curse. No tile selected.")
+	else
+		tile.rate = 0
+		tile.timer = 4
+	end
+end
+
+local function Change_land( tile )
+	--stuff
+end
+
+
+
+
+powers = {}
+
+function powers:resolve( key , tile , meddler )
+	local is_player_done = false
+
+	if give_tree then
+		if key == 'l' or key == 'b' then
+			is_player_done = true
+			if key == 'l' then create_race()
+			elseif key == 'b' then Bless( tile ) end
+		end
+	elseif take_tree then
+		if key == 'l' or key == 'b' or key == 'g' then
+			is_player_done = true
+			if key == 'l' then Sacrifice( tile , meddler )
+			elseif key == 'b' then Curse( tile )
+			end--elseif key == 'g' then take_land() end
+		end
+	elseif alter_tree then
+		if key == 'l' or key == 'g' or key == 'a' then
+			is_player_done = true
+			--if key == 'l' then change_life()
+			--if key == 'g' then Change_land() end
+			--elseif key == 'a' then change_law()
+			--end
+		end
+	end
+	return is_player_done
+end
 
 
 --[[
@@ -25,33 +99,6 @@ powers = {
 	,'Chained'	--2,1,1
 	,'Knowing'	--1,1,2
 	]]
-
---=== Basic Powers, available to all Meddlers at start of game =======
-
-	Bless = function bless( tile )
-				tile.output_rate = tile.output_rate * 2
-			end
-
-	,Blast = function blast( tile )
-				tile.type = 'scorched'
-				local target = tile:get_resident()
-				if target then
-					target:damage( 50 )
-				end
-			end
-
-	,Raise = function raise( tile )
-				if tile.type == 'water' then
-					tile.type == 'plain'
-				elseif tile.type == 'plain' or tile.type == 'forest' then
-					tile.type == 'mountain'
-				end
-			end
-
-	
-
-
-
 
 
 
@@ -95,9 +142,6 @@ function powers.inf( cost , med )
 	med.influence = med.influence - cost
 end
 --]]
-
-
-}
 
 
 return powers

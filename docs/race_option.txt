@@ -58,19 +58,22 @@ physical
 
 
 
-mental (pick 1) (Affects Order , Boldness , Industry , and Reproduction )
+mental (pick 1) (Affects Order , Boldness , Industry , and Reproduction ) Race attributes that affect expansion and collection, autnomous functions.
 	zealous		-	+100% Boldness
 	relaxed		-	-50% Industry , +150% Reproduction Rate
-	greedy		-	+1 to resource rate
+	greedy		-	+1 to resource rate, -25% upkeep?
 	focused		-	-50% Reproduction Rate , +150% Industry
 	pious		-	Order +200% , -50% Boldness
+	reserved	-	Upkeep -50%
 
 
-culture (pick 2)
-	sacrificial		-	increases eminence gained from Take-Life, and halves Order penalty
-	caste			-	
-	scholars
-	undead
-	travelers
-	militant
+culture (pick 1) Race attributes that affect Meddler interactions and unit stats
+	sacrificial		-	increases eminence gained from Take-Life, and halves Order penalty for Take-Life (only)
+	caste			-	All Order penalties halved
+	scholars		-	upgrades cheaper? Or buildings cheaper...
+	undead			-	Take-Life does nothing, but 25% chance to ignore wounds per engagement
+	nomadic			-	All buildings are able to move.
+	militant		-	10% military stat increase, Heavy units available at Towns.
+
+
 

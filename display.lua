@@ -44,18 +44,25 @@ local gui = require 'gui'
 	function display:move() --later, add velocity factor. Further over the cursor, faster movement. 1/2/3/4/5
 		local x , y = love.mouse.getPosition()
 		local step = 4
+		local move_reduction = 4
 		local old_x , old_y = self.x_pix_pos , self.y_pix_pos
 
-		if x > (self.pix_width / 6)*5 then
-			self.x_pix_pos = self.x_pix_pos + step
-		elseif x < (self.pix_width / 6) then
-			self.x_pix_pos = self.x_pix_pos - step
-		end
 
-		if y > (self.pix_height / 5)*4 then
-			self.y_pix_pos = self.y_pix_pos + step
-		elseif y < (self.pix_height / 5) then
-			self.y_pix_pos = self.y_pix_pos - step
+		if pressed_y or pressed_x then
+			if pressed_x then self.x_pix_pos = self.x_pix_pos + (( x - pressed_x )/move_reduction ) end
+			if pressed_y then self.y_pix_pos = self.y_pix_pos + (( y - pressed_y )/move_reduction ) end
+		else
+			if x > (self.pix_width / 6)*5 then
+				self.x_pix_pos = self.x_pix_pos + step
+			elseif x < (self.pix_width / 6) then
+				self.x_pix_pos = self.x_pix_pos - step
+			end
+
+			if y > (self.pix_height / 5)*4 then
+				self.y_pix_pos = self.y_pix_pos + step
+			elseif y < (self.pix_height / 5) then
+				self.y_pix_pos = self.y_pix_pos - step
+			end
 		end
 
 		self:in_bounds()
@@ -99,12 +106,16 @@ local gui = require 'gui'
 		gui:setup( gui_main , tileset , self.pix_width , self.pix_height )
 	end
 
-	function display:draw_gui( scale )
-		gui:draw( scale )
+	function display:draw_gui( scale , player )
+		gui:draw( scale , nil , player.name , player.eminence )
 	end
 
 	function display:gui_select( tile , x , y )
 		gui:select( tile , x , y )
+	end
+
+	function display:gui_dialogue( text )
+		gui:add_dialogue( text )
 	end
 
 

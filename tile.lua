@@ -8,6 +8,7 @@ local tile = {
 	holds = nil
 	,is_passable = false
 	,type = "nope"
+	,timer = -1
 }
 
 
@@ -27,11 +28,11 @@ function tile:new( type )
 end
 
 
-function tile:set_ocpied( npc, clear )
-	if clear then
-		self.holds = nil
-	else
+function tile:set_ocpied( npc )
+	if npc then
 		self.holds = npc
+	else
+		self.holds = nil
 	end
 		
 end

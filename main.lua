@@ -1,4 +1,4 @@
- 
+
 --[[
 	Author: Eric Ames
 	Created: December 8th, 2014
@@ -17,13 +17,16 @@
 	local scale = 2
 	local setting_game_options , loading_game , name_entered , first_confirmation , second_confirmation , temp_str
 	local txt_input , reading_keys = "" , false
-	local turn_count = 0
 	local npc_list , sounds = {} , {}
 	local player = nil
+	local selected_tile = nil
 
 	player_turn = false
 
 	top_layer , give_tree , take_tree , alter_tree = true , false , false , false --be careful, global state flags!
+	choices = true
+	creating_race = false
+	turn_count = 0
 
 	package.path = package.path .. ';Meddler/submodules/?.lua' .. ';Meddler/loader_modules/?.lua'
 
@@ -38,7 +41,7 @@
 		rules = require 'tile_rules';	--race_rules = require 'race_rules'
 		genesis = require "genesis";	meddler = require "meddler"
 		atlas 	= require "atlas";		--race = require 'race'
-		tiles 	= require "tile";
+		tiles 	= require "tile";		powers = require "powers"
 		disp 	= require "display"
 	end
 
@@ -132,10 +135,11 @@ function love.draw()
 		draw_player_options()
 
 	else
+		set_color( 'white' );
 		atlas:draw( scale )
-		display:draw_gui( scale )
+		display:draw_gui( scale , player )
 		if _debug then debug_GUI() end
-		lprint( "Turn: "..turn_count , disp.pix_width - (disp.pix_width/10) , 50 )
+		--lprint( "Turn: "..turn_count , disp.pix_width - (disp.pix_width/10) , 50 )
 	end
 end
 
@@ -157,6 +161,7 @@ end
 			just_started_game = true
 			player_turn = true
 			player = meddler:new( true , temp_str )
+			print( player.name )
 		end
 	end--[[
 	function player_turn()
@@ -189,8 +194,6 @@ end
 	end
 -----------------------
 function love.update( dt )
-
-
 	if setting_game_options then
 		update_setup_flags()
 
@@ -201,6 +204,7 @@ function love.update( dt )
 		end
 
 		local build = disp:move()
+
 		if not player_turn then
 			--npcs_turn()
 			time_passes()
@@ -208,6 +212,7 @@ function love.update( dt )
 			player_turn = true
 			build = true
 		end
+
 		if build then
 			atlas:build_batch()
 		end
@@ -276,15 +281,21 @@ end
 
 function love.keypressed(key, isrepeat) --might actually needs to move subs into seperate 'text processing'
 	if _debug then print( key ) end
+	local is_player_done = false
 
 	if reading_keys then --for text input
 		process_text_keys( key )
 
 	elseif player_turn then
+
+
 		if key == '-' and scale > 1 then
 			change_scale( scale * -0.5 )
 		elseif key == '=' and scale < 4 then
 			change_scale( scale )
+
+		elseif key == 'p' then
+			choices = not choices
 
 		elseif key == 'return' and player_turn then
 			player_turn = false
@@ -293,45 +304,50 @@ function love.keypressed(key, isrepeat) --might actually needs to move subs into
 		elseif (give_tree or take_tree or alter_tree) then
 			if (key == 'n' or key == 'esc' or key == 'backspace') then
 				change_tree_flags( 'back' )
-			elseif give_tree then
-				if key == 'l' or key == 'b' then
-					end_player_turn()
-					--if key == 'l' then create_race()
-					--elseif key == 'b' then bless() end
-				end
-			elseif take_tree then
-				if key == 'l' or key == 'b' or key == 'g' then
-					end_player_turn()
-					--if key == 'l' then sacrifice()
-					--elseif key == 'b' then curse()
-					--elseif key == 'g' then take_land() end
-				end
-			elseif alter_tree then
-				if key == 'l' or key == 'g' or key == 'a' then
-					end_player_turn()
-					--if key == 'l' then change_life()
-					--elseif key == 'g' then change_land()
-					--elseif key == 'a' then change_law()
-					--end
-				end
+			else
+				is_player_done = powers:resolve( key , selected_tile , player )
 			end
 		end
+
+
+
+		if is_player_done then
+			end_player_turn()
+		end
+
 	end	
 end
 
 
 function love.mousepressed( x , y , button )
-		
+	pressed_x = x; 	pressed_y = y --used for calculating display movement off of mouse press / distance
+
+	if creating_race then
+		pressed_x = nil; pressed_y = nil;
+
+
+
+	end
+
+
+end
+
+function love.mousereleased( x , y , button )
+	pressed_x = nil; pressed_y = nil;
+
 	if is_button then
 		--stuff
 	else
 		local tile , x , y = atlas:get_tile( x , y , 'translate' )
 		disp:gui_select( tile , ttp(x) , ttp(y)  )
-	end
-end
 
-function love.mousereleased( x , y , button )
-	
+		if tile == selected_tile then
+			selected_tile = nil
+		else
+			selected_tile = tile
+		end
+
+	end
 end
 
 
@@ -341,7 +357,7 @@ end
 
 --========== Utility Functions ================
 	function debug_GUI()
-		lprint("FPS: "..love.timer.getFPS(), 10, 20)
+		lprint("FPS: "..love.timer.getFPS(), 500, 20)
 	end
 
 	function tile_to_pixel( unit ) 
@@ -360,7 +376,9 @@ end
 		return pixel_to_tile( unit )
 	end
 
-
+	function dialogue( text )
+		disp:gui_dialogue( text )
+	end
 
 
 --========= Love Wrapper Functions ===================

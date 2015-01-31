@@ -4,7 +4,7 @@
 
 race = {
 	name = "Precursor"
-	,Life = 0
+	,life = 0
 	,upper_limb = 0
 	,torso = 0
 	,mind = 0

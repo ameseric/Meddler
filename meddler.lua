@@ -40,6 +40,9 @@ function meddler:new( is_player , name )
 end
 
 
+function meddler:change_emi( value )
+	self.eminence = self.eminence + value
+end
 
 
 

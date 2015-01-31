@@ -10,6 +10,8 @@ Global Parameters
 	Boldness		-	Determines aggressiveness of race- willingness to battle, speed of expansion.
 	Industry		-	Determines structure build speed. 1 -> 5 (8)
 	Reproduction	-	Determines unit build speed. 1 -> 5 (8)
+	Upkeep			-	Determines resource amount needed every turn to keep village/town/city working.
+							Generally 5 food / 2 stone / 2 wood per turn?
 
 
 
