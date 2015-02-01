@@ -161,10 +161,13 @@ function gui:draw_race_creation()
 		--other stuff
 	elseif creating_race_name then
 		--stuff
+	elseif creating_race_phys then
+		--stuff
+	elseif creating_race_mental then
+		--stuff
+	elseif creating_race_cultural then
+		--final stuff
 	end
-
-
-
 end
 
 
