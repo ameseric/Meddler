@@ -28,9 +28,11 @@ local gui = require 'gui'
 --===== Main Functions =======
 	function display:setup( scale )
 		local width , height = love.window.getDesktopDimensions()
+		print(width , height )
 
-		width = math.floor( (width / ( TS * scale ))*0.75)
-		height = math.floor( (height / ( TS * scale ))*0.75)
+		width = math.floor( (width / ( TS * scale ))* window_factor )
+		height = math.floor( (height / ( TS * scale )) * window_factor )
+		print( width , height )
 
 		self.tile_width = width
 		self.pix_width = tile_to_pixel( width )
@@ -49,8 +51,8 @@ local gui = require 'gui'
 
 
 		if pressed_y or pressed_x then
-			if pressed_x then self.x_pix_pos = self.x_pix_pos + (( x - pressed_x )/move_reduction ) end
-			if pressed_y then self.y_pix_pos = self.y_pix_pos + (( y - pressed_y )/move_reduction ) end
+			if pressed_x then self.x_pix_pos = self.x_pix_pos + math.floor(( x - pressed_x )/move_reduction ) end
+			if pressed_y then self.y_pix_pos = self.y_pix_pos + math.floor(( y - pressed_y )/move_reduction ) end
 		else
 			if x > (self.pix_width / 6)*5 then
 				self.x_pix_pos = self.x_pix_pos + step
@@ -63,7 +65,9 @@ local gui = require 'gui'
 			elseif y < (self.pix_height / 5) then
 				self.y_pix_pos = self.y_pix_pos - step
 			end
+
 		end
+
 
 		self:in_bounds()
 		return ( old_x - self.x_pix_pos ~= 0 ) or ( old_y - self.y_pix_pos ~= 0 ) --see whether to build spritebatch or not
@@ -106,8 +110,8 @@ local gui = require 'gui'
 		gui:setup( gui_main , tileset , self.pix_width , self.pix_height )
 	end
 
-	function display:draw_gui( scale , player )
-		gui:draw( scale , nil , player.name , player.eminence )
+	function display:draw_gui( scale , player , race_being_created )
+		gui:draw( scale , nil , player.name , player.eminence , race_being_created )
 	end
 
 	function display:gui_select( tile , x , y )
@@ -116,6 +120,10 @@ local gui = require 'gui'
 
 	function display:gui_dialogue( text )
 		gui:add_dialogue( text )
+	end
+
+	function display:check_gui_buttons( x , y , button )
+		gui:race_selection( x , y , button )
 	end
 
 

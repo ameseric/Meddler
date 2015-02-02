@@ -17,7 +17,7 @@ function gui:setup( gui_image , tileset , width , height )
 	self.x_draw_point = width/8  --(width/4)
 	self.y_draw_point = ((height/12) * 9)
 	
-	self.y_margin = (disp.pix_height - gui.y_draw_point) * 0.05
+	self.margin = (disp.pix_height - gui.y_draw_point) * 0.05
 
 	self.x_tile_info = 	self.x_draw_point + self.x_draw_point * 0.4
 	self.x_choices = 	self.x_draw_point * 3.75
@@ -43,12 +43,12 @@ end
 												 TS*scale , TS*scale )
 		end
 		local function draw_main_gui_text( x )
-			lprint( gui.tile.type , x , gui.y_draw_point + gui.y_margin * 10 )
-			lprint( gui.tile.move_cost .. " move cost" , x , gui.y_draw_point + gui.y_margin * 12 )
-			lprint( "+"..gui.tile.rate.." "..gui.tile.resource , x , gui.y_draw_point + gui.y_margin * 14 )
+			lprint( gui.tile.type , x , gui.y_draw_point + gui.margin * 10 )
+			lprint( gui.tile.move_cost .. " move cost" , x , gui.y_draw_point + gui.margin * 12 )
+			lprint( "+"..gui.tile.rate.." "..gui.tile.resource , x , gui.y_draw_point + gui.margin * 14 )
 		end
 	local function draw_tile_info( scale )
-		draw_tile_img_in_gui( gui.x_tile_info , gui.y_draw_point + gui.y_margin*4 )
+		draw_tile_img_in_gui( gui.x_tile_info , gui.y_draw_point + gui.margin*4 )
 		draw_tile_select( scale )
 
 		set_color( 'black' ); set_font( font_med )
@@ -57,14 +57,14 @@ end
 
 	local function draw_dialogue()
 		set_color( 255 , 255 , 255 , 100 )
-		--love.graphics.rectangle( 'fill' , 0 , gui.y_margin*6 , gui.x_draw_point*1.5 , gui.y_draw_point*0.5 )
+		--love.graphics.rectangle( 'fill' , 0 , gui.margin*6 , gui.x_draw_point*1.5 , gui.y_draw_point*0.5 )
 
 		set_color( 'white' ); set_font( font_small );
 		local size = #gui.message_log
 		for i=1,9 do
 			local message = gui.message_log[ i ]
 			if message then
-				lprint( gui.message_log[ size-i+1 ] , 20 , (gui.y_margin*6)+(40 * i) )
+				lprint( gui.message_log[ size-i+1 ] , 20 , (gui.margin*6)+(40 * i) )
 			end
 		end
 	end
@@ -93,38 +93,38 @@ end
 		end
 
 		set_font( font_title ); set_color( "black" );
-		--lprint( text , gui.x_choices , gui.y_draw_point + gui.y_margin*4 )
+		--lprint( text , gui.x_choices , gui.y_draw_point + gui.margin*4 )
 		set_color( 'grey' ); set_font( font_large )
 
 		if choices then
-			if top_layer then
-				lprint( 'Give: g' , gui.x_choices , gui.y_draw_point + gui.y_margin*7 )
-				lprint( 'Take: t' , gui.x_choices , gui.y_draw_point + gui.y_margin*10 )
-				lprint( 'Alter: a' , gui.x_choices , gui.y_draw_point + gui.y_margin*13 )
+			if top_layer() then
+				lprint( 'Give: g' , gui.x_choices , gui.y_draw_point + gui.margin*7 )
+				lprint( 'Take: t' , gui.x_choices , gui.y_draw_point + gui.margin*10 )
+				lprint( 'Alter: a' , gui.x_choices , gui.y_draw_point + gui.margin*13 )
 			elseif give_tree then
-				lprint( 'Life: l' , gui.x_choices , gui.y_draw_point + gui.y_margin*7 )
-				lprint( 'Blessing: b' , gui.x_choices , gui.y_draw_point + gui.y_margin*10 )
-				--lprint( 'Alter: a' , gui.x_choices , gui.y_draw_point + gui.y_margin*10 )
+				lprint( 'Life: l' , gui.x_choices , gui.y_draw_point + gui.margin*7 )
+				lprint( 'Blessing: b' , gui.x_choices , gui.y_draw_point + gui.margin*10 )
+				--lprint( 'Alter: a' , gui.x_choices , gui.y_draw_point + gui.margin*10 )
 			elseif take_tree then
-				lprint( 'Life: l' , gui.x_choices , gui.y_draw_point + gui.y_margin*7 )
-				lprint( 'Blessing: b' , gui.x_choices , gui.y_draw_point + gui.y_margin*10 )
-				lprint( 'Land: g' , gui.x_choices , gui.y_draw_point + gui.y_margin*13 )
+				lprint( 'Life: l' , gui.x_choices , gui.y_draw_point + gui.margin*7 )
+				lprint( 'Blessing: b' , gui.x_choices , gui.y_draw_point + gui.margin*10 )
+				lprint( 'Land: g' , gui.x_choices , gui.y_draw_point + gui.margin*13 )
 			elseif alter_tree then
-				lprint( 'Life: l' , gui.x_choices , gui.y_draw_point + gui.y_margin*7 )
-				lprint( 'Land: g' , gui.x_choices , gui.y_draw_point + gui.y_margin*10 )
-				lprint( 'Law: a' , gui.x_choices , gui.y_draw_point + gui.y_margin*13 )
+				lprint( 'Life: l' , gui.x_choices , gui.y_draw_point + gui.margin*7 )
+				lprint( 'Land: g' , gui.x_choices , gui.y_draw_point + gui.margin*10 )
+				lprint( 'Law: a' , gui.x_choices , gui.y_draw_point + gui.margin*13 )
 			end
 		else
 			for i,v in ipairs( list_of_powers ) do
-				lprint( i..") "..v , gui.x_choices , gui.y_draw_point + gui.y_margin*((i*3)+4) )
+				lprint( i..") "..v , gui.x_choices , gui.y_draw_point + gui.margin*((i*3)+4) )
 			end
 		end
 
 		set_color( 'white' ); set_font( font_med )
 	end
 
-function gui:draw( scale , list_of_powers , name , eminence )
-	love.graphics.draw( self.gui_image , self.x_draw_point , self.y_draw_point , 0 , 3 , 2 )
+function gui:draw( scale , list_of_powers , name , eminence , race_being_created )
+	love.graphics.draw( self.gui_image , self.x_draw_point , self.y_draw_point , 0 , 4*window_factor , 2.7*window_factor )
 	set_font( font_med )
 	lprint( "Turn: "..turn_count , 10 , 10 )
 	lprint( "Eminence: "..eminence , 10 , 30 )
@@ -142,23 +142,30 @@ function gui:draw( scale , list_of_powers , name , eminence )
 	end
 
 	if creating_race then
-		self:draw_race_creation()
+		self:draw_race_creation( race_being_created )
 	end
 
 end
 
 
 
-
-
-function gui:draw_race_creation()
-	set_color( 'black' )
+function gui:draw_race_creation( race_being_created )
+	local race = race_being_created
+	set_color( 'grey' )
 	love.graphics.rectangle( 'fill' , self.x_create_life , 30 , self.x_create_life , self.y_create_life )
 	set_color( 'white' )
 
 	if creating_race_top_level then
-		lprint( "Race Selection" , self.x_create_life+20 , 30 + 20 )
-		--other stuff
+		local x = self.x_create_life + self.margin
+		local y = self.y_create_life / 7
+
+		lprint( "New Race Creation" , x + (x/3) , y*1 )
+
+		lprint( "1) Name" , x , y*2 );						lprint( race.name , x + (x/1.5) , y*2 )
+		lprint( "2) Physical Characteristics" , x , y*3 );	--lprint( race.)
+		lprint( "3) Mental Characteristics" , x , y*4 );	lprint( race.mental , x + (x/1.5) , y*4 )
+		lprint( "4) Cultural Aspect" , x , y*5 );			lprint( race.culture , x+(x/1.5) , y*5 )
+
 	elseif creating_race_name then
 		--stuff
 	elseif creating_race_phys then
@@ -171,6 +178,8 @@ function gui:draw_race_creation()
 end
 
 
+function gui:race_selection( x , y , button )
+end
 
 
 function gui:add_dialogue( text )

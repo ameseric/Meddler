@@ -10,6 +10,7 @@
 
 --===== Globals =========
 	TS = 32
+	window_factor = 0.75
 	disp = {}
 
 	local img_dir , sound_dir = "images/" , "sounds/"
@@ -22,10 +23,11 @@
 	local selected_tile = nil
 
 	player_turn = false
+	race_being_created = {}
 
-	top_layer , give_tree , take_tree , alter_tree = true , false , false , false --be careful, global state flags!
+	give_tree , take_tree , alter_tree = false , false , false --be careful, global state flags!
 	choices = true
-	creating_race = false
+	creating_race , creating_race_top_level , creating_race_name , creating_race_mental , creating_race_cultural = false , false , false , false , false
 	turn_count = 0
 
 	package.path = package.path .. ';Meddler/submodules/?.lua' .. ';Meddler/loader_modules/?.lua'
@@ -137,13 +139,11 @@ function love.draw()
 	else
 		set_color( 'white' );
 		atlas:draw( scale )
-		display:draw_gui( scale , player )
+		--display:draw_gui( scale , player , race_being_created )
 		if _debug then debug_GUI() end
 		--lprint( "Turn: "..turn_count , disp.pix_width - (disp.pix_width/10) , 50 )
 	end
 end
-
-
 
 
 
@@ -163,13 +163,7 @@ end
 			player = meddler:new( true , temp_str )
 			print( player.name )
 		end
-	end--[[
-	function player_turn()
-		--list_options
-		--get_input
-		--resolve_actions
-		
-	end--]]
+	end
 	local function npcs_turn()
 		for k,v in pairs( npc_list ) do
 			print( v.name )
@@ -226,133 +220,133 @@ end
 
 
 --========= Keyboard and Mouse IO ===============
---=== Helpers ====
-	local function change_scale( num )
-		disp:update_scale( scale , scale + num )
-		scale = scale + num
-		atlas:update_scale()
-	end
-	function love.textinput( t )
-		txt_input = txt_input .. t
-	end
-	local function process_text_keys( key )
-		if key == 'backspace' then
-			txt_input = txt_input:sub( 0 , #txt_input-1 )
-		elseif key == 'return' then
-			first_confirmation = true
-			temp_str = txt_input
-			txt_input = ""
-		elseif first_confirmation then
-			if key == 'y' then
-				second_confirmation = true
-			elseif key == 'n' then
-				first_confirmation = false
-				txt_input = temp_str
+	--=== Helpers ====
+		local function change_scale( num )
+			disp:update_scale( scale , scale + num )
+			scale = scale + num
+			atlas:update_scale()
+		end
+		function love.textinput( t )
+			txt_input = txt_input .. t
+		end
+		local function process_text_keys( key )
+			if key == 'backspace' then
+				txt_input = txt_input:sub( 0 , #txt_input-1 )
+			elseif key == 'return' then
+				first_confirmation = true
+				temp_str = txt_input
+				txt_input = ""
+			elseif first_confirmation then
+				if key == 'y' then
+					second_confirmation = true
+				elseif key == 'n' then
+					first_confirmation = false
+					txt_input = temp_str
+				end
+			end	
+		end
+
+	function love.keypressed( key , isrepeat ) --might actually needs to move subs into seperate 'text processing'
+		if _debug then print( key ) end
+		local is_player_done = false
+
+		if reading_keys then --for text input
+			process_text_keys( key )
+
+		elseif player_turn then
+
+
+			if key == '-' and scale > 1 then
+				change_scale( scale * -0.5 )
+			elseif key == '=' and scale < 4 then
+				change_scale( scale )
+
+			elseif key == 'p' then
+				choices = not choices
+
+			elseif top_layer() then
+				change_tree_flags( key )
+			elseif not top_layer() then
+				if (key == 'n' or key == 'esc' or key == 'backspace') then
+					change_tree_flags( 'back' )
+				else
+					is_player_done = powers:resolve( key , selected_tile , player )
+				end
 			end
+
+
+
+			if is_player_done then
+				end_player_turn()
+			end
+
 		end	
 	end
-	local function change_tree_flags( t , l )
+
+
+	function love.mousepressed( x , y , button )
+		pressed_x = x; 	pressed_y = y --used for calculating display movement off of mouse press / distance
+
+		if creating_race then
+			pressed_x = nil; pressed_y = nil;
+
+			disp:check_gui_buttons( x , y , button )
+
+		end
+
+
+	end
+
+	function love.mousereleased( x , y , button )
+		pressed_x = nil; pressed_y = nil;
+
+		if is_button then
+			--stuff
+		else
+			local tile , x , y = atlas:get_tile( x , y , 'translate' )
+			disp:gui_select( tile , ttp(x) , ttp(y)  )
+
+			if tile == selected_tile then
+				selected_tile = nil
+			else
+				selected_tile = tile
+			end
+
+		end
+	end
+
+
+--========== State Flag Functions =============
+	--These need to be global in order for sub-modules to change flags if needed.
+
+	function top_layer()
+		return not give_tree and not alter_tree and not take_tree
+	end
+
+	function change_tree_flags( t , l )
 		if t == 'g' then
 			give_tree = true
 			alter_tree = false
 			take_tree = false
-			top_layer = false
 		elseif t == 't' then
 			give_tree = false
 			take_tree = true
 			alter_tree = false
-			top_layer = false
 		elseif t == 'a' then
 			give_tree = false
 			take_tree = false
 			alter_tree = true
-			top_layer = false
 		elseif t == 'back' then
 			give_tree =  false
 			take_tree = false
 			alter_tree = false
-			top_layer = true
 		end
 	end
-	local function end_player_turn()
+
+	function end_player_turn()
 		player_turn = false
 		change_tree_flags( 'back' )
 	end
-
-function love.keypressed(key, isrepeat) --might actually needs to move subs into seperate 'text processing'
-	if _debug then print( key ) end
-	local is_player_done = false
-
-	if reading_keys then --for text input
-		process_text_keys( key )
-
-	elseif player_turn then
-
-
-		if key == '-' and scale > 1 then
-			change_scale( scale * -0.5 )
-		elseif key == '=' and scale < 4 then
-			change_scale( scale )
-
-		elseif key == 'p' then
-			choices = not choices
-
-		elseif key == 'return' and player_turn then
-			player_turn = false
-		elseif top_layer then
-			change_tree_flags( key )
-		elseif (give_tree or take_tree or alter_tree) then
-			if (key == 'n' or key == 'esc' or key == 'backspace') then
-				change_tree_flags( 'back' )
-			else
-				is_player_done = powers:resolve( key , selected_tile , player )
-			end
-		end
-
-
-
-		if is_player_done then
-			end_player_turn()
-		end
-
-	end	
-end
-
-
-function love.mousepressed( x , y , button )
-	pressed_x = x; 	pressed_y = y --used for calculating display movement off of mouse press / distance
-
-	if creating_race then
-		pressed_x = nil; pressed_y = nil;
-
-
-
-	end
-
-
-end
-
-function love.mousereleased( x , y , button )
-	pressed_x = nil; pressed_y = nil;
-
-	if is_button then
-		--stuff
-	else
-		local tile , x , y = atlas:get_tile( x , y , 'translate' )
-		disp:gui_select( tile , ttp(x) , ttp(y)  )
-
-		if tile == selected_tile then
-			selected_tile = nil
-		else
-			selected_tile = tile
-		end
-
-	end
-end
-
-
-
-
 
 
 --========== Utility Functions ================

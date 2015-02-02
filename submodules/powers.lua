@@ -17,6 +17,8 @@ end
 local function create_race()
 	print( "Creating race..." )
 	creating_race = true
+	creating_race_top_level = true
+	race_being_created = { name = "None" , mental = "None" , culture = "None" }
 end
 
 
