@@ -45,7 +45,7 @@ local gui = require 'gui'
 
 	function display:move() --later, add velocity factor. Further over the cursor, faster movement. 1/2/3/4/5
 		local x , y = love.mouse.getPosition()
-		local step = 4
+		local step = 6
 		local move_reduction = 4
 		local old_x , old_y = self.x_pix_pos , self.y_pix_pos
 
@@ -70,7 +70,7 @@ local gui = require 'gui'
 
 
 		self:in_bounds()
-		return ( old_x - self.x_pix_pos ~= 0 ) or ( old_y - self.y_pix_pos ~= 0 ) --see whether to build spritebatch or not
+		return old_x ~= self.x_pix_pos or old_y ~= self.y_pix_pos
 	end
 	--===== Helpers =======
 		function display:in_bounds()

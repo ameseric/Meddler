@@ -139,7 +139,7 @@ function love.draw()
 	else
 		set_color( 'white' );
 		atlas:draw( scale )
-		--display:draw_gui( scale , player , race_being_created )
+		display:draw_gui( scale , player , race_being_created )
 		if _debug then debug_GUI() end
 		--lprint( "Turn: "..turn_count , disp.pix_width - (disp.pix_width/10) , 50 )
 	end
