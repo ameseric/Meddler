@@ -13,23 +13,32 @@
 	window_factor = 0.75
 	disp = {}
 
-	local img_dir , sound_dir = "images/" , "sounds/"
 	local world_width , world_height = 100 , 100
+	local img_dir , sound_dir , save_dir = "images/" , "sounds/" , "../saves"
 	local scale = 2
-	local setting_game_options , loading_game , name_entered , first_confirmation , second_confirmation , temp_str
-	local txt_input , reading_keys = "" , false
-	local npc_list , sounds = {} , {}
-	local player = nil
-	local selected_tile = nil
 
+
+	--State Flags
 	player_turn = false
-	race_being_created = {}
-
+	in_start_screen , in_game_actual , in_new_game_options = false , false , false
 	give_tree , take_tree , alter_tree = false , false , false --be careful, global state flags!
 	choices = true
 	creating_race , creating_race_top_level , creating_race_name , creating_race_mental , creating_race_cultural = false , false , false , false , false
-	turn_count = 0
+	txt_input , reading_keys = "" , false
 
+	setting_game_options , loading_game , name_entered = false , false , false
+	first_confirmation , second_confirmation , temp_str = false , false , false
+
+
+
+	--World objects
+	race_being_created = {}
+	local selected_tile = nil
+	local player = nil
+	npc_list , sounds = {} , {}
+
+
+	turn_count = 0
 	package.path = package.path .. ';Meddler/submodules/?.lua' .. ';Meddler/loader_modules/?.lua'
 
 
@@ -45,6 +54,11 @@
 		atlas 	= require "atlas";		--race = require 'race'
 		tiles 	= require "tile";		powers = require "powers"
 		disp 	= require "display"
+
+		wrapper = require "game_mode_scripts"
+		start_screen = wrapper.sss;
+		ngo = wrapper.ngo;
+		game_actual = wrapper.ga
 	end
 
 	--==== Helpers ======
@@ -61,39 +75,20 @@
 		local function load_sounds()
 			sounds.bgm = love.audio.newSource( sound_dir.."rolling_hills.mp3" , "stream" )
 		end
-	local function setup_environment()
+	local function load_environment()
 
 		load_images()
 		load_sounds()
 
-		--Random Settings (global fonts )
-		font_title = love.graphics.setNewFont( 32 )
-		font_large = love.graphics.setNewFont( 26 )
-		font_med = love.graphics.setNewFont( 22 )
-		font_small = love.graphics.setNewFont( 18 )
+		font_title = love.graphics.setNewFont( 	44 * window_factor )
+		font_large = love.graphics.setNewFont( 	36 * window_factor )
+		font_med = love.graphics.setNewFont( 	28 * window_factor )
+		font_small = love.graphics.setNewFont( 	24 * window_factor )
+
 		love.keyboard.setKeyRepeat( true )
 	end
 
-
-	local function set_new_game()
-		setting_game_options = true
-		reading_keys = true
-
-		--World Creation
-		math.randomseed( os.time() )	--set pseudo-random seed value for map generation
-		local world = genesis:create( world_width , world_height )
-		atlas:set_world( world , world_width , world_height , scale )
-		atlas:build_batch()
-
-		--NPCs
-		local num_of_npcs = 3
-		for i = 1,num_of_npcs+1 do
-			local med = meddler:new()
-			npc_list[ med.name ] = med
-		end
-	end
-
-	local function setup_flags()
+	local function setup_run_flags()
 		for i , v in ipairs( arg ) do
 			if v == '-d' or '--debug' then _debug = true
 			elseif v == '-ng' or '--newgame' then print("Not implemented!")
@@ -102,92 +97,20 @@
 	end
 
 function love.load()							--initial values and files to load for gameplay
-	setup_flags()
+	setup_run_flags()
 	load_libraries()
 	disp:setup( scale )
-	setup_environment() --load images , sounds , and fonts
+	load_environment() --load images , sounds , and fonts
 
-	if loading_game then
-		--load_game()
-	else
-		set_new_game() --this includes world gen, which will have to be moved for player
-						--setup options later...
-	end
+	in_start_screen = true
+
 end
 
 
-
---==== Helpers =======
-	function draw_player_options()
-		set_color( 'l_grey' )
-
-		if not name_entered then
-			if first_confirmation and not second_confirmation then
-				lprint( "Enter Meddler Name: " .. temp_str , 500 , 500 )
-				lprint( "Confirm name choice [y/n]? " .. txt_input , 500 , 600 )
-			else
-				lprint( "Enter Meddler Name: " .. txt_input , 500 , 500 )
-			end
-		end
-
-		set_color( 'white' )
-	end
-function love.draw()
-	if setting_game_options then
-		draw_player_options()
-
-	else
-		set_color( 'white' );
-		atlas:draw( scale )
-		display:draw_gui( scale , player , race_being_created )
-		if _debug then debug_GUI() end
-		--lprint( "Turn: "..turn_count , disp.pix_width - (disp.pix_width/10) , 50 )
-	end
-end
-
-
-
---=== Helpers =====
-	local function update_setup_flags()
-		if second_confirmation then
-			first_confirmation = false; second_confirmation = false
-			name_entered = true
-			print( temp_str )
-		end
-
-		if name_entered then --and other stuff, later
-			setting_game_options = false
-			reading_keys = false
-			just_started_game = true
-			player_turn = true
-			player = meddler:new( true , temp_str )
-			print( player.name )
-		end
-	end
-	local function npcs_turn()
-		for k,v in pairs( npc_list ) do
-			print( v.name )
-		end
-	end
-	--==== Helpers ====
-			local function natural_events()
-				for i,row in ipairs( atlas.world ) do
-					for j,tile in ipairs( row ) do
-						tile:time_passes()
-					end
-				end
-			end
-	---------------------
-	local function time_passes()
-		--races_turn_by_ini()
-		natural_events()
-	end
-
-	local function update_turn_stats()
-		turn_count = turn_count + 1
-	end
------------------------
 function love.update( dt )
+
+
+--[[
 	if setting_game_options then
 		update_setup_flags()
 
@@ -212,6 +135,76 @@ function love.update( dt )
 		end
 
 	end
+--]]
+
+	if in_start_screen then
+		--start_screen:update_flags()
+
+	elseif in_new_game_options then
+		if not reading_keys then read_keys( true ) end
+
+		ngo:update_setup_flags()
+
+		if name_entered then
+			player = meddler:new( true , temp_str )
+			ngo:set_new_game( world_width , world_height , scale )
+			print( player.name )
+			read_keys( false )
+		end
+
+	elseif in_game_actual then
+
+		if just_started_game then
+			love.audio.play( sounds.bgm )
+			just_started_game = false
+		end
+
+		local build = disp:move()
+
+		if not player_turn then			
+			game_actual:update()
+			player_turn = true
+			build = true
+		end
+
+		if build then
+			atlas:build_batch()
+		end
+
+	end
+
+end
+
+
+
+function love.draw()
+
+--[[
+	if setting_game_options then
+		draw_player_options()
+
+	else
+		set_color( 'white' );
+		atlas:draw( scale )
+		display:draw_gui( scale , player , race_being_created )
+		if _debug then debug_GUI() end
+		--lprint( "Turn: "..turn_count , disp.pix_width - (disp.pix_width/10) , 50 )
+	end
+--]]
+
+	if in_start_screen then
+		set_color( 'grey' ); set_font( font_title )
+		start_screen:draw()
+
+	elseif in_new_game_options then
+		ngo:draw()
+
+	elseif in_game_actual then
+		game_actual:draw( scale , player , race_being_created )
+
+	end
+
+
 end
 
 
@@ -221,7 +214,7 @@ end
 
 --========= Keyboard and Mouse IO ===============
 	--=== Helpers ====
-		local function change_scale( num )
+		function change_scale( num )
 			disp:update_scale( scale , scale + num )
 			scale = scale + num
 			atlas:update_scale()
@@ -246,63 +239,70 @@ end
 			end	
 		end
 
+
+
 	function love.keypressed( key , isrepeat ) --might actually needs to move subs into seperate 'text processing'
 		if _debug then print( key ) end
-		local is_player_done = false
 
-		if reading_keys then --for text input
+		if reading_keys then
 			process_text_keys( key )
+		else
 
-		elseif player_turn then
-
-
-			if key == '-' and scale > 1 then
-				change_scale( scale * -0.5 )
-			elseif key == '=' and scale < 4 then
-				change_scale( scale )
-
-			elseif key == 'p' then
-				choices = not choices
-
-			elseif top_layer() then
-				change_tree_flags( key )
-			elseif not top_layer() then
-				if (key == 'n' or key == 'esc' or key == 'backspace') then
-					change_tree_flags( 'back' )
-				else
-					is_player_done = powers:resolve( key , selected_tile , player )
+			if in_start_screen then
+				if key == 'n' then
+					in_start_screen = false;
+					in_new_game_options = true;
+				elseif key == 'nope' then
+					in_start_screen = false
+					load_game()
+					in_game_actual = true
 				end
+
+			elseif in_new_game_options then
+				--nothing
+
+			elseif in_game_actual and player_turn then
+				game_actual:keypress( key , scale )
 			end
 
-
-
-			if is_player_done then
-				end_player_turn()
-			end
-
-		end	
+		end
 	end
 
 
 	function love.mousepressed( x , y , button )
 		pressed_x = x; 	pressed_y = y --used for calculating display movement off of mouse press / distance
 
-		if creating_race then
-			pressed_x = nil; pressed_y = nil;
+		if in_start_screen then
+			--stuff
 
-			disp:check_gui_buttons( x , y , button )
+		elseif in_new_game_options then
+			--stuff
 
+		elseif in_game_actual then
+			if creating_race then
+				pressed_y = nil; pressed_x = nil
+			end
 		end
 
+--[[
+		if creating_race then
+			pressed_x = nil; pressed_y = nil;
+			disp:check_gui_buttons( x , y , button )
+		end
+--]]
 
 	end
 
 	function love.mousereleased( x , y , button )
 		pressed_x = nil; pressed_y = nil;
 
-		if is_button then
+		if in_start_screen then
 			--stuff
-		else
+
+		elseif in_new_game_options then
+			--stuff
+
+		elseif in_game_actual then
 			local tile , x , y = atlas:get_tile( x , y , 'translate' )
 			disp:gui_select( tile , ttp(x) , ttp(y)  )
 
@@ -372,6 +372,12 @@ end
 
 	function dialogue( text )
 		disp:gui_dialogue( text )
+	end
+
+	function read_keys( value )
+		reading_keys = value
+		temp_str = ""
+		txt_input = ""
 	end
 
 
