@@ -47,165 +47,124 @@
 
 
 
---=== Helpers =====
-	local function load_libraries()
-		rules = require 'tile_rules';	--race_rules = require 'race_rules'
-		genesis = require "genesis";	meddler = require "meddler"
-		atlas 	= require "atlas";		--race = require 'race'
-		tiles 	= require "tile";		powers = require "powers"
-		disp 	= require "display"
+	--=== Helpers =====
+		local function load_libraries()
+			rules = require 'tile_rules';	--race_rules = require 'race_rules'
+			genesis = require "genesis";	meddler = require "meddler"
+			atlas 	= require "atlas";		--race = require 'race'
+			tiles 	= require "tile";		powers = require "powers"
+			disp 	= require "display"
 
-		wrapper = require "game_mode_scripts"
-		start_screen = wrapper.sss;
-		ngo = wrapper.ngo;
-		game_actual = wrapper.ga
-	end
-
-	--==== Helpers ======
-		local function load_images()
-			local natural_tiles = love.graphics.newImage( img_dir.."natural_tiles.png" )
-			natural_tiles:setFilter( 'nearest' )
-			atlas:set_batch( natural_tiles , (disp.tile_height+2) * (disp.tile_width+2) ) --extra 2 for buffer to show partial tiles
-
-			local gui_image = love.graphics.newImage( img_dir.."main_gui.png" )
-			gui_image:setFilter( 'nearest' )
-			display:setup_gui( gui_image , natural_tiles )
+			wrapper = require "game_mode_scripts"
+			start_screen = wrapper.sss;
+			ngo = wrapper.ngo;
+			game_actual = wrapper.ga
 		end
 
-		local function load_sounds()
-			sounds.bgm = love.audio.newSource( sound_dir.."rolling_hills.mp3" , "stream" )
+		--==== Helpers ======
+			local function load_images()
+				local natural_tiles = love.graphics.newImage( img_dir.."natural_tiles.png" )
+				natural_tiles:setFilter( 'nearest' )
+				atlas:set_batch( natural_tiles , (disp.tile_height+2) * (disp.tile_width+2) ) --extra 2 for buffer to show partial tiles
+
+				local gui_image = love.graphics.newImage( img_dir.."main_gui.png" )
+				gui_image:setFilter( 'nearest' )
+				display:setup_gui( gui_image , natural_tiles )
+			end
+
+			local function load_sounds()
+				sounds.bgm = love.audio.newSource( sound_dir.."rolling_hills.mp3" , "stream" )
+			end
+		local function load_environment()
+
+			load_images()
+			load_sounds()
+
+			font_title = love.graphics.setNewFont( 	44 * window_factor )
+			font_large = love.graphics.setNewFont( 	36 * window_factor )
+			font_med = love.graphics.setNewFont( 	28 * window_factor )
+			font_small = love.graphics.setNewFont( 	24 * window_factor )
+
+			love.keyboard.setKeyRepeat( true )
 		end
-	local function load_environment()
 
-		load_images()
-		load_sounds()
-
-		font_title = love.graphics.setNewFont( 	44 * window_factor )
-		font_large = love.graphics.setNewFont( 	36 * window_factor )
-		font_med = love.graphics.setNewFont( 	28 * window_factor )
-		font_small = love.graphics.setNewFont( 	24 * window_factor )
-
-		love.keyboard.setKeyRepeat( true )
-	end
-
-	local function setup_run_flags()
-		for i , v in ipairs( arg ) do
-			if v == '-d' or '--debug' then _debug = true
-			elseif v == '-ng' or '--newgame' then print("Not implemented!")
+		local function setup_run_flags()
+			for i , v in ipairs( arg ) do
+				if v == '-d' or '--debug' then _debug = true
+				elseif v == '-ng' or '--newgame' then print("Not implemented!")
+				end
 			end
 		end
-	end
 
-function love.load()							--initial values and files to load for gameplay
-	setup_run_flags()
-	load_libraries()
-	disp:setup( scale )
-	load_environment() --load images , sounds , and fonts
+	function love.load()							--initial values and files to load for gameplay
+		setup_run_flags()
+		load_libraries()
+		disp:setup( scale )
+		load_environment() --load images , sounds , and fonts
 
-	in_start_screen = true
-
-end
-
-
-function love.update( dt )
-
-
---[[
-	if setting_game_options then
-		update_setup_flags()
-
-	else
-		if just_started_game then
-			love.audio.play( sounds.bgm )
-			just_started_game = false
-		end
-
-		local build = disp:move()
-
-		if not player_turn then
-			--npcs_turn()
-			time_passes()
-			update_turn_stats()
-			player_turn = true
-			build = true
-		end
-
-		if build then
-			atlas:build_batch()
-		end
-
-	end
---]]
-
-	if in_start_screen then
-		--start_screen:update_flags()
-
-	elseif in_new_game_options then
-		if not reading_keys then read_keys( true ) end
-
-		ngo:update_setup_flags()
-
-		if name_entered then
-			player = meddler:new( true , temp_str )
-			ngo:set_new_game( world_width , world_height , scale )
-			print( player.name )
-			read_keys( false )
-		end
-
-	elseif in_game_actual then
-
-		if just_started_game then
-			love.audio.play( sounds.bgm )
-			just_started_game = false
-		end
-
-		local build = disp:move()
-
-		if not player_turn then			
-			game_actual:update()
-			player_turn = true
-			build = true
-		end
-
-		if build then
-			atlas:build_batch()
-		end
-
-	end
-
-end
-
-
-
-function love.draw()
-
---[[
-	if setting_game_options then
-		draw_player_options()
-
-	else
-		set_color( 'white' );
-		atlas:draw( scale )
-		display:draw_gui( scale , player , race_being_created )
-		if _debug then debug_GUI() end
-		--lprint( "Turn: "..turn_count , disp.pix_width - (disp.pix_width/10) , 50 )
-	end
---]]
-
-	if in_start_screen then
-		set_color( 'grey' ); set_font( font_title )
-		start_screen:draw()
-
-	elseif in_new_game_options then
-		ngo:draw()
-
-	elseif in_game_actual then
-		game_actual:draw( scale , player , race_being_created )
+		in_start_screen = true
 
 	end
 
 
-end
+	function love.update( dt )
+
+		if in_start_screen then
+			--start_screen:update_flags()
+
+		elseif in_new_game_options then
+			if not reading_keys then read_keys( true ) end
+
+			ngo:update_setup_flags()
+
+			if name_entered then
+				player = meddler:new( true , temp_str )
+				ngo:set_new_game( world_width , world_height , scale )
+				print( player.name )
+				read_keys( false )
+			end
+
+		elseif in_game_actual then
+
+			if just_started_game then
+				love.audio.play( sounds.bgm )
+				just_started_game = false
+			end
+
+			local build = disp:move()
+
+			if not player_turn then			
+				game_actual:update()
+				player_turn = true
+				build = true
+			end
+
+			if build then
+				atlas:build_batch()
+			end
+
+		end
+
+	end
+
+
+
+	function love.draw()
+
+		if in_start_screen then
+			set_color( 'grey' ); set_font( font_title )
+			start_screen:draw()
+
+		elseif in_new_game_options then
+			ngo:draw()
+
+		elseif in_game_actual then
+			game_actual:draw( scale , player , race_being_created )
+
+		end
+
+
+	end
 
 
 
@@ -283,14 +242,6 @@ end
 				pressed_y = nil; pressed_x = nil
 			end
 		end
-
---[[
-		if creating_race then
-			pressed_x = nil; pressed_y = nil;
-			disp:check_gui_buttons( x , y , button )
-		end
---]]
-
 	end
 
 	function love.mousereleased( x , y , button )
