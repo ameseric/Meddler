@@ -26,13 +26,11 @@ local gui = require 'gui'
 
 
 --===== Main Functions =======
-	function display:setup( scale )
+	function display:setup( scale , gui_image , tileset )
 		local width , height = love.window.getDesktopDimensions()
-		print(width , height )
 
 		width = math.floor( (width / ( TS * scale ))* window_factor )
 		height = math.floor( (height / ( TS * scale )) * window_factor )
-		print( width , height )
 
 		self.tile_width = width
 		self.pix_width = tile_to_pixel( width )
@@ -41,6 +39,8 @@ local gui = require 'gui'
 		self.pix_height = tile_to_pixel( height )
 
 		love.window.setMode( self.pix_width , self.pix_height )
+
+		gui:setup( gui_image , tileset , self.pix_width , self.pix_height )
 	end
 
 	function display:move() --later, add velocity factor. Further over the cursor, faster movement. 1/2/3/4/5
@@ -106,10 +106,6 @@ local gui = require 'gui'
 
 
 --====== GUI calls =========
-	function display:setup_gui( gui_main , tileset )
-		gui:setup( gui_main , tileset , self.pix_width , self.pix_height )
-	end
-
 	function display:draw_gui( scale , player , race_being_created )
 		gui:draw( scale , nil , player.name , player.eminence , race_being_created )
 	end

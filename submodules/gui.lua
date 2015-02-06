@@ -35,7 +35,7 @@ end
 		local function draw_tile_img_in_gui( x , y )
 			local quad = rules:get_quad( gui.tile.type )
 			set_color( 'white' )
-			love.graphics.draw( gui.tileset , quad , x , y , 0 , 2 , 2 )
+			love.graphics.draw( gui.tileset , quad , x , y , 0 , 2.8*window_factor , 2.8*window_factor )
 		end
 		local function draw_tile_select( scale )
 			set_color( 'white' )

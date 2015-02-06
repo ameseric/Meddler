@@ -135,6 +135,15 @@ gs.name = "game_actual_scripts"
 		elseif key == '=' and scale < 4 then
 			change_scale( scale )
 
+		elseif key == ']' and window_factor < 1 then
+			window_factor = window_factor + 0.25
+			configure_screen_settings()
+			atlas:build_batch()
+		elseif key == '[' and window_factor > 0.25 then
+			window_factor = window_factor - 0.25
+			configure_screen_settings()
+			atlas:build_batch()
+
 		elseif key == 'p' then
 			choices = not choices
 

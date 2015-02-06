@@ -8,9 +8,9 @@
 
 --]]
 
---===== Globals =========
+--===== Globals ========= (needs serious cleaning )
 	TS = 32
-	window_factor = 0.75
+	window_factor = 0.5
 	disp = {}
 
 	local world_width , world_height = 100 , 100
@@ -35,7 +35,7 @@
 	race_being_created = {}
 	local selected_tile = nil
 	local player = nil
-	npc_list , sounds = {} , {}
+	npc_list , sounds , images = {} , {} , {}
 
 
 	turn_count = 0
@@ -65,11 +65,14 @@
 			local function load_images()
 				local natural_tiles = love.graphics.newImage( img_dir.."natural_tiles.png" )
 				natural_tiles:setFilter( 'nearest' )
-				atlas:set_batch( natural_tiles , (disp.tile_height+2) * (disp.tile_width+2) ) --extra 2 for buffer to show partial tiles
+				images.tileset = natural_tiles
 
 				local gui_image = love.graphics.newImage( img_dir.."main_gui.png" )
 				gui_image:setFilter( 'nearest' )
-				display:setup_gui( gui_image , natural_tiles )
+				images.gui_image = gui_image
+				
+				--display:setup_gui( gui_image , natural_tiles )
+				--atlas:set_batch( natural_tiles , (disp.tile_height+2) * (disp.tile_width+2) ) --extra 2 for buffer to show partial tiles
 			end
 
 			local function load_sounds()
@@ -79,12 +82,6 @@
 
 			load_images()
 			load_sounds()
-
-			font_title = love.graphics.setNewFont( 	44 * window_factor )
-			font_large = love.graphics.setNewFont( 	36 * window_factor )
-			font_med = love.graphics.setNewFont( 	28 * window_factor )
-			font_small = love.graphics.setNewFont( 	24 * window_factor )
-
 			love.keyboard.setKeyRepeat( true )
 		end
 
@@ -97,13 +94,15 @@
 		end
 
 	function love.load()							--initial values and files to load for gameplay
+
 		setup_run_flags()
+
 		load_libraries()
-		disp:setup( scale )
-		load_environment() --load images , sounds , and fonts
+		load_environment() --load images , sounds , and fonts. Display is set within.
+
+		configure_screen_settings() --sets display, GUI, and fonts based on current window_factor
 
 		in_start_screen = true
-
 	end
 
 
@@ -329,6 +328,20 @@
 		reading_keys = value
 		temp_str = ""
 		txt_input = ""
+	end
+
+	function set_fonts()
+		font_title = love.graphics.setNewFont( 	44 * window_factor )
+		font_large = love.graphics.setNewFont( 	36 * window_factor )
+		font_med = love.graphics.setNewFont( 	28 * window_factor )
+		font_small = love.graphics.setNewFont( 	24 * window_factor )
+	end
+
+	function configure_screen_settings()
+		
+		disp:setup( scale , images.gui_image , images.tileset )
+		atlas:set_batch( images.tileset , (disp.tile_height+2) * (disp.tile_width+2) ) --extra 2 for buffer to show partial tiles
+		set_fonts()
 	end
 
 
