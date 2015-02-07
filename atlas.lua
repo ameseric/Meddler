@@ -20,7 +20,7 @@ end
 
 
 function atlas:set_batch( image , num_of_tiles )
-	self.sprite_batch = love.graphics.newSpriteBatch( image , 4000 ) --get rid of magic num
+	self.sprite_batch = love.graphics.newSpriteBatch( image , num_of_tiles ) --get rid of magic num
 end
 
 
@@ -44,10 +44,6 @@ end
 
 function atlas:draw( scale )
 	love.graphics.draw( self.sprite_batch , -disp.x_pix_pos , -disp.y_pix_pos , 0 , scale , scale ) --for buffer
-end
-
-function atlas:update_scale()
-	self:build_batch()
 end
 
 function atlas:in_bounds( x , y )

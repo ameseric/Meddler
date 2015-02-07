@@ -21,7 +21,7 @@
 	--State Flags
 	player_turn = false
 	in_start_screen , in_game_actual , in_new_game_options = false , false , false
-	give_tree , take_tree , alter_tree = false , false , false --be careful, global state flags!
+	give_tree , take_tree , alter_tree = false , false , false
 	choices = true
 	creating_race , creating_race_top_level , creating_race_name , creating_race_mental , creating_race_cultural = false , false , false , false , false
 	txt_input , reading_keys = "" , false
@@ -70,9 +70,6 @@
 				local gui_image = love.graphics.newImage( img_dir.."main_gui.png" )
 				gui_image:setFilter( 'nearest' )
 				images.gui_image = gui_image
-				
-				--display:setup_gui( gui_image , natural_tiles )
-				--atlas:set_batch( natural_tiles , (disp.tile_height+2) * (disp.tile_width+2) ) --extra 2 for buffer to show partial tiles
 			end
 
 			local function load_sounds()
@@ -100,7 +97,7 @@
 		load_libraries()
 		load_environment() --load images , sounds , and fonts. Display is set within.
 
-		configure_screen_settings() --sets display, GUI, and fonts based on current window_factor
+		configure_screen_settings( true ) --sets display, GUI, and fonts based on current window_factor
 
 		in_start_screen = true
 	end
@@ -143,7 +140,6 @@
 			end
 
 		end
-
 	end
 
 
@@ -161,8 +157,6 @@
 			game_actual:draw( scale , player , race_being_created )
 
 		end
-
-
 	end
 
 
@@ -175,7 +169,7 @@
 		function change_scale( num )
 			disp:update_scale( scale , scale + num )
 			scale = scale + num
-			atlas:update_scale()
+			configure_screen_settings()
 		end
 		function love.textinput( t )
 			txt_input = txt_input .. t
@@ -337,10 +331,18 @@
 		font_small = love.graphics.setNewFont( 	24 * window_factor )
 	end
 
-	function configure_screen_settings()
+	function configure_screen_settings( perform_disp_setup )
 		
-		disp:setup( scale , images.gui_image , images.tileset )
+		if perform_disp_setup then
+			disp:setup( scale , images.gui_image , images.tileset )
+		end
+
 		atlas:set_batch( images.tileset , (disp.tile_height+2) * (disp.tile_width+2) ) --extra 2 for buffer to show partial tiles
+
+		if in_game_actual then
+			atlas:build_batch()
+		end
+
 		set_fonts()
 	end
 
