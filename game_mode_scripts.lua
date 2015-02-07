@@ -30,21 +30,17 @@ ngs = {}
 ngs.name = "new_game_scripts"
 --========/ New Game Option Scripts /===========
 	function ngs:update_setup_flags()
-		if second_confirmation then
-			first_confirmation = false; second_confirmation = false
+		if keystrokes:full_conf() then
+			keystrokes:are_reading( 'false' )
 			name_entered = true
-			print( temp_str )
 		end
 
-		if name_entered then --and other stuff, later
+		if name_entered then
 			in_new_game_options = false
 			just_started_game = true
 			player_turn = true
 			in_game_actual = true
 		end
-
-		--return in_new_game_options , just_started_game , player_turn , in_game_actual
-
 	end
 
 
@@ -68,11 +64,11 @@ ngs.name = "new_game_scripts"
 		set_color( 'l_grey' )
 
 		if not name_entered then
-			if first_confirmation and not second_confirmation then
-				lprint( "Enter Meddler Name: " .. temp_str , 500 , 500 )
-				lprint( "Confirm name choice [y/n]? " .. txt_input , 500 , 600 )
+			if keystrokes:first_conf() and not keystrokes:full_conf() then
+				lprint( "Enter Meddler Name: " .. keystrokes:get_temp() , 500 , 500 )
+				lprint( "Confirm name choice [y/n]? " .. keystrokes:get_strokes() , 500 , 600 )
 			else
-				lprint( "Enter Meddler Name: " .. txt_input , 500 , 500 )
+				lprint( "Enter Meddler Name: " .. keystrokes:get_strokes() , 500 , 500 )
 			end
 		end
 
@@ -116,10 +112,10 @@ gs.name = "game_actual_scripts"
 	end
 
 
-	function gs:draw( scale , player , race_being_created )
+	function gs:draw( scale , player , race_creation_flags )
 		set_color( 'white' );
 		atlas:draw( scale )
-		display:draw_gui( scale , player , race_being_created )
+		disp:draw_gui( scale , player , race_creation_flags )
 		if _debug then debug_GUI() end
 	end
 
@@ -129,7 +125,7 @@ gs.name = "game_actual_scripts"
 		self:update_turn_stats()
 	end
 
-	function gs:keypress( key , scale , player , selected_tile )
+	function gs:keypress( key , scale , player , selected_tile , race_creation_flags )
 		local is_player_done = false
 
 		if key == '-' and scale > 1 then
@@ -153,7 +149,7 @@ gs.name = "game_actual_scripts"
 			if (key == 'n' or key == 'esc' or key == 'backspace') then
 				change_tree_flags( 'back' )
 			else
-				is_player_done = powers:resolve( key , selected_tile , player )
+				is_player_done = powers:resolve( key , selected_tile , player , race_creation_flags )
 			end
 		end
 

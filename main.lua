@@ -24,9 +24,9 @@
 	give_tree , take_tree , alter_tree = false , false , false
 	choices = true
 
-	creating_race = {
+	local race_creation_flags = {
 
-	race_flags = {
+		race = {}
 		,status = false
 		,top_level = false
 		,race_name = false
@@ -34,17 +34,7 @@
 		,race_cultural = false
 		,race_phys = false
 	}
---[[
-	keystrokes = {
 
-		txt_input = ""
-		,reading_keys = false
-		,first_confirmation = false
-		,second_confirmation = false
-		,temp_str = ""
-
-	}
---]]
 	loading_game , name_entered = false , false
 
 
@@ -57,7 +47,7 @@
 
 
 	turn_count = 0
-	package.path = package.path .. ';Meddler/submodules/?.lua' .. ';Meddler/loader_modules/?.lua'
+	package.path = package.path .. ';Meddler/submodules/?.lua' .. ';Meddler/loader_modules/?.lua' .. ';Meddler/minor_modules/?.lua'
 
 
 
@@ -68,6 +58,7 @@
 	--=== Helpers =====
 		local function load_libraries()
 			keystrokes = require "keystrokes"
+			--require "strict"
 
 			rules = require 'tile_rules';	--race_rules = require 'race_rules'
 			genesis = require "genesis";	meddler = require "meddler"
@@ -96,7 +87,6 @@
 				sounds.bgm = love.audio.newSource( sound_dir.."rolling_hills.mp3" , "stream" )
 			end
 		local function load_environment()
-
 			load_images()
 			load_sounds()
 			love.keyboard.setKeyRepeat( true )
@@ -111,14 +101,10 @@
 		end
 
 	function love.load()							--initial values and files to load for gameplay
-
 		setup_run_flags()
-
 		load_libraries()
 		load_environment() --load images , sounds , and fonts. Display is set within.
-
 		configure_screen_settings( true ) --sets display, GUI, and fonts based on current window_factor
-
 		in_start_screen = true
 	end
 
@@ -129,15 +115,16 @@
 			--start_screen:update_flags()
 
 		elseif in_new_game_options then
-			if not keystrokes:are_reading() then read_keys( true ) end
+			if not keystrokes:are_reading() then 
+				keystrokes:are_reading( true )
+			end
 
 			ngo:update_setup_flags()
 
 			if name_entered then
-				player = meddler:new( true , temp_str )
+				player = meddler:new( true , keystrokes:get_temp() )
 				ngo:set_new_game( world_width , world_height , scale )
-				print( player.name )
-				read_keys( false )
+				keystrokes:stop_reading()
 			end
 
 		elseif in_game_actual then
@@ -174,7 +161,7 @@
 			ngo:draw()
 
 		elseif in_game_actual then
-			game_actual:draw( scale , player , race_being_created )
+			game_actual:draw( scale , player , race_creation_flags )
 
 		end
 	end
@@ -192,32 +179,14 @@
 			configure_screen_settings()
 		end
 		function love.textinput( t )
-			keystrokes.txt_input = keystrokes.txt_input .. t
+			keystrokes:add( t )
 		end
-		local function process_text_keys( key )
-			if key == 'backspace' then
-				keystrokes.txt_input = keystrokes.txt_input:sub( 0 , #keystrokes.txt_input-1 )
-			elseif key == 'return' then
-				first_confirmation = true
-				keystrokes.temp_str = keystrokes.txt_input
-				keystrokes.txt_input = ""
-			elseif first_confirmation then
-				if key == 'y' then
-					second_confirmation = true
-				elseif key == 'n' then
-					first_confirmation = false
-					txt_input = temp_str
-				end
-			end	
-		end
-
-
 
 	function love.keypressed( key , isrepeat ) --might actually needs to move subs into seperate 'text processing'
 		if _debug then print( key ) end
 
-		if reading_keys then
-			process_text_keys( key )
+		if keystrokes:are_reading() then
+			keystrokes:process( key )
 		else
 
 			if in_start_screen then
@@ -234,7 +203,7 @@
 				--nothing
 
 			elseif in_game_actual and player_turn then
-				game_actual:keypress( key , scale , player , selected_tile )
+				game_actual:keypress( key , scale , player , selected_tile , race_creation_flags )
 			end
 
 		end
@@ -251,7 +220,7 @@
 			--stuff
 
 		elseif in_game_actual then
-			if creating_race then
+			if race_creation_flags.status then
 				pressed_y = nil; pressed_x = nil
 			end
 		end

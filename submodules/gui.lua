@@ -123,7 +123,9 @@ end
 		set_color( 'white' ); set_font( font_med )
 	end
 
-function gui:draw( scale , list_of_powers , name , eminence , race_being_created )
+function gui:draw( scale , list_of_powers , name , eminence , race_creation_flags )
+	local rcf = race_creation_flags
+
 	love.graphics.draw( self.gui_image , self.x_draw_point , self.y_draw_point , 0 , 4*window_factor , 2.7*window_factor )
 	set_font( font_med )
 	lprint( "Turn: "..turn_count , 10 , 10 )
@@ -141,30 +143,31 @@ function gui:draw( scale , list_of_powers , name , eminence , race_being_created
 		draw_player_options( list_of_powers )
 	end
 
-	if creating_race then
-		self:draw_race_creation( race_being_created )
+	if rcf.status then
+		self:draw_race_creation( rcf )
 	end
 
 end
 
 
 
-function gui:draw_race_creation( race_being_created )
-	local race = race_being_created
+function gui:draw_race_creation( race_creation_flags )
+	local rcf = race_creation_flags
+
 	set_color( 'grey' )
 	love.graphics.rectangle( 'fill' , self.x_create_life , 30 , self.x_create_life , self.y_create_life )
 	set_color( 'white' )
 
-	if creating_race_top_level then
+	if rcf.top_level then
 		local x = self.x_create_life + self.margin
 		local y = self.y_create_life / 7
 
 		lprint( "New Race Creation" , x + (x/3) , y*1 )
 
-		lprint( "1) Name" , x , y*2 );						lprint( race.name , x + (x/1.5) , y*2 )
+		lprint( "1) Name" , x , y*2 );						lprint( rcf.race.name , x + (x/1.5) , y*2 )
 		lprint( "2) Physical Characteristics" , x , y*3 );	--lprint( race.)
-		lprint( "3) Mental Characteristics" , x , y*4 );	lprint( race.mental , x + (x/1.5) , y*4 )
-		lprint( "4) Cultural Aspect" , x , y*5 );			lprint( race.culture , x+(x/1.5) , y*5 )
+		lprint( "3) Mental Characteristics" , x , y*4 );	lprint( rcf.race.mental , x + (x/1.5) , y*4 )
+		lprint( "4) Cultural Aspect" , x , y*5 );			lprint( rcf.race.culture , x+(x/1.5) , y*5 )
 
 	elseif creating_race_name then
 		--stuff
@@ -175,10 +178,6 @@ function gui:draw_race_creation( race_being_created )
 	elseif creating_race_cultural then
 		--final stuff
 	end
-end
-
-
-function gui:race_selection( x , y , button )
 end
 
 

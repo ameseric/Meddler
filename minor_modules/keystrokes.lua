@@ -5,49 +5,84 @@
 ]]
 
 
-keystrokes = {
+local strokes = ""
+local reading_keys = false
+local first_confirmation = false
+local second_confirmation = false
+local temp_strokes = ""
 
-	strokes = ""
-	,reading_keys = false
-	,first_confirmation = false
-	,second_confirmation = false
-	,temp_strokes = ""
+keystrokes = {}
 
-}
 
 
 function keystrokes:are_reading( value )
 	if value == true or value == false then
-		self.reading_keys = value
+		if value == true then
+			keystrokes:stop_reading() --clears values
+		end
+		reading_keys = value
 	end
-
-	return self.reading_keys
+	return reading_keys
 end
 
+function keystrokes:add( t )
+	strokes = strokes .. t
+end
+
+function keystrokes:get_strokes()
+	return strokes
+end
+
+function keystrokes:get_temp()
+	return temp_strokes
+end
 
 function keystrokes:first_conf()
-	return self.first_confirmation
+	return first_confirmation
 end
 
 function keystrokes:full_conf()
-	return self.second_confirmation and self.first_confirmation
+	return second_confirmation and first_confirmation
 end
 
 function keystrokes:stop_reading()
-	self.reading_keys = false
-	self.first_confirmation = false
-	self.second_confirmation = false
-	self.temp_strokes = ""
-	self.strokes = ""
+	reading_keys = false
+	first_confirmation = false
+	second_confirmation = false
+	temp_strokes = ""
+	strokes = ""
 end
 
 function keystrokes:clear( value )
 	if value == 'main' then
-		self.strokes = ""
+		strokes = ""
 	elseif value == 'temp' then
-		self.temp_strokes = ""
+		temp_strokes = ""
 	elseif value == 'both' then
-		self.strokes = ""
-		self.temp_strokes = ""
+		strokes = ""
+		temp_strokes = ""
 	end
 end
+
+function keystrokes:process( key )
+	if key == 'backspace' then
+		strokes = strokes:sub( 0 , #strokes-1 )
+	elseif key == 'return' then
+		first_confirmation = true
+		temp_strokes = strokes
+		strokes = ""
+	elseif first_confirmation then
+		if key == 'y' then
+			second_confirmation = true
+		elseif key == 'n' then
+			first_confirmation = false
+			strokes = temp_strokes
+		end
+	end	
+end
+
+
+
+
+
+return keystrokes
