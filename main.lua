@@ -23,16 +23,34 @@
 	in_start_screen , in_game_actual , in_new_game_options = false , false , false
 	give_tree , take_tree , alter_tree = false , false , false
 	choices = true
-	creating_race , creating_race_top_level , creating_race_name , creating_race_mental , creating_race_cultural = false , false , false , false , false
-	txt_input , reading_keys = "" , false
 
-	setting_game_options , loading_game , name_entered = false , false , false
-	first_confirmation , second_confirmation , temp_str = false , false , false
+	creating_race = {
+
+	race_flags = {
+		,status = false
+		,top_level = false
+		,race_name = false
+		,race_mental = false
+		,race_cultural = false
+		,race_phys = false
+	}
+--[[
+	keystrokes = {
+
+		txt_input = ""
+		,reading_keys = false
+		,first_confirmation = false
+		,second_confirmation = false
+		,temp_str = ""
+
+	}
+--]]
+	loading_game , name_entered = false , false
 
 
 
 	--World objects
-	race_being_created = {}
+	--race_being_created = {}
 	local selected_tile = nil
 	local player = nil
 	npc_list , sounds , images = {} , {} , {}
@@ -49,6 +67,8 @@
 
 	--=== Helpers =====
 		local function load_libraries()
+			keystrokes = require "keystrokes"
+
 			rules = require 'tile_rules';	--race_rules = require 'race_rules'
 			genesis = require "genesis";	meddler = require "meddler"
 			atlas 	= require "atlas";		--race = require 'race'
@@ -109,7 +129,7 @@
 			--start_screen:update_flags()
 
 		elseif in_new_game_options then
-			if not reading_keys then read_keys( true ) end
+			if not keystrokes:are_reading() then read_keys( true ) end
 
 			ngo:update_setup_flags()
 
@@ -172,15 +192,15 @@
 			configure_screen_settings()
 		end
 		function love.textinput( t )
-			txt_input = txt_input .. t
+			keystrokes.txt_input = keystrokes.txt_input .. t
 		end
 		local function process_text_keys( key )
 			if key == 'backspace' then
-				txt_input = txt_input:sub( 0 , #txt_input-1 )
+				keystrokes.txt_input = keystrokes.txt_input:sub( 0 , #keystrokes.txt_input-1 )
 			elseif key == 'return' then
 				first_confirmation = true
-				temp_str = txt_input
-				txt_input = ""
+				keystrokes.temp_str = keystrokes.txt_input
+				keystrokes.txt_input = ""
 			elseif first_confirmation then
 				if key == 'y' then
 					second_confirmation = true
@@ -323,12 +343,6 @@
 		end
 
 		disp:gui_dialogue( text )
-	end
-
-	function read_keys( value )
-		reading_keys = value
-		temp_str = ""
-		txt_input = ""
 	end
 
 	function set_fonts()

@@ -1,0 +1,23 @@
+ 
+Breakdown of directory tree
+	Very redundant, but some important points.
+
+
+Muddled Ones
+
+loader_modules - lua modules that don't act as an O2 object, but upon loading as a module, loads pre-sets for other objects.
+					examples are npc_list, which contains a list of npcs stored as parameter value. Upon loading, these parameters
+					are used to create a list of npcs.
+
+submodules - 	lua modules that aren't included in the top level (global) namespace. These modules are tacked onto pre-existing global modules.
+
+minor_modules - lua modules that are in the global namespace, but aren't core o2 objects. Rather, they exist separately simply to keep love.main
+					clean as possible.
+
+
+
+Obvious Ones
+
+docs - project documentation.
+images - game images. Mostly .xcf and .png files.
+sound - game sounds. One currently.
