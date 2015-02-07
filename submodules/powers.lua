@@ -5,33 +5,50 @@
 ]]
 
 
-local function Bless( tile )
+local function Bless( tile , meddler )
 	if not tile then
-		dialogue( "Cannot bless. No tile selected." )
+		dialogue( "lack_target" )
+		return false
+
+	elseif meddler.eminence <= 0 then
+		dialogue( "lack_emi")
+		return false
+
 	else
 		tile.rate = math.ceil( tile.rate * 1.5 )
 		tile.timer = 4
+		return true
 	end
 end
 
-local function create_race()
-	print( "Creating race..." )
-	creating_race = true
-	creating_race_top_level = true
-	race_being_created = { name = "None" , mental = "None" , culture = "None" }
+
+local function create_race( meddler )
+	if meddler.eminence <= 0 then
+		dialogue( "lack_emi" )
+		return false
+
+	else
+		dialogue( meddler.name.." is creating a race!" )
+		creating_race = true
+		creating_race_top_level = true
+		race_being_created = { name = "None" , mental = "None" , culture = "None" }
+		return true
+	end
 end
 
 
 local function Sacrifice( tile , meddler )
 	if not tile then
-		dialogue( "Cannot sacrifice. No unit selected." )
+		dialogue( "lack_target" )
 	else
 		local unit = tile:get_resident()
 		if not unit then
-			dialogue( "Cannot sacrifice. No unit selected.")
+			dialogue( "lack_target")
+			return false
 		else
 			tile:set_ocpied()
 			meddler:change_emi( 5 )
+			return true
 		end
 	end
 end
@@ -39,10 +56,12 @@ end
 
 local function Curse( tile )
 	if not tile then
-		dialogue( "Cannot curse. No tile selected.")
+		dialogue( "lack_target")
+		return false
 	else
 		tile.rate = 0
 		tile.timer = 4
+		return true
 	end
 end
 
@@ -59,26 +78,27 @@ function powers:resolve( key , tile , meddler )
 	local is_player_done = false
 
 	if give_tree then
-		if key == 'l' or key == 'b' then
-			is_player_done = true
-			if key == 'l' then create_race()
-			elseif key == 'b' then Bless( tile ) end
+		if key == 'l' then 
+			is_player_done = create_race( meddler )
+
+		elseif key == 'b' then 
+			is_player_done = Bless( tile , meddler )
 		end
-	elseif take_tree then
-		if key == 'l' or key == 'b' or key == 'g' then
-			is_player_done = true
-			if key == 'l' then Sacrifice( tile , meddler )
-			elseif key == 'b' then Curse( tile )
-			end--elseif key == 'g' then take_land() end
+
+	elseif take_tree then		
+		if key == 'l' then
+			is_player_done = Sacrifice( tile , meddler )
+
+		elseif key == 'b' then
+			is_player_done = Curse( tile )
 		end
+
 	elseif alter_tree then
-		if key == 'l' or key == 'g' or key == 'a' then
-			is_player_done = true
-			--if key == 'l' then change_life()
-			--if key == 'g' then Change_land() end
-			--elseif key == 'a' then change_law()
-			--end
-		end
+		is_player_done = true
+		--if key == 'l' then change_life()
+		--if key == 'g' then Change_land() end
+		--elseif key == 'a' then change_law()
+		--end
 	end
 	return is_player_done
 end

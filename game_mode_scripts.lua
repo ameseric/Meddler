@@ -12,6 +12,8 @@
 sss = {}
 --========/ Start Screen Scripts /===========
 	function sss:draw()
+		local x , y  = 
+
 		lprint( "Temporary Start Screen" , 500 , 500 )
 		lprint( "New Game: N" , 500 , 550 )
 		lprint( "Load Game: L" , 500 , 600 )
@@ -127,7 +129,7 @@ gs.name = "game_actual_scripts"
 		self:update_turn_stats()
 	end
 
-	function gs:keypress( key , scale )
+	function gs:keypress( key , scale , player , selected_tile )
 		local is_player_done = false
 
 		if key == '-' and scale > 1 then

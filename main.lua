@@ -214,7 +214,7 @@
 				--nothing
 
 			elseif in_game_actual and player_turn then
-				game_actual:keypress( key , scale )
+				game_actual:keypress( key , scale , player , selected_tile )
 			end
 
 		end
@@ -315,6 +315,13 @@
 	end
 
 	function dialogue( text )
+
+		if text == 'lack_emi' then
+			text = "Cannot perform action. Not enough eminence."
+		elseif text == 'lack_target' then
+			text = "Cannot perform action. Lack target."
+		end
+
 		disp:gui_dialogue( text )
 	end
 
