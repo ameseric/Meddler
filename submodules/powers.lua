@@ -24,12 +24,6 @@ end
 
 local function create_race( meddler , race_creation_flags )
 	local rcf = race_creation_flags
-	print( rcf.status , race_creation_flags.status )
-	rcf.status = true
-	print( rcf.status , race_creation_flags.status )
-	rcf.status = false
-	print( rcf.status , race_creation_flags.status )
-
 
 	if meddler.eminence <= 0 then
 		dialogue( "lack_emi" )
@@ -37,8 +31,8 @@ local function create_race( meddler , race_creation_flags )
 
 	else
 		dialogue( meddler.name.." is creating a race!" )
-		rcf.status = true
-		rcf.top_level = true
+		rcf._status = true
+		rcf._toplevel = true
 		rcf.race = { name = "None" , mental = "None" , culture = "None" }
 		return true
 	end

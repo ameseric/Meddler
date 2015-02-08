@@ -11,57 +11,64 @@ local first_confirmation = false
 local second_confirmation = false
 local temp_strokes = ""
 
-keystrokes = {}
+local function clear( full_clear )
+	first_confirmation = false
+	second_confirmation = false
+	reading_keys = false
 
-
-
-function keystrokes:are_reading( value )
-	if value == true or value == false then
-		if value == true then
-			keystrokes:stop_reading() --clears values
-		end
-		reading_keys = value
+	if full_clear then
+		strokes = ""
+		temp_strokes = ""
 	end
-	return reading_keys
+end
+
+keystrokes = {
+	message = ""
+	,x = 0
+	,y = 0
+}
+
+
+
+function keystrokes:draw()
+	set_color( 'white' ); set_font( font_title );
+
+	if first_confirmation then
+		lprint( self.message..temp_strokes , self.x , self.y )
+		lprint( "Confirm? [y/n]" , self.x , self.y + 100 )
+	else
+		lprint( self.message..strokes , self.x , self.y )
+	end
 end
 
 function keystrokes:add( t )
 	strokes = strokes .. t
 end
 
-function keystrokes:get_strokes()
-	return strokes
-end
+function keystrokes:start_reading( message , x , y )
+	clear( true )
+	reading_keys = true
 
-function keystrokes:get_temp()
-	return temp_strokes
-end
+	if message then self.message = message
+	else self.message = "Text entered: "
+	end
 
-function keystrokes:first_conf()
-	return first_confirmation
-end
+	if x then self.x = x
+	else self.x = 0
+	end
 
-function keystrokes:full_conf()
-	return second_confirmation and first_confirmation
+	if y then self.y = y
+	else self.y = 0
+	end
+
 end
 
 function keystrokes:stop_reading()
-	reading_keys = false
-	first_confirmation = false
-	second_confirmation = false
-	temp_strokes = ""
-	strokes = ""
+	clear( false )
 end
 
-function keystrokes:clear( value )
-	if value == 'main' then
-		strokes = ""
-	elseif value == 'temp' then
-		temp_strokes = ""
-	elseif value == 'both' then
-		strokes = ""
-		temp_strokes = ""
-	end
+function keystrokes:are_reading()
+	return reading_keys
 end
 
 function keystrokes:process( key )
@@ -81,6 +88,17 @@ function keystrokes:process( key )
 	end	
 end
 
+function keystrokes:get_temp()
+	return temp_strokes
+end
+
+function keystrokes:get_strokes()
+	return strokes
+end
+
+function keystrokes:finished()
+	return first_confirmation and second_confirmation
+end
 
 
 

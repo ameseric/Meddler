@@ -143,7 +143,7 @@ function gui:draw( scale , list_of_powers , name , eminence , race_creation_flag
 		draw_player_options( list_of_powers )
 	end
 
-	if rcf.status then
+	if rcf._status then
 		self:draw_race_creation( rcf )
 	end
 
@@ -158,24 +158,24 @@ function gui:draw_race_creation( race_creation_flags )
 	love.graphics.rectangle( 'fill' , self.x_create_life , 30 , self.x_create_life , self.y_create_life )
 	set_color( 'white' )
 
-	if rcf.top_level then
+	if rcf._toplevel then
 		local x = self.x_create_life + self.margin
 		local y = self.y_create_life / 7
 
 		lprint( "New Race Creation" , x + (x/3) , y*1 )
 
-		lprint( "1) Name" , x , y*2 );						lprint( rcf.race.name , x + (x/1.5) , y*2 )
-		lprint( "2) Physical Characteristics" , x , y*3 );	--lprint( race.)
-		lprint( "3) Mental Characteristics" , x , y*4 );	lprint( rcf.race.mental , x + (x/1.5) , y*4 )
-		lprint( "4) Cultural Aspect" , x , y*5 );			lprint( rcf.race.culture , x+(x/1.5) , y*5 )
+		lprint( "(1) Name" , x , y*2 );						lprint( rcf.race.name , x + (x/1.5) , y*2 )
+		lprint( "(2) Physical Characteristics" , x , y*3 );	--lprint( race.)
+		lprint( "(3) Mental Characteristics " , x , y*4 );	lprint( rcf.race.mental , x + (x/1.5) , y*4 )
+		lprint( "(4) Cultural Aspect" , x , y*5 );			lprint( rcf.race.culture , x+(x/1.5) , y*5 )
 
-	elseif creating_race_name then
+	elseif rcf._toplevel then
 		--stuff
-	elseif creating_race_phys then
+	elseif rcf._phys then
 		--stuff
-	elseif creating_race_mental then
+	elseif rcf._mental then
 		--stuff
-	elseif creating_race_cultural then
+	elseif rcf._cultural then
 		--final stuff
 	end
 end

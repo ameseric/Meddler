@@ -27,12 +27,12 @@
 	local race_creation_flags = {
 
 		race = {}
-		,status = false
-		,top_level = false
-		,race_name = false
-		,race_mental = false
-		,race_cultural = false
-		,race_phys = false
+		,_status = false
+		,_toplevel = false
+		,_name = false
+		,_mental = false
+		,_cultural = false
+		,_phys = false
 	}
 
 	loading_game , name_entered = false , false
@@ -116,7 +116,7 @@
 
 		elseif in_new_game_options then
 			if not keystrokes:are_reading() then 
-				keystrokes:are_reading( true )
+				keystrokes:start_reading( "Enter Meddler Name: " , 500 , 500 )
 			end
 
 			ngo:update_setup_flags()
@@ -153,12 +153,16 @@
 
 	function love.draw()
 
+		if keystrokes:are_reading() then
+			keystrokes:draw()
+		end
+
 		if in_start_screen then
 			set_color( 'grey' ); set_font( font_title )
 			start_screen:draw()
 
 		elseif in_new_game_options then
-			ngo:draw()
+			--ngo:draw()
 
 		elseif in_game_actual then
 			game_actual:draw( scale , player , race_creation_flags )
@@ -220,7 +224,7 @@
 			--stuff
 
 		elseif in_game_actual then
-			if race_creation_flags.status then
+			if race_creation_flags._status then
 				pressed_y = nil; pressed_x = nil
 			end
 		end

@@ -30,8 +30,8 @@ ngs = {}
 ngs.name = "new_game_scripts"
 --========/ New Game Option Scripts /===========
 	function ngs:update_setup_flags()
-		if keystrokes:full_conf() then
-			keystrokes:are_reading( 'false' )
+		if keystrokes:finished() then
+			keystrokes:stop_reading()
 			name_entered = true
 		end
 
@@ -65,8 +65,7 @@ ngs.name = "new_game_scripts"
 
 		if not name_entered then
 			if keystrokes:first_conf() and not keystrokes:full_conf() then
-				lprint( "Enter Meddler Name: " .. keystrokes:get_temp() , 500 , 500 )
-				lprint( "Confirm name choice [y/n]? " .. keystrokes:get_strokes() , 500 , 600 )
+				--lprint( "Confirm name choice [y/n]? " .. keystrokes:get_strokes() , 500 , 600 )
 			else
 				lprint( "Enter Meddler Name: " .. keystrokes:get_strokes() , 500 , 500 )
 			end
