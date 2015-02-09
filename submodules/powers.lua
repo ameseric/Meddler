@@ -33,7 +33,13 @@ local function create_race( meddler , race_creation_flags )
 		dialogue( meddler.name.." is creating a race!" )
 		rcf._status = true
 		rcf._toplevel = true
-		rcf.race = { name = "None" , mental = "None" , culture = "None" }
+		rcf.race = { name = "None" , mental = "None" , culture = "None" , phys = {} }
+		rcf.race.phys.head = { value=1 , build=Normal , mod=None }
+		rcf.race.phys.torso = { value=1 , base="Skin" , build="Medium" , mod="None" }
+		rcf.race.phys.upper_limbs = { value=1 , build="Normal" , modifier="None" , base="Sapien" }
+		rcf.race.phys.lower_limbs = { value=1 , build="Normal" , modifier="None" , base="Sapien" }
+		
+
 		return true
 	end
 end

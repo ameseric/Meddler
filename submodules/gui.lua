@@ -69,7 +69,34 @@ end
 		end
 	end
 
-	local function draw_player_options( list_of_powers )
+function gui:draw( scale , list_of_powers , name , eminence , race_creation_flags )
+	local rcf = race_creation_flags
+
+	love.graphics.draw( self.gui_image , self.x_draw_point , self.y_draw_point , 0 , 4*window_factor , 2.7*window_factor )
+	set_font( font_med )
+	lprint( "Turn: "..turn_count , 10 , 10 )
+	lprint( "Eminence: "..eminence , 10 , 30 )
+	draw_dialogue()
+
+	set_font( font_title ); set_color( 'black' )
+	lprint( name , self.x_choices , self.y_draw_point+4 )
+
+	if self.selected_tile then
+		draw_tile_info( scale )
+	end
+
+	if player_turn then
+		self:draw_player_options( list_of_powers )
+	end
+
+	if rcf._status then
+		self:draw_race_creation( rcf )
+	end
+
+end
+
+--=====/ Additional Draws /=====
+	function gui:draw_player_options( list_of_powers )
 		local text = ""
 
 		if not list_of_powers then
@@ -123,62 +150,55 @@ end
 		set_color( 'white' ); set_font( font_med )
 	end
 
-function gui:draw( scale , list_of_powers , name , eminence , race_creation_flags )
-	local rcf = race_creation_flags
 
-	love.graphics.draw( self.gui_image , self.x_draw_point , self.y_draw_point , 0 , 4*window_factor , 2.7*window_factor )
-	set_font( font_med )
-	lprint( "Turn: "..turn_count , 10 , 10 )
-	lprint( "Eminence: "..eminence , 10 , 30 )
-	draw_dialogue()
+	function gui:draw_race_creation( race_creation_flags )
+		local rcf = race_creation_flags
 
-	set_font( font_title ); set_color( 'black' )
-	lprint( name , self.x_choices , self.y_draw_point+4 )
+		set_color( 'grey' )
+		love.graphics.rectangle( 'fill' , self.x_create_life , 30 , self.x_create_life , self.y_create_life )
+		set_color( 'white' )
 
-	if self.selected_tile then
-		draw_tile_info( scale )
-	end
-
-	if player_turn then
-		draw_player_options( list_of_powers )
-	end
-
-	if rcf._status then
-		self:draw_race_creation( rcf )
-	end
-
-end
-
-
-
-function gui:draw_race_creation( race_creation_flags )
-	local rcf = race_creation_flags
-
-	set_color( 'grey' )
-	love.graphics.rectangle( 'fill' , self.x_create_life , 30 , self.x_create_life , self.y_create_life )
-	set_color( 'white' )
-
-	if rcf._toplevel then
 		local x = self.x_create_life + self.margin
 		local y = self.y_create_life / 7
 
-		lprint( "New Race Creation" , x + (x/3) , y*1 )
+		if rcf._toplevel then
 
-		lprint( "(1) Name" , x , y*2 );						lprint( rcf.race.name , x + (x/1.5) , y*2 )
-		lprint( "(2) Physical Characteristics" , x , y*3 );	--lprint( race.)
-		lprint( "(3) Mental Characteristics " , x , y*4 );	lprint( rcf.race.mental , x + (x/1.5) , y*4 )
-		lprint( "(4) Cultural Aspect" , x , y*5 );			lprint( rcf.race.culture , x+(x/1.5) , y*5 )
 
-	elseif rcf._toplevel then
-		--stuff
-	elseif rcf._phys then
-		--stuff
-	elseif rcf._mental then
-		--stuff
-	elseif rcf._cultural then
-		--final stuff
+			lprint( "New Race Creation" , x + (x/3) , y*1 )
+
+			lprint( "(1) Name" , x , y*2 );						lprint( rcf.race.name , x + (x/1.5) , y*2 )
+			lprint( "(2) Physical Characteristics" , x , y*3 );	--lprint( race.)
+			lprint( "(3) Mental Characteristics " , x , y*4 );	lprint( rcf.race.mental , x + (x/1.5) , y*4 )
+			lprint( "(4) Cultural Aspect" , x , y*5 );			lprint( rcf.race.culture , x+(x/1.5) , y*5 )
+
+		elseif rcf._name then
+			x = self.x_create_life + self.margin*6
+			keystrokes:set( "Enter Name: " , x , y*3.5 , font_med )
+
+		elseif rcf._phys then
+			set_font( font_med ); y = self.y_create_life / 20
+
+			lprint( "(1) Base Covering" , x , y*4 );			lprint( rcf.race.phys.torso.base , x + (x/1.5) , y*4 )
+				set_font( font_small )
+				lprint( "	(a) Skin           Cost 0 | ---      | ---" , x , y*5 )
+				lprint( "	(b) Fur             Cost 2 | +1 Torso | ---" , x , y*5.5 )
+				lprint( "	(c) Scale          Cost 3 | +2 Torso | ---" , x , y*6 )
+				lprint( "	(d) Arthropod   Cost 4 | +3 Torso | ---" , x , y*6.5 )
+
+			--lprint()
+
+		elseif rcf._mental then
+			--stuff
+
+		elseif rcf._cultural then
+			--final stuff
+		end
 	end
-end
+
+
+
+
+
 
 
 function gui:add_dialogue( text )

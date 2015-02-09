@@ -35,7 +35,7 @@
 		,_phys = false
 	}
 
-	loading_game , name_entered = false , false
+	loading_game = false
 
 
 
@@ -110,21 +110,22 @@
 
 
 	function love.update( dt )
+		local build
 
 		if in_start_screen then
 			--start_screen:update_flags()
 
 		elseif in_new_game_options then
-			if not keystrokes:are_reading() then 
+			if not keystrokes:are_reading() and not keystrokes:finished() then 
 				keystrokes:start_reading( "Enter Meddler Name: " , 500 , 500 )
 			end
 
 			ngo:update_setup_flags()
 
-			if name_entered then
-				player = meddler:new( true , keystrokes:get_temp() )
+			if keystrokes:finished() then
+				player = meddler:new( true , keystrokes:get_strokes() )
 				ngo:set_new_game( world_width , world_height , scale )
-				keystrokes:stop_reading()
+				keystrokes:ack()
 			end
 
 		elseif in_game_actual then
@@ -134,7 +135,16 @@
 				just_started_game = false
 			end
 
-			local build = disp:move()
+			if race_creation_flags._name and keystrokes:finished() then
+				race_creation_flags.race.name = keystrokes:get_strokes()
+				keystrokes:ack()
+				race_creation_flags._name = false
+				race_creation_flags._toplevel = true
+			end
+
+			if not race_creation_flags._status then
+				build = disp:move()
+			end
 
 			if not player_turn then			
 				game_actual:update()
@@ -153,21 +163,22 @@
 
 	function love.draw()
 
-		if keystrokes:are_reading() then
-			keystrokes:draw()
-		end
-
 		if in_start_screen then
 			set_color( 'grey' ); set_font( font_title )
 			start_screen:draw()
 
 		elseif in_new_game_options then
-			--ngo:draw()
+			--nothing to see here...
 
 		elseif in_game_actual then
 			game_actual:draw( scale , player , race_creation_flags )
 
 		end
+
+		if keystrokes:are_reading() then
+			keystrokes:draw()
+		end
+
 	end
 
 

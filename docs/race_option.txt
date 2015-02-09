@@ -4,41 +4,60 @@ base - desc - desc
 The aesthetic of a race's buildings is determined by the culture choice and by the Meddler's affinity.
 
 
-physical
-	base covering
-		skin - no cost , no benefits
-		fur	-	1 cost , +1 body
-		scale - 2 cost , +2 body
-		arthopod - 3 cost , +3 body
-	head
-		desc 1
-			normal	-	no cost
-			torso	-	1 cost , +1 body
-		desc 2
-			multi-eyed	-	1 cost , +1 mind
-			no mouth	-	1 cost , resource cost -25%
-			multi-headed	1 cost , resource +25% , +3 mind
-			blind	-		0 cost , +1 mind , -1 str , -1 life
-			horned	-		2 cost , +1 head , +1 str
-	body
-		desc 1
-			thin	-	1 cost , +1 speed , -1 str
-			medium - none
-			large - 	1 cost , +1 str , -1 speed
-		desc 2
-			muscular	-	1 cost , +1 str
-			segmented	-	1 cost , +1 speed			
 
-	upper limbs
-		desc 1
-			short
-			normal
+General cost parameters
+	0 Cost
+		No change (skin, etc.)
+	1 Cost
+		Swapping two points around, (+1 str , -1 spd)
+	2 Cost
+		Adding 1 point
+		Swapping three points around, (+2 str , -1 spd)
+
+	etc. Net gain + 1 determines point cost.
+
+
+
+PHYSICAL
+	Base
+		skin		---
+		fur			2 cost , +1 torso
+		scale		3 cost , +2 torso
+		arthropod 	4 cost , +3 torso
+
+	Head
+		Type
+			Normal			---
+			In Torso		2 cost , +1 torso
+			Long 			---
+			Stubby 			---
+		Modifier
+			None 			---
+			multi-eyed		2 cost , +1 mind
+			no mouth		2 cost , resource cost -25%
+			multi-headed	2 cost , resource +25% , +3 mind
+			blind			1 cost , +1 mind , -1 str
+			horned			3 cost , +1 head , +1 str
+
+	Torso
+		Build
+			thin		1 cost , +1 speed , -1 str
+			medium		---
+			large		1 cost , +1 str , -1 speed
+		Modifier
+			muscular	1 cost , +1 str
+			segmented	1 cost , +1 speed			
+
+	Upper Limbs
+		Build
+			short		
+			normal		---
 			long
-			none
-		desc 2
-			arms
-			tentacles
-			wings		move cost always 1 per tile
+			None 		2 cost , -all upper limb , +2 Mind , +2 Head
+		Modifier
+			Sapien		---
+			Tentacles 	???
+			Wings		move cost always 1 per tile
 		desc 3
 			multi-limbed
 			something?
@@ -58,7 +77,7 @@ physical
 
 
 
-mental (pick 1) (Affects Order , Boldness , Industry , and Reproduction ) Race attributes that affect expansion and collection, autnomous functions.
+MENTAL (pick 1) (Affects Order , Boldness , Industry , and Reproduction ) Race attributes that affect expansion and collection, autnomous functions.
 	zealous		-	+100% Boldness
 	relaxed		-	-50% Industry , +150% Reproduction Rate
 	greedy		-	+1 to resource rate, -25% upkeep?
@@ -67,13 +86,14 @@ mental (pick 1) (Affects Order , Boldness , Industry , and Reproduction ) Race a
 	reserved	-	Upkeep -50%
 
 
-culture (pick 1) Race attributes that affect Meddler interactions and unit stats
+CULTURE (pick 1) Race attributes that affect Meddler interactions and unit stats
 	sacrificial		-	increases eminence gained from Take-Life, and halves Order penalty for Take-Life (only)
 	caste			-	All Order penalties halved
 	scholars		-	upgrades cheaper? Or buildings cheaper...
-	undead			-	Take-Life does nothing, but 25% chance to ignore wounds per engagement
 	nomadic			-	All buildings are able to move.
 	militant		-	10% military stat increase, Heavy units available at Towns.
 
-
-
+TRAIT (each costs 2pts)
+	aquatic
+	hive
+	undead			-	Take-Life does nothing, but 25% chance to ignore wounds per engagement

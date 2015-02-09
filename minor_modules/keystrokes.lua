@@ -8,12 +8,11 @@
 local strokes = ""
 local reading_keys = false
 local first_confirmation = false
-local second_confirmation = false
+local finished = false
 local temp_strokes = ""
 
 local function clear( full_clear )
 	first_confirmation = false
-	second_confirmation = false
 	reading_keys = false
 
 	if full_clear then
@@ -26,12 +25,13 @@ keystrokes = {
 	message = ""
 	,x = 0
 	,y = 0
+	,font = nil
 }
 
 
 
 function keystrokes:draw()
-	set_color( 'white' ); set_font( font_title );
+	set_color( 'white' ); set_font( self.font );
 
 	if first_confirmation then
 		lprint( self.message..temp_strokes , self.x , self.y )
@@ -45,10 +45,14 @@ function keystrokes:add( t )
 	strokes = strokes .. t
 end
 
-function keystrokes:start_reading( message , x , y )
+function keystrokes:start_reading( message , x , y , font )
 	clear( true )
 	reading_keys = true
+	finished = false
+	self:set( message , x , y , font )
+end
 
+function keystrokes:set( message , x , y , font )
 	if message then self.message = message
 	else self.message = "Text entered: "
 	end
@@ -61,10 +65,15 @@ function keystrokes:start_reading( message , x , y )
 	else self.y = 0
 	end
 
+	if font then self.font = font
+	else self.font = font_large
+	end
+
 end
 
 function keystrokes:stop_reading()
 	clear( false )
+	finished = true
 end
 
 function keystrokes:are_reading()
@@ -80,7 +89,7 @@ function keystrokes:process( key )
 		strokes = ""
 	elseif first_confirmation then
 		if key == 'y' then
-			second_confirmation = true
+			self:stop_reading()--second_confirmation = true
 		elseif key == 'n' then
 			first_confirmation = false
 			strokes = temp_strokes
@@ -88,18 +97,17 @@ function keystrokes:process( key )
 	end	
 end
 
-function keystrokes:get_temp()
+function keystrokes:get_strokes()
 	return temp_strokes
 end
 
-function keystrokes:get_strokes()
-	return strokes
-end
-
 function keystrokes:finished()
-	return first_confirmation and second_confirmation
+	return finished
 end
 
+function keystrokes:ack()
+	finished = false
+end
 
 
 

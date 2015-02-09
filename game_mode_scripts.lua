@@ -30,12 +30,8 @@ ngs = {}
 ngs.name = "new_game_scripts"
 --========/ New Game Option Scripts /===========
 	function ngs:update_setup_flags()
-		if keystrokes:finished() then
-			keystrokes:stop_reading()
-			name_entered = true
-		end
 
-		if name_entered then
+		if keystrokes:finished() then
 			in_new_game_options = false
 			just_started_game = true
 			player_turn = true
@@ -57,21 +53,6 @@ ngs.name = "new_game_scripts"
 			local med = meddler:new()
 			npc_list[ med.name ] = med
 		end
-	end
-
-
-	function ngs:draw()
-		set_color( 'l_grey' )
-
-		if not name_entered then
-			if keystrokes:first_conf() and not keystrokes:full_conf() then
-				--lprint( "Confirm name choice [y/n]? " .. keystrokes:get_strokes() , 500 , 600 )
-			else
-				lprint( "Enter Meddler Name: " .. keystrokes:get_strokes() , 500 , 500 )
-			end
-		end
-
-		set_color( 'white' )
 	end
 
 
@@ -126,32 +107,61 @@ gs.name = "game_actual_scripts"
 
 	function gs:keypress( key , scale , player , selected_tile , race_creation_flags )
 		local is_player_done = false
+		local rcf = race_creation_flags
 
-		if key == '-' and scale > 1 then
-			change_scale( scale * -0.5 )
-		elseif key == '=' and scale < 4 then
-			change_scale( scale )
 
-		elseif key == ']' and window_factor < 1 then
-			window_factor = window_factor + 0.25
-			configure_screen_settings( true )
-		elseif key == '[' and window_factor > 0.25 then
-			window_factor = window_factor - 0.25
-			configure_screen_settings( true )
+		if rcf._status then
+			if rcf._toplevel then
+				if key == '1' then
+					rcf._toplevel = false
+					rcf._name = true
+					keystrokes:start_reading()
+				elseif key == '2' then
+					rcf._toplevel = false
+					rcf._phys = true
+				elseif key == '3' then
+					rcf._toplevel = false
+					rcf._mental = true
+				elseif key == '4' then
+					rcf._toplevel = false
+					rcf._cultural = true
+				end
+			elseif rcf._name then
+				--doesn't matter, keypress will grab it.
+			elseif rcf._phys then
+				--stuff
+			elseif rcf.mental then
+				--stuff
+			elseif rcf._cultural then
+				--stuff
+			end
 
-		elseif key == 'p' then
-			choices = not choices
+		else
+			if key == '-' and scale > 1 then
+				change_scale( scale * -0.5 )
+			elseif key == '=' and scale < 4 then
+				change_scale( scale )
 
-		elseif top_layer() then
-			change_tree_flags( key )
-		elseif not top_layer() then
-			if (key == 'n' or key == 'esc' or key == 'backspace') then
-				change_tree_flags( 'back' )
-			else
-				is_player_done = powers:resolve( key , selected_tile , player , race_creation_flags )
+			elseif key == ']' and window_factor < 1 then
+				window_factor = window_factor + 0.25
+				configure_screen_settings( true )
+			elseif key == '[' and window_factor > 0.25 then
+				window_factor = window_factor - 0.25
+				configure_screen_settings( true )
+
+			elseif key == 'p' then
+				choices = not choices
+
+			elseif top_layer() then
+				change_tree_flags( key )
+			elseif not top_layer() then
+				if (key == 'n' or key == 'esc' or key == 'backspace') then
+					change_tree_flags( 'back' )
+				else
+					is_player_done = powers:resolve( key , selected_tile , player , race_creation_flags )
+				end
 			end
 		end
-
 
 
 		if is_player_done then
