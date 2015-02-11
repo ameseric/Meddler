@@ -160,16 +160,18 @@ end
 
 		local x = self.x_create_life + self.margin
 		local y = self.y_create_life / 7
+		local x_1 = x + (x/1.5)
+		local x_2 = x + (x/2.5)
 
 		if rcf._toplevel then
 
 
 			lprint( "New Race Creation" , x + (x/3) , y*1 )
 
-			lprint( "(1) Name" , x , y*2 );						lprint( rcf.race.name , x + (x/1.5) , y*2 )
+			lprint( "(1) Name" , x , y*2 );						lprint( rcf.race.name , x_1 , y*2 )
 			lprint( "(2) Physical Characteristics" , x , y*3 );	--lprint( race.)
-			lprint( "(3) Mental Characteristics " , x , y*4 );	lprint( rcf.race.mental , x + (x/1.5) , y*4 )
-			lprint( "(4) Cultural Aspect" , x , y*5 );			lprint( rcf.race.culture , x+(x/1.5) , y*5 )
+			lprint( "(3) Mental Characteristics " , x , y*4 );	lprint( rcf.race.mental , x_1 , y*4 )
+			lprint( "(4) Cultural Aspect" , x , y*5 );			lprint( rcf.race.culture , x_1 , y*5 )
 
 		elseif rcf._name then
 			x = self.x_create_life + self.margin*6
@@ -178,14 +180,34 @@ end
 		elseif rcf._phys then
 			set_font( font_med ); y = self.y_create_life / 20
 
-			lprint( "(1) Base Covering" , x , y*4 );			lprint( rcf.race.phys.torso.base , x + (x/1.5) , y*4 )
-				set_font( font_small )
-				lprint( "	(a) Skin           Cost 0 | ---      | ---" , x , y*5 )
-				lprint( "	(b) Fur             Cost 2 | +1 Torso | ---" , x , y*5.5 )
-				lprint( "	(c) Scale          Cost 3 | +2 Torso | ---" , x , y*6 )
-				lprint( "	(d) Arthropod   Cost 4 | +3 Torso | ---" , x , y*6.5 )
+			local count = 4
+			for category , array in pairs( race_rules ) do
+				for choice , info in pairs( array ) do
+					lprint( category , x , y*count ); lprint( rcf.race.phys[ category ])
 
-			--lprint()
+
+
+			lprint( "Base Covering" , x , y*4 );			lprint( rcf.race.phys.torso.base , x_1 , y*4 )
+				set_font( font_small )
+				lprint( "	(a) Skin " , x , y*5 );				lprint( "0 Cost | ---" , x_2 , y*5 )
+				lprint( "	(b) Fur " , x , y*5.5 );			lprint( "2 cost | +1 torso " , x_2 , y*5.5 )
+				lprint( "	(c) Scale " , x , y*6 );			lprint( "3 cost | +2 torso " , x_2 , y*6 )
+				lprint( "	(d) Arthropod " , x , y*6.5 );		lprint( "4 cost | +3 torso " , x_2 , y*6.5)
+
+			set_font( font_med )
+			lprint( "Head" , x , y*7.5 );					--lprint( rcf.race.phys.head.type.." / "..rcf.race.phys.head.mod , x_1 , y*7.5);
+				lprint( "Type" , x , y*8 );					lprint( rcf.race.phys.head.type , x_1 , y*8 )
+					lprint( "Normal" , x , y*8.5 );			lprint( "")
+					lprint( "In Torso" , x , y*9 );
+					lprint()
+					lprint()
+				lprint( "Modifier" , x , ysomethign );
+					lprint()
+					lprint()
+					lprint()
+					lprint()
+					lprint()
+					lprint()			
 
 		elseif rcf._mental then
 			--stuff

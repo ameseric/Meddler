@@ -18,13 +18,22 @@ Global Parameters
  A unit of a race is 100 members of that race, represented on the map as a single unit on a single tile.
  Each unit has the following parameters, generated from the race base-stats, to determine game usage.
  	Life		( Health Points )
- 	Head		( Psy Attack )
- 	Mind		( Psy Defense )
+ 	Head		( Psy Defense )
+ 	Mind		( Psy Attack )
  	Upper Limb	( Phys Attack )
  	Torso		( Phys Defense )
  	Lower Limb	( Speed / tile movement )
+ 	Profile		( Num of phys attacks ignored )
+ 	Skill		( Num of phys attacks inflicted )
 
- 	Stability	( Range modifier ) ???
+ 	large numbers are good, except for profile
+
+ 	Race Creation Options
+ 		Head
+ 		Torso
+ 		Limbs
+ 		Mental
+ 		Cultural
 
 
 What can races do?

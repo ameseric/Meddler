@@ -13,12 +13,14 @@ race = {
 
 	--/ Created during race creation 
 --[[
-	,life = 0
-	,head = 0
-	,mind = 0
-	,upper_limb = 0
-	,torso = 0
-	,lower_limb = 0
+	,life = 0			//health indicator
+	,head = 0			//psychic defense
+	,mind = 0			//psychic damage
+	,upper_limb = 0		//physical damage
+	,torso = 0			//physical defense
+	,lower_limb = 0		//movement speed
+	,profile = 0		//chance to evade, i.e. fewer physical attacks hit
+	,skill = 0			//chance to hit, i.e. more physical attacks inflicted
 --]]
 
 }
@@ -34,7 +36,7 @@ stats = {
 
 	life = { value=2 }
 	,head = { value=3 , sprite1=normal , sprite2=horned }
-	,torse = { value=2 , sprite1=thin , sprite2=segmented }
+	,torso = { value=2 , sprite1=thin , sprite2=segmented }
 	,etc
 }
 

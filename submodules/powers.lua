@@ -36,9 +36,9 @@ local function create_race( meddler , race_creation_flags )
 		rcf.race = { name = "None" , mental = "None" , culture = "None" , phys = {} }
 		rcf.race.phys.head = { value=1 , build=Normal , mod=None }
 		rcf.race.phys.torso = { value=1 , base="Skin" , build="Medium" , mod="None" }
-		rcf.race.phys.upper_limbs = { value=1 , build="Normal" , modifier="None" , base="Sapien" }
-		rcf.race.phys.lower_limbs = { value=1 , build="Normal" , modifier="None" , base="Sapien" }
-		
+		rcf.race.phys.upper_limbs = { value=1 , build="Normal" , mod="None" , base="Sapien" }
+		rcf.race.phys.lower_limbs = { value=1 , build="Normal" , mod="None" , base="Sapien" }
+
 
 		return true
 	end
