@@ -111,30 +111,7 @@ gs.name = "game_actual_scripts"
 
 
 		if rcf._status then
-			if rcf._toplevel then
-				if key == '1' then
-					rcf._toplevel = false
-					rcf._name = true
-					keystrokes:start_reading()
-				elseif key == '2' then
-					rcf._toplevel = false
-					rcf._phys = true
-				elseif key == '3' then
-					rcf._toplevel = false
-					rcf._mental = true
-				elseif key == '4' then
-					rcf._toplevel = false
-					rcf._cultural = true
-				end
-			elseif rcf._name then
-				--doesn't matter, keypress will grab it.
-			elseif rcf._phys then
-				--stuff
-			elseif rcf.mental then
-				--stuff
-			elseif rcf._cultural then
-				--stuff
-			end
+			self:race_creation_keytree( rcf , key )
 
 		else
 			if key == '-' and scale > 1 then
@@ -155,7 +132,7 @@ gs.name = "game_actual_scripts"
 			elseif top_layer() then
 				change_tree_flags( key )
 			elseif not top_layer() then
-				if (key == 'n' or key == 'esc' or key == 'backspace') then
+				if is_escape_key( key ) then
 					change_tree_flags( 'back' )
 				else
 					is_player_done = powers:resolve( key , selected_tile , player , race_creation_flags )
@@ -169,6 +146,52 @@ gs.name = "game_actual_scripts"
 		end
 	end
 
+	--====/ Helpers /=========
+		function gs:race_creation_keytree( rcf , key )
+			if rcf._toplevel then
+				if key == '1' then
+					rcf._toplevel = false
+					rcf._name = true
+					keystrokes:start_reading()
+				elseif key == '2' then
+					rcf._toplevel = false
+					rcf._phys_top = true
+				elseif key == '3' then
+					rcf._toplevel = false
+					rcf._mental = true
+				elseif key == '4' then
+					rcf._toplevel = false
+					rcf._cultural = true
+				elseif is_escape_key( key ) then
+					rcf._toplevel = false
+					rcf._status = false
+				end
+			elseif rcf._name then
+				--doesn't matter, keypress will grab it.
+			elseif rcf._phys_top then
+
+				toggle( is_escape_key( key ) , rcf , {"_toplevel" , "_phys_top"} )
+				toggle( key == '1' , rcf , {"_phys_head" , "_phys_top"} )
+				toggle( key == '2' , rcf , {"_phys_torso" ,  "_phys_top"} )
+				toggle( key == '3' , rcf , {"_phys_limbs" ,  "_phys_top"} )
+
+			elseif rcf._phys_head then
+				
+				toggle( is_escape_key( key ) , rcf , {"_phys_head" , "_phys_top"} )
+
+			elseif rcf._mental then
+				if is_escape_key( key ) then
+					rcf._mental = false
+					rcf._toplevel = true
+				end
+
+			elseif rcf._cultural then
+				if is_escape_key( key ) then
+					rcf._cultural = false
+					rcf._toplevel = true
+				end
+			end
+		end
 
 
 

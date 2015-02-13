@@ -10,7 +10,7 @@
 
 --===== Globals ========= (needs serious cleaning )
 	TS = 32
-	window_factor = 0.5
+	window_factor = 0.75
 	disp = {}
 
 	local world_width , world_height = 100 , 100
@@ -32,7 +32,10 @@
 		,_name = false
 		,_mental = false
 		,_cultural = false
-		,_phys = false
+		,_phys_top = false
+		,_phys_head = false
+		,_phys_torso = false
+		,_phys_limbs = false
 	}
 
 	loading_game = false
@@ -60,7 +63,7 @@
 			keystrokes = require "keystrokes"
 			--require "strict"
 
-			rules = require 'tile_rules';	--race_rules = require 'race_rules'
+			rules = require 'tile_rules';	race_rules = require 'race_rules'
 			genesis = require "genesis";	meddler = require "meddler"
 			atlas 	= require "atlas";		--race = require 'race'
 			tiles 	= require "tile";		powers = require "powers"
@@ -336,6 +339,10 @@
 		font_small = love.graphics.setNewFont( 	24 * window_factor )
 	end
 
+	function is_escape_key( key )
+		return key == 'escape' or key == 'n' or key == 'q'
+	end
+
 	function configure_screen_settings( perform_disp_setup )
 		
 		if perform_disp_setup then
@@ -349,6 +356,15 @@
 		end
 
 		set_fonts()
+	end
+
+	function toggle( switch , tble , values )
+		if switch then
+			for i , value in ipairs( values ) do
+				tble[ value ] = not tble[ value ]
+				--print( tble[value] , not tble[value])
+			end
+		end
 	end
 
 

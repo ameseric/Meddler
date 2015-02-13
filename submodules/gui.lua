@@ -160,24 +160,89 @@ end
 
 		local x = self.x_create_life + self.margin
 		local y = self.y_create_life / 7
-		local x_1 = x + (x/1.5)
-		local x_2 = x + (x/2.5)
+		local x_1 = x + (x/14)
+		local x_2 = x + (x/14)*2
+		--local x_3 = x + (x/10)*3
+		local x_4 = x + (x/14)*5
+		local x_6 = x + (x/14)*8
 
 		if rcf._toplevel then
 
 
 			lprint( "New Race Creation" , x + (x/3) , y*1 )
 
-			lprint( "(1) Name" , x , y*2 );						lprint( rcf.race.name , x_1 , y*2 )
-			lprint( "(2) Physical Characteristics" , x , y*3 );	--lprint( race.)
-			lprint( "(3) Mental Characteristics " , x , y*4 );	lprint( rcf.race.mental , x_1 , y*4 )
-			lprint( "(4) Cultural Aspect" , x , y*5 );			lprint( rcf.race.culture , x_1 , y*5 )
+			lprint( "(1) Name" , x , y*2 );						lprint( rcf.race.name , x_6 , y*2 )
+			lprint( "(2) Physical Characteristics" , x , y*3 );
+			lprint( "(3) Mental Characteristics " , x , y*4 );	lprint( rcf.race.mental , x_6 , y*4 )
+			lprint( "(4) Cultural Aspect" , x , y*5 );			lprint( rcf.race.culture , x_6 , y*5 )
 
 		elseif rcf._name then
 			x = self.x_create_life + self.margin*6
 			keystrokes:set( "Enter Name: " , x , y*3.5 , font_med )
 
-		elseif rcf._phys then
+		elseif rcf._phys_top or rcf._phys_head or rcf._phys_torso or rcf._phys_limbs then
+			local name = "None"
+			local option_draw = {}
+
+			if rcf._phys_head then
+				option_draw = race_rules.Head; name = "Head"
+			elseif rcf._phys_torso then
+				option_draw = race_rules.Torso; name = "Torso"
+			elseif rcf._phys_limbs then
+				option_draw = race_rules.Limbs; name = "Limbs"
+			elseif rcf._phys_top then
+				option_draw = nil
+			end
+
+			--for body_part_name , body_part_info in pairs( race_rules ) do
+			if not option_draw then
+				set_font( font_title )
+				lprint( "(1) Head" , x , y*1 )
+				lprint( "(2) Torso" , x , y*2 )
+				lprint( "(3) Limbs " , x , y*3 )
+
+			else
+				y = self.y_create_life / 20
+				local count = 2
+
+				set_font( font_large )
+				lprint( name , x , y*count )
+				count = count + 1
+
+				for category , choices in pairs( option_draw ) do
+					set_font( font_med )
+					lprint( category , x_1 , y*count )
+					count = count + 0.8
+
+					for choice , values in pairs( choices ) do
+						set_font( font_small )
+						lprint( choice , x_2 , y*count )
+
+						local chain = values.cost.." Cost | "
+						local inc = 0
+						for key , value in pairs( values.effects ) do
+							if value < 1 and value > -1 then
+								value = value * 100
+								value = tostring( value )..'%'
+							elseif value >= 1 then
+								value = '+'..tostring( value )
+							end
+							chain = chain .. value .. " " .. key .. '/ '
+
+						end
+						for key , value in pairs( values.traits ) do
+							chain = chain .. '\n' .. value.desc
+							inc = inc + 0.8
+						end
+
+						lprint( chain , x_4 , y*count )
+						count = count + 0.8 + inc
+					end
+				end
+			end
+
+
+		--[[
 			set_font( font_med ); y = self.y_create_life / 20
 
 			local count = 4
@@ -208,7 +273,7 @@ end
 					lprint()
 					lprint()
 					lprint()			
-
+--]]
 		elseif rcf._mental then
 			--stuff
 
