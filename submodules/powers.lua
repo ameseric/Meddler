@@ -4,6 +4,38 @@
 
 ]]
 
+local default_race = {
+	
+	name = "None"
+	,cost = 0
+	,config = {
+		Head = { Build={ cost=0 , name="Normal" } , Modifier={ cost=0 , name="None" } }
+		,Torso = { Base={ cost=0 , name="Skin"} , Build={ cost=0,name="Medium"} , Modifier={cost=0,name="None"} }
+		,Limbs = { Build={cost=0,name="Sapien"} , Modifier={cost=0,name="None"} , Tip={cost=0,name="Digits"} }
+		,Mental = { placebo={ name="Zealous" , cost=0 , effects={Boldness=2} } }
+		,Cultural = { placebo={ name="Sacrificial" , cost=0} }
+	}
+
+	,traits = {}
+
+	,Attack = 1
+	,Defense = 1
+	,Projection = 1
+	,Will = 1
+	,Move = 3
+	,Profile = 1
+	,Skill = 1
+
+	,Industry = 1
+	,Boldness = 0
+	,Order = 0
+	,Reproduction = 0
+	,Upkeep = 0
+
+	,head_sprite = nil
+	,limb_sprite = nil
+	,torso_sprite = nil
+}
 
 local function Bless( tile , meddler )
 	if not tile then
@@ -33,12 +65,7 @@ local function create_race( meddler , race_creation_flags )
 		dialogue( meddler.name.." is creating a race!" )
 		rcf._status = true
 		rcf._toplevel = true
-		rcf.race = { name = "None" , mental = "None" , culture = "None" , phys = {} }
-		rcf.race.phys.head = { value=1 , build=Normal , mod=None }
-		rcf.race.phys.torso = { value=1 , base="Skin" , build="Medium" , mod="None" }
-		rcf.race.phys.upper_limbs = { value=1 , build="Normal" , mod="None" , base="Sapien" }
-		rcf.race.phys.lower_limbs = { value=1 , build="Normal" , mod="None" , base="Sapien" }
-
+		rcf.race = default_race
 
 		return true
 	end

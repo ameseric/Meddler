@@ -18,9 +18,9 @@ a = {}
 
 	a.Head = {
 
-		Type = {
+		Build = {
 			Normal = 	{ 0 }
-			,Chest = 	{ 2 , torso=1 }
+			,Chest = 	{ 2 , Defense = 1 }
 			,Long =		{ 2
 							,Snout = {function() --[[25% chance of no hit]]end 
 										,phase='battle'
@@ -35,11 +35,11 @@ a = {}
 
 		,Modifier = {
 			None =			{ 0 }
-			,Multi_Eyed =	{ 2 , mind=1 }
-			,No_Mouth = 	{ 2 , upkeep=-0.25 }
-			,Multi_Headed=	{ 2 , upkeep=0.25 , mind=3 }
-			,Blind = 		{ 1 , mind=1 , upper_limb=-1 }
-			,Horned = 		{ 3 , head=1 , upper_limb=1 }
+			,Multi_Eyed =	{ 2 , Will=1 }
+			,No_Mouth = 	{ 2 , Upkeep=-0.25 }
+			,Multi_Headed=	{ 2 , Upkeep=0.25 , Projection=3 }
+			,Blind = 		{ 1 , Will=1 , Attack=-1 }
+			,Horned = 		{ 3 , Projection=1 , Attack=1 }
 		}
 	}
 	
@@ -48,9 +48,9 @@ a = {}
 
 		Base = {
 			Skin = 		{ 0 }
-			,Fur = 		{ 2 , torso=1 }
-			,Scale = 	{ 3 , torso=2 }
-			,Arthropod= { 4 , torso=3 }
+			,Fur = 		{ 2 , Defense=1 }
+			,Scale = 	{ 3 , Defense=2 }
+			,Arthropod= { 4 , Defense=3 }
 			--,Bone = 	{ ??? }
 			--,Slime = 	{}
 			--,Mineral = 	{}
@@ -58,16 +58,16 @@ a = {}
 		}
 
 		,Build = {
-			Thin = 		{ 1 , lower_limb=1 , upper_limb=-1 }
+			Thin = 		{ 1 , Move=1 , Attack=-1 }
 			,Medium = 	{ 0 }
-			,Large = 	{ 1 , lower_limb=-1 , upper_limb=1 }
+			,Large = 	{ 1 , Move=-1 , Attack=1 }
 		}
 
 		,Modifier = {
 			None = {0}
-			,Musuclar = 	{ 1 , upper_limb=1 }
-			,Segmented = 	{ 1 , lower_limb=1 }
-			,Anorexic = 		{ 1 , torso=-1 , upper_limb=-1 , head=1 , mind=1 }
+			,Musuclar = 	{ 1 , Attack=1 }
+			,Segmented = 	{ 1 , Move=1 }
+			,Anorexic = 		{ 1 , Defense=-1 , Attack=-1 , Projection=1 , Will=1 }
 		}
 	}
 
@@ -75,27 +75,27 @@ a = {}
 	a.Limbs = {
 
 		Build = {
-			Short = { 2 , profile=-1 , skill=-1 }
+			Short = { 2 , Profile=-1 , Skill=-1 }
 			,Medium = { 0 }
-			,Long = { 2 , profile=1 , skill=1 }
-			,None = { 0 , profile=-3 , upper_limb=0 , lower_limb=-1 }
+			,Long = { 2 , Profile=1 , Skill=1 }
+			,None = { 0 , Profile=-3 , Attack=0 , Move=-1 }
 		}
 
 		,Base = {
 			Humanoid = { 0 }
-			--,Segmented = { 3 , skill=1 , upper_limb=1 }
-			--,Boneless = { 2 , upper_limb=-1 , i have no idea }
+			,Segmented = { 3 , Skill=1 , Attack=1 }
+			,Boneless = { 2 , Attack=-1 }
 		}
 
 		,Tip = {
 			--Claws = {  }
 			--,Pincers = {  }
-			Digits = { 0 , industry=1 }
+			Digits = { 0 }
 		}
 
 		,Modifier = {
-			Multi_Armed = { 3 , upper_limb=2 }
-			,Multi_Legged = { 3 , lower_limb=2 }
+			Multi_Armed = { 3 , Attack=2 }
+			,Multi_Legged = { 3 , Move=2 }
 			,Wings = { 4 , Flight = { function() --[[Can always move thru terrain]] end 
 										,phase='movement' 
 										,desc="Can always move through terrain."}
@@ -107,6 +107,31 @@ a = {}
 		}
 	}
 
+	a.Mental = {
+
+		placebo = {
+			Zealous = 		{ Boldness=2 }
+			,Relaxed = 		{ Industry=-1 , Reproduction=2 }
+			,Greedy = 		{ Upkeep=-1 , Industry=1 }
+			,Focused = 		{ Reproduction=-1 , Industry=2 }
+			,Pious = 		{ Order=2 , Boldness=-1 }
+			,Reserved = 	{ Upkeep=-1 }
+		}
+	}
+
+
+	a.Cultural = {
+
+		placebo = {
+			Sacrificial = { sac={desc="Increases Eminence gained and halves Order penalty for Take-Life."} }
+			,Caste = { a={desc="All Order penalties halved."} }
+			,Scholars = { a={desc="Upgrades cheaper?"} }
+			,Nomadic = { building_move={desc="Buildings can move 1 tile per turn."} }
+			,Militant = { a={desc="10% military stat increase, Heavy units available at Towns."} }
+		}
+
+	}
+
 
 local race_rules = {}
 
@@ -116,22 +141,27 @@ for k , body_part in pairs( a ) do
 	for category , choices in pairs( body_part ) do
 		race_rules[ k ][ category ] = {}
 		for choice , values in pairs( choices ) do			
-			race_rules[ k ][ category ][ choice ] = { cost=0 , effects={} , traits={} }
+			local temp = { cost=0 , effects={} , traits={} , name="" }
+			temp.name = choice			
+
+
 			for key , value in pairs( values ) do
 
 				if type( key ) == 'number' then
-					race_rules[ k ][ category ][ choice ].cost = value
-					--print( "Cost: "..value)
+					temp.cost = value
 
 				elseif type( value ) == 'number' then
-					race_rules[ k ][ category ][ choice ].effects[ key ] = value
-					--print( "Stat change: " .. value )
+					temp.effects[ key ] = value
 
 				else
-					race_rules[ k ][ category ][ choice ].traits[ key ] = value
-					--print( "Trait: "..key.." "..value.desc )
+					temp.traits[ key ] = value
 				end
 			end
+
+			if not temp.cost then temp.cost = 0 end
+
+			table.insert( race_rules[ k ][ category ] , temp )
+
 		end
 	end
 end

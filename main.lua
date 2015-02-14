@@ -362,7 +362,20 @@
 		if switch then
 			for i , value in ipairs( values ) do
 				tble[ value ] = not tble[ value ]
-				--print( tble[value] , not tble[value])
+			end
+		end
+	end
+
+	function alpha_shift( char )
+		local chars = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t'}
+
+		if type(char) == 'number' then
+			return chars[ char ]
+		end
+
+		for i,v in ipairs( chars ) do
+			if char == v then
+				return i
 			end
 		end
 	end

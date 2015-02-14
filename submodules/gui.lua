@@ -23,8 +23,8 @@ function gui:setup( gui_image , tileset , width , height )
 	self.x_choices = 	self.x_draw_point * 3.75
 	self.x_unit_info = 	self.x_draw_point * 6
 
-	self.x_create_life = (width/3)
-	self.y_create_life = (height/3)*2
+	self.x_create_life = (width/4)
+	self.y_create_life = (height/8)*7
 
 end
 
@@ -155,33 +155,33 @@ end
 		local rcf = race_creation_flags
 
 		set_color( 'grey' )
-		love.graphics.rectangle( 'fill' , self.x_create_life , 30 , self.x_create_life , self.y_create_life )
+		love.graphics.rectangle( 'fill' , self.x_create_life , 30 , self.x_create_life*2 , self.y_create_life )
 		set_color( 'white' )
 
 		local x = self.x_create_life + self.margin
 		local y = self.y_create_life / 7
-		local x_1 = x + (x/14)
-		local x_2 = x + (x/14)*2
-		--local x_3 = x + (x/10)*3
-		local x_4 = x + (x/14)*5
-		local x_6 = x + (x/14)*8
+
+		local xmod = (x*2)/14
+
+		local x_1 = x + xmod*1
+		local x_2 = x + xmod*2
+		local x_4 = x + xmod*5
+		local x_6 = x + xmod*8
 
 		if rcf._toplevel then
-
-
 			lprint( "New Race Creation" , x + (x/3) , y*1 )
-
 			lprint( "(1) Name" , x , y*2 );						lprint( rcf.race.name , x_6 , y*2 )
 			lprint( "(2) Physical Characteristics" , x , y*3 );
-			lprint( "(3) Mental Characteristics " , x , y*4 );	lprint( rcf.race.mental , x_6 , y*4 )
-			lprint( "(4) Cultural Aspect" , x , y*5 );			lprint( rcf.race.culture , x_6 , y*5 )
+			lprint( "(3) Mental Characteristics " , x , y*4 );	lprint( rcf.race.config.Mental.placebo.name , x_6 , y*4 )
+			lprint( "(4) Cultural Aspect" , x , y*5 );			lprint( rcf.race.config.Cultural.placebo.name , x_6 , y*5 )
 
 		elseif rcf._name then
 			x = self.x_create_life + self.margin*6
 			keystrokes:set( "Enter Name: " , x , y*3.5 , font_med )
 
-		elseif rcf._phys_top or rcf._phys_head or rcf._phys_torso or rcf._phys_limbs then
+		else
 			local name = "None"
+			local names = {}
 			local option_draw = {}
 
 			if rcf._phys_head then
@@ -190,20 +190,37 @@ end
 				option_draw = race_rules.Torso; name = "Torso"
 			elseif rcf._phys_limbs then
 				option_draw = race_rules.Limbs; name = "Limbs"
+			elseif rcf._cultural then
+				option_draw = race_rules.Cultural; name="Cultural"
+			elseif rcf._mental then
+				option_draw = race_rules.Mental; name="Mental"
 			elseif rcf._phys_top then
-				option_draw = nil
+				option_draw[1] = rcf.race.config.Head;
+				option_draw[2] = rcf.race.config.Torso;
+				option_draw[3] = rcf.race.config.Limbs;
+				names = { "Heads" , "Torso" , "Limbs" }
 			end
 
-			--for body_part_name , body_part_info in pairs( race_rules ) do
-			if not option_draw then
-				set_font( font_title )
-				lprint( "(1) Head" , x , y*1 )
-				lprint( "(2) Torso" , x , y*2 )
-				lprint( "(3) Limbs " , x , y*3 )
+
+			if rcf._phys_top then
+				local num = 1
+
+				for i , body_part_categories in ipairs( option_draw ) do
+					set_font( font_title )
+					lprint( "("..i..") "..names[i] , x , y*num )
+					num = num + 0.3
+					for category , choice in pairs( body_part_categories ) do
+						set_font( font_med )
+						lprint( category..": "..choice.name , x_2 , y*num )
+						num = num + 0.2
+					end
+					num = num + 0.6
+				end
 
 			else
 				y = self.y_create_life / 20
 				local count = 2
+				local alpha_count = 0
 
 				set_font( font_large )
 				lprint( name , x , y*count )
@@ -212,15 +229,15 @@ end
 				for category , choices in pairs( option_draw ) do
 					set_font( font_med )
 					lprint( category , x_1 , y*count )
-					count = count + 0.8
+					count = count + 0.6
 
-					for choice , values in pairs( choices ) do
+					for i , choice in ipairs( choices ) do
 						set_font( font_small )
-						lprint( choice , x_2 , y*count )
+						lprint( "("..alpha_shift( i+alpha_count )..") "..choice.name , x_2 , y*count )
 
-						local chain = values.cost.." Cost | "
+						local chain = choice.cost.." Cost | "
 						local inc = 0
-						for key , value in pairs( values.effects ) do
+						for key , value in pairs( choice.effects ) do
 							if value < 1 and value > -1 then
 								value = value * 100
 								value = tostring( value )..'%'
@@ -230,55 +247,18 @@ end
 							chain = chain .. value .. " " .. key .. '/ '
 
 						end
-						for key , value in pairs( values.traits ) do
+						for key , value in pairs( choice.traits ) do
 							chain = chain .. '\n' .. value.desc
-							inc = inc + 0.8
+							inc = inc + 0.6
 						end
 
 						lprint( chain , x_4 , y*count )
-						count = count + 0.8 + inc
+						count = count + 0.6 + inc
 					end
+					alpha_count = alpha_count + #choices
 				end
 			end
 
-
-		--[[
-			set_font( font_med ); y = self.y_create_life / 20
-
-			local count = 4
-			for category , array in pairs( race_rules ) do
-				for choice , info in pairs( array ) do
-					lprint( category , x , y*count ); lprint( rcf.race.phys[ category ])
-
-
-
-			lprint( "Base Covering" , x , y*4 );			lprint( rcf.race.phys.torso.base , x_1 , y*4 )
-				set_font( font_small )
-				lprint( "	(a) Skin " , x , y*5 );				lprint( "0 Cost | ---" , x_2 , y*5 )
-				lprint( "	(b) Fur " , x , y*5.5 );			lprint( "2 cost | +1 torso " , x_2 , y*5.5 )
-				lprint( "	(c) Scale " , x , y*6 );			lprint( "3 cost | +2 torso " , x_2 , y*6 )
-				lprint( "	(d) Arthropod " , x , y*6.5 );		lprint( "4 cost | +3 torso " , x_2 , y*6.5)
-
-			set_font( font_med )
-			lprint( "Head" , x , y*7.5 );					--lprint( rcf.race.phys.head.type.." / "..rcf.race.phys.head.mod , x_1 , y*7.5);
-				lprint( "Type" , x , y*8 );					lprint( rcf.race.phys.head.type , x_1 , y*8 )
-					lprint( "Normal" , x , y*8.5 );			lprint( "")
-					lprint( "In Torso" , x , y*9 );
-					lprint()
-					lprint()
-				lprint( "Modifier" , x , ysomethign );
-					lprint()
-					lprint()
-					lprint()
-					lprint()
-					lprint()
-					lprint()			
---]]
-		elseif rcf._mental then
-			--stuff
-
-		elseif rcf._cultural then
-			--final stuff
 		end
 	end
 

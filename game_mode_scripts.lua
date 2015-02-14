@@ -149,52 +149,68 @@ gs.name = "game_actual_scripts"
 	--====/ Helpers /=========
 		function gs:race_creation_keytree( rcf , key )
 			if rcf._toplevel then
+
 				if key == '1' then
-					rcf._toplevel = false
-					rcf._name = true
+					toggle( true , rcf , {"_name","_toplevel"} )
 					keystrokes:start_reading()
-				elseif key == '2' then
-					rcf._toplevel = false
-					rcf._phys_top = true
-				elseif key == '3' then
-					rcf._toplevel = false
-					rcf._mental = true
-				elseif key == '4' then
-					rcf._toplevel = false
-					rcf._cultural = true
-				elseif is_escape_key( key ) then
-					rcf._toplevel = false
-					rcf._status = false
 				end
+
+				toggle( is_escape_key( key ) , rcf , {"_status" , "_toplevel"} )
+				toggle( key=='2' , rcf , {"_phys_top" , "_toplevel"} )
+				toggle( key=='3' , rcf , {"_mental" , "_toplevel"} )
+				toggle( key=='4' , rcf , {"_cultural" , "_toplevel"} )
+
 			elseif rcf._name then
 				--doesn't matter, keypress will grab it.
-			elseif rcf._phys_top then
 
+			elseif rcf._phys_top then
 				toggle( is_escape_key( key ) , rcf , {"_toplevel" , "_phys_top"} )
 				toggle( key == '1' , rcf , {"_phys_head" , "_phys_top"} )
 				toggle( key == '2' , rcf , {"_phys_torso" ,  "_phys_top"} )
 				toggle( key == '3' , rcf , {"_phys_limbs" ,  "_phys_top"} )
 
-			elseif rcf._phys_head then
-				
+			elseif rcf._phys_head then				
 				toggle( is_escape_key( key ) , rcf , {"_phys_head" , "_phys_top"} )
+				self:get_option( key , rcf , 'Head' )
+
+			elseif rcf._phys_limbs then
+				toggle( is_escape_key( key ) , rcf , {"_phys_top" , "_phys_limbs"} )
+				self:get_option( key , rcf , 'Limbs' )
+
+			elseif rcf._phys_torso then
+				toggle( is_escape_key( key ) , rcf , {"_phys_top" , "_phys_torso"})
+				self:get_option( key , rcf , 'Torso' )
 
 			elseif rcf._mental then
-				if is_escape_key( key ) then
-					rcf._mental = false
-					rcf._toplevel = true
-				end
+				toggle( is_escape_key( key ) , rcf , {"_mental" , "_toplevel"})
+				self:get_option( key , rcf , "Mental" )
 
 			elseif rcf._cultural then
-				if is_escape_key( key ) then
-					rcf._cultural = false
-					rcf._toplevel = true
-				end
+				toggle( is_escape_key( key ) , rcf , {"_cultural" , "_toplevel"})
+				self:get_option( key , rcf , "Cultural" )
+
 			end
 		end
 
+		--=====/ Helpers /===============
+			function gs:get_option( key , rcf , limb )
+				key = alpha_shift( key )
+				local offset = 0
+				if key then
+					for i,j in pairs( race_rules[ limb ] ) do
+						if key > offset and key <= (#j+offset) then
+							rcf.race.config[ limb ][ i ] = j[key-offset]
 
+							for k,v in pairs( rcf.race.config[ limb ][i] ) do
+								print( k , v )
+							end
 
+						end
+						offset = offset + #j
+					end
+				end
+
+			end
 
 
 return { sss=sss , ngo=ngs , ga=gs }
