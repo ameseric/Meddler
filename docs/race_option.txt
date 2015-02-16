@@ -54,11 +54,11 @@ PHYSICAL
 			normal		---
 			long
 			None 		2 cost , -all upper limb , +2 Mind , +2 Head
-		Modifier
+		Base
 			Sapien		---
 			Tentacles 	???
 			Wings		move cost always 1 per tile
-		desc 3
+		Modifier
 			multi-limbed
 			something?
 

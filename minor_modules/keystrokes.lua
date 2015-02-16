@@ -10,12 +10,16 @@ local reading_keys = false
 local first_confirmation = false
 local finished = false
 local temp_strokes = ""
+local ignore_char = true
 
-local function clear( full_clear )
-	first_confirmation = false
-	reading_keys = false
+local function clear( set )
+	
+	if set == 'flags' or set == 'both' then
+		first_confirmation = false
+		reading_keys = false
+	end
 
-	if full_clear then
+	if set == 'values' or set == 'both' then
 		strokes = ""
 		temp_strokes = ""
 	end
@@ -42,14 +46,29 @@ function keystrokes:draw()
 end
 
 function keystrokes:add( t )
-	strokes = strokes .. t
+
+	if ignore_char then
+		ignore_char = false
+		return
+	end
+
+	if first_confirmation then
+		--nothing
+	elseif #strokes > 15 then
+		first_confirmation = true
+		temp_strokes = strokes
+		strokes = ""
+
+	else
+		strokes = strokes .. t
+	end
 end
 
 function keystrokes:start_reading( message , x , y , font )
-	clear( true )
 	reading_keys = true
 	finished = false
 	self:set( message , x , y , font )
+	self.begin = true
 end
 
 function keystrokes:set( message , x , y , font )
@@ -68,11 +87,17 @@ function keystrokes:set( message , x , y , font )
 	if font then self.font = font
 	else self.font = font_large
 	end
+end
 
+function keystrokes:clear()
+	if self.begin then
+		clear( 'values' )
+		self.begin = false
+	end
 end
 
 function keystrokes:stop_reading()
-	clear( false )
+	clear( 'flags' )
 	finished = true
 end
 
@@ -92,7 +117,11 @@ function keystrokes:process( key )
 			self:stop_reading()--second_confirmation = true
 		elseif key == 'n' then
 			first_confirmation = false
+			if #temp_strokes > 15 then
+				clear( 'values' )
+			end
 			strokes = temp_strokes
+			ignore_char = true
 		end
 	end	
 end

@@ -165,19 +165,55 @@ end
 
 		local x_1 = x + xmod*1
 		local x_2 = x + xmod*2
-		local x_4 = x + xmod*5
-		local x_6 = x + xmod*8
+		local x_3 = x + xmod*3
+		local x_5 = x + xmod*5
+		local x_8 = x + xmod*8
 
 		if rcf._toplevel then
-			lprint( "New Race Creation" , x + (x/3) , y*1 )
-			lprint( "(1) Name" , x , y*2 );						lprint( rcf.race.name , x_6 , y*2 )
-			lprint( "(2) Physical Characteristics" , x , y*3 );
-			lprint( "(3) Mental Characteristics " , x , y*4 );	lprint( rcf.race.config.Mental.placebo.name , x_6 , y*4 )
-			lprint( "(4) Cultural Aspect" , x , y*5 );			lprint( rcf.race.config.Cultural.placebo.name , x_6 , y*5 )
+			lprint( "New Race Creation" , x_5 , y*1 )
+			lprint( "(1) Name" , x , y*1.5 )					
+			lprint( "(2) Physical Characteristics" , x , y*2 )
+			lprint( "(3) Mental Characteristics " , x , y*2.5 )
+			lprint( "(4) Cultural Aspect" , x , y*3 )
+
+			lprint( "Name: "..rcf.race.name , x_3 , y*4 );	lprint( "Cost: "..rcf.race.cost , x+xmod*7 , y*4 )
+
+			local draw_order = { "break","Attack","Defense","Projection","Will","Move","Profile","Skill","break","Industry","Reproduction",
+						"Boldness","Upkeep","Order","break","Mental","Cultural","Head","Torso","Limbs" }
+
+			local x_header , x_value , y_overview
+			local x_count , y_count = 1 , 1
+			for i , name in ipairs( draw_order ) do
+
+				if name == 'break' then
+					x_header = x + xmod*x_count
+					x_value = x + xmod*(x_count+2.2)
+					y_overview = y*4.25
+					y_count = 1
+					x_count = x_count + 3.5
+
+				else
+					set_color( 'white' );
+					lprint( name..": " , x_header , y_overview )
+					set_color( 'green')
+					if rcf.race.config[ name ] then
+						local race = rcf.race.config[name]
+						if race.Base then
+							lprint( race.Base.name.." / "..race.Build.name , x_value , y_overview )
+						else
+							lprint( race.Build.name , x_value , y_overview )
+						end
+					else
+						lprint( rcf.race[ name ] , x_value , y_overview )
+					end
+					y_count = y_count + 1
+					y_overview = y*(4+(0.25*y_count))
+				end
+			end
 
 		elseif rcf._name then
 			x = self.x_create_life + self.margin*6
-			keystrokes:set( "Enter Name: " , x , y*3.5 , font_med )
+			keystrokes:set( "Enter Name: " , x_5 , y*3.5 , font_med )
 
 		else
 			local name = "None"
@@ -202,7 +238,7 @@ end
 			end
 
 
-			if rcf._phys_top then
+			if rcf._phys_top then --top menu selecton, Head/Torso/Limbs
 				local num = 1
 
 				for i , body_part_categories in ipairs( option_draw ) do
@@ -252,7 +288,7 @@ end
 							inc = inc + 0.6
 						end
 
-						lprint( chain , x_4 , y*count )
+						lprint( chain , x_5 , y*count )
 						count = count + 0.6 + inc
 					end
 					alpha_count = alpha_count + #choices

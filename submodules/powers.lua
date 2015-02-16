@@ -11,9 +11,9 @@ local default_race = {
 	,config = {
 		Head = { Build={ cost=0 , name="Normal" } , Modifier={ cost=0 , name="None" } }
 		,Torso = { Base={ cost=0 , name="Skin"} , Build={ cost=0,name="Medium"} , Modifier={cost=0,name="None"} }
-		,Limbs = { Build={cost=0,name="Sapien"} , Modifier={cost=0,name="None"} , Tip={cost=0,name="Digits"} }
-		,Mental = { placebo={ name="Zealous" , cost=0 , effects={Boldness=2} } }
-		,Cultural = { placebo={ name="Sacrificial" , cost=0} }
+		,Limbs = { Build={cost=0,name="Sapien"} , Base={cost=0,name="Humanoid"} , Modifier={cost=0,name="None"} , Tip={cost=0,name="Digits"} }
+		,Mental = { Build={ name="Zealous" , cost=0 , effects={Boldness=2} } }
+		,Cultural = { Build={ name="Sacrificial" , cost=0} }
 	}
 
 	,traits = {}

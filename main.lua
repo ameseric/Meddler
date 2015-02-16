@@ -115,6 +115,8 @@
 	function love.update( dt )
 		local build
 
+		keystrokes:clear( 'values' ) --only triggers at start of keystrokes
+
 		if in_start_screen then
 			--start_screen:update_flags()
 
@@ -386,7 +388,7 @@
 
 	function set_color( R , G , B , A )
 		if R == 'white' then
-			love.graphics.setColor( 255 , 255 , 255 , G )
+			love.graphics.setColor( 240 , 240 , 240 , G )
 		elseif R == 'black' then
 			love.graphics.setColor( 0 , 0 , 0 , G )
 		elseif R == 'green' then
