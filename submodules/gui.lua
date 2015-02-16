@@ -269,7 +269,13 @@ end
 
 					for i , choice in ipairs( choices ) do
 						set_font( font_small )
+
+						if rcf.race.config[ name ][ category ].name == choice.name then
+							set_color( 'green' ); set_font( font_med )
+						end
+
 						lprint( "("..alpha_shift( i+alpha_count )..") "..choice.name , x_2 , y*count )
+						set_font( font_small ); set_color( 'white' )
 
 						local chain = choice.cost.." Cost | "
 						local inc = 0
