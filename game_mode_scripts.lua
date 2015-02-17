@@ -92,10 +92,10 @@ gs.name = "game_actual_scripts"
 	end
 
 
-	function gs:draw( scale , player , race_creation_flags )
+	function gs:draw( scale , player , race_creation_flags , turn_action_flags )
 		set_color( 'white' );
 		atlas:draw( scale )
-		disp:draw_gui( scale , player , race_creation_flags )
+		disp:draw_gui( scale , player , race_creation_flags , turn_action_flags )
 		if _debug then debug_GUI() end
 	end
 
@@ -105,7 +105,7 @@ gs.name = "game_actual_scripts"
 		self:update_turn_stats()
 	end
 
-	function gs:keypress( key , scale , player , selected_tile , race_creation_flags )
+	function gs:keypress( key , scale , player , selected_tile , race_creation_flags , turn_action_flags )
 		local is_player_done = false
 		local rcf = race_creation_flags
 
@@ -133,9 +133,9 @@ gs.name = "game_actual_scripts"
 				change_tree_flags( key )
 			elseif not top_layer() then
 				if is_escape_key( key ) then
-					change_tree_flags( 'back' )
+					change_tree_flags( 'n' )
 				else
-					is_player_done = powers:resolve( key , selected_tile , player , race_creation_flags )
+					is_player_done = powers:resolve( key , selected_tile , player , race_creation_flags , turn_action_flags )
 				end
 			end
 		end
@@ -155,10 +155,17 @@ gs.name = "game_actual_scripts"
 					keystrokes:start_reading()
 				end
 
+				if key == 'enter' then
+					_toplevel = false
+					_status = false
+					_finished = true
+				end
+
 				toggle( is_escape_key( key ) , rcf , {"_status" , "_toplevel"} )
 				toggle( key=='2' , rcf , {"_phys_top" , "_toplevel"} )
 				toggle( key=='3' , rcf , {"_mental" , "_toplevel"} )
 				toggle( key=='4' , rcf , {"_cultural" , "_toplevel"} )
+
 
 			elseif rcf._name then
 				--doesn't matter, keypress will grab it.
@@ -199,17 +206,29 @@ gs.name = "game_actual_scripts"
 				if key then
 					for i,j in pairs( race_rules[ limb ] ) do
 						if key > offset and key <= (#j+offset) then
+							self:update_race( rcf.race , j[key-offset] , rcf.race.config[limb][i] )
 							rcf.race.config[ limb ][ i ] = j[key-offset]
-
-							for k,v in pairs( rcf.race.config[ limb ][i] ) do
-								print( k , v )
-							end
-
 						end
 						offset = offset + #j
 					end
 				end
+			end
 
+			function gs:update_race( race , new_choice , old_choice )
+				race.cost = race.cost + new_choice.cost - old_choice.cost
+				print( race.cost , new_choice.cost , old_choice.cost )
+				
+				if old_choice.effects then
+					for k , v in pairs( old_choice.effects ) do
+						race[ k ] = race[ k ] - v
+						print( k , v )
+					end
+				end
+
+				for k , v in pairs( new_choice.effects ) do
+					race[ k ] = race[ k ] + v
+					print( k , v )
+				end
 			end
 
 

@@ -8,10 +8,9 @@
 
 --]]
 
---===== Globals ========= (needs serious cleaning )
+--=========/ Globals /=========
 	TS = 32
 	window_factor = 0.75
-	disp = {}
 
 	local world_width , world_height = 100 , 100
 	local img_dir , sound_dir , save_dir = "images/" , "sounds/" , "../saves"
@@ -21,11 +20,9 @@
 	--State Flags
 	player_turn = false
 	in_start_screen , in_game_actual , in_new_game_options = false , false , false
-	give_tree , take_tree , alter_tree = false , false , false
 	choices = true
 
 	local race_creation_flags = {
-
 		race = {}
 		,_status = false
 		,_toplevel = false
@@ -36,6 +33,12 @@
 		,_phys_head = false
 		,_phys_torso = false
 		,_phys_limbs = false
+	}
+
+	local turn_action_flags = {
+		_give_tree = false
+		,_take_tree = false
+		,_alter_tree = false
 	}
 
 	loading_game = false
@@ -65,7 +68,7 @@
 
 			rules = require 'tile_rules';	race_rules = require 'race_rules'
 			genesis = require "genesis";	meddler = require "meddler"
-			atlas 	= require "atlas";		--race = require 'race'
+			atlas 	= require "atlas";		race = require 'race'
 			tiles 	= require "tile";		powers = require "powers"
 			disp 	= require "display"
 
@@ -141,10 +144,10 @@
 			end
 
 			if race_creation_flags._name and keystrokes:finished() then
-				race_creation_flags.race.name = keystrokes:get_strokes()
+				local rcf = race_creation_flags
+				rcf.race.name = keystrokes:get_strokes()
 				keystrokes:ack()
-				race_creation_flags._name = false
-				race_creation_flags._toplevel = true
+				toggle( true , rcf , {"_toplevel","_name"} )
 			end
 
 			if not race_creation_flags._status then
@@ -176,7 +179,7 @@
 			--nothing to see here...
 
 		elseif in_game_actual then
-			game_actual:draw( scale , player , race_creation_flags )
+			game_actual:draw( scale , player , race_creation_flags , turn_action_flags )
 
 		end
 
@@ -223,7 +226,7 @@
 				--nothing
 
 			elseif in_game_actual and player_turn then
-				game_actual:keypress( key , scale , player , selected_tile , race_creation_flags )
+				game_actual:keypress( key , scale , player , selected_tile , race_creation_flags , turn_action_flags )
 			end
 
 		end
@@ -234,10 +237,10 @@
 		pressed_x = x; 	pressed_y = y --used for calculating display movement off of mouse press / distance
 
 		if in_start_screen then
-			--stuff
+			--nothing
 
 		elseif in_new_game_options then
-			--stuff
+			--nothing
 
 		elseif in_game_actual then
 			if race_creation_flags._status then
@@ -273,32 +276,21 @@
 	--These need to be global in order for sub-modules to change flags if needed.
 
 	function top_layer()
-		return not give_tree and not alter_tree and not take_tree
+		local taf = turn_action_flags
+		return not ( taf._givetree or taf._altertree or taf._taketree )
 	end
 
-	function change_tree_flags( t , l )
-		if t == 'g' then
-			give_tree = true
-			alter_tree = false
-			take_tree = false
-		elseif t == 't' then
-			give_tree = false
-			take_tree = true
-			alter_tree = false
-		elseif t == 'a' then
-			give_tree = false
-			take_tree = false
-			alter_tree = true
-		elseif t == 'back' then
-			give_tree =  false
-			take_tree = false
-			alter_tree = false
-		end
+	function change_tree_flags( t )
+		local taf = turn_action_flags
+		toggle( t=="n" , taf , {"_givetree",'_altertree','_taketree'} , false )
+		toggle( t=='g' , taf , {"_givetree"} )
+		toggle( t=='t' , taf , {"_taketree"} )
+		toggle( t=='a' , taf , {"_altertree"} )
 	end
 
 	function end_player_turn()
 		player_turn = false
-		change_tree_flags( 'back' )
+		change_tree_flags( 'n' )
 	end
 
 
@@ -307,24 +299,21 @@
 		lprint("FPS: "..love.timer.getFPS(), 500, 20)
 	end
 
-	function tile_to_pixel( unit ) 
-		return unit * TS * scale
-	end
-
 	function ttp( unit )
 		return tile_to_pixel( unit )
 	end
-
-	function pixel_to_tile( unit ) 
-		return math.floor( unit / (TS*scale) )
-	end
+		function tile_to_pixel( unit ) 
+			return unit * TS * scale
+		end
 
 	function ptt( unit )
 		return pixel_to_tile( unit )
 	end
+		function pixel_to_tile( unit ) 
+			return math.floor( unit / (TS*scale) )
+		end
 
 	function dialogue( text )
-
 		if text == 'lack_emi' then
 			text = "Cannot perform action. Not enough eminence."
 		elseif text == 'lack_target' then
@@ -360,10 +349,14 @@
 		set_fonts()
 	end
 
-	function toggle( switch , tble , values )
+	function toggle( switch , tble , values , set )
 		if switch then
 			for i , value in ipairs( values ) do
-				tble[ value ] = not tble[ value ]
+				if set == true or set == false then
+					tble[ value ] = set
+				else
+					tble[ value ] = not tble[ value ]
+				end
 			end
 		end
 	end

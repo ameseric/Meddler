@@ -94,7 +94,8 @@ a = {}
 		}
 
 		,Modifier = {
-			Multi_Armed = { 3 , Attack=2 }
+			None = { 0 }
+			,Multi_Armed = { 3 , Attack=2 }
 			,Multi_Legged = { 3 , Move=2 }
 			,Wings = { 4 , Flight = { function() --[[Can always move thru terrain]] end 
 										,phase='movement' 
@@ -109,7 +110,7 @@ a = {}
 
 	a.Mental = {
 
-		placebo = {
+		Build = {
 			Zealous = 		{ Boldness=2 }
 			,Relaxed = 		{ Industry=-1 , Reproduction=2 }
 			,Greedy = 		{ Upkeep=-1 , Industry=1 }
@@ -122,7 +123,7 @@ a = {}
 
 	a.Cultural = {
 
-		placebo = {
+		Build = {
 			Sacrificial = { sac={desc="Increases Eminence gained and halves Order penalty for Take-Life."} }
 			,Caste = { a={desc="All Order penalties halved."} }
 			,Scholars = { a={desc="Upgrades cheaper?"} }

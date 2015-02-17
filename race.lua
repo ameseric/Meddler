@@ -5,12 +5,6 @@
 race = {
 	--/ Globals
 	name = "Precursor"
-	,order = 0
-	,boldness = 0
-	,industry = 0
-	,reproduction = 0
-	,upkeep = 0
-
 	--/ Created during race creation 
 --[[
 	,life = 0			//health indicator
@@ -27,51 +21,66 @@ race = {
 
 --[[ Sample stats input
 
-stats = {	
-	name = "Sample"
-	,order = 4
-	,boldness = 1
-	
-	...
+config = {	
+	name = "None"
+	,cost = 0
+	,config = {
+		Head = { Build={ cost=0 , name="Normal" } , Modifier={ cost=0 , name="None" } }
+		,Torso = { Base={ cost=0 , name="Skin"} , Build={ cost=0,name="Medium"} , Modifier={cost=0,name="None"} }
+		,Limbs = { Build={cost=0,name="Medium"} , Base={cost=0,name="Humanoid"} , Modifier={cost=0,name="None"} , Tip={cost=0,name="Digits"} }
+		,Mental = { Build={ name="Zealous" , cost=0 , effects={Boldness=2} } }
+		,Cultural = { Build={ name="Sacrificial" , cost=0} }
+	}
 
-	life = { value=2 }
-	,head = { value=3 , sprite1=normal , sprite2=horned }
-	,torso = { value=2 , sprite1=thin , sprite2=segmented }
-	,etc
+	,traits = {}
+
+	,Attack = 1
+	,Defense = 1
+	,Projection = 1
+	,Will = 1
+	,Move = 3
+	,Profile = 1
+	,Skill = 1
+
+	,Industry = 1
+	,Boldness = 0
+	,Order = 0
+	,Reproduction = 0
+	,Upkeep = 0
+
+	,head_sprite = nil
+	,limb_sprite = nil
+	,torso_sprite = nil
 }
 
 ]]
 
-function race:new( stats )
+function race:new( config )
 	local o  = {}
 	setmetatable( o , self )
 	self.__index = self
 
-	if type(stats) == 'number' then
-		generate_random_race( stats )
+	if type(config) == 'number' then
+		generate_random_race( config )
 	end
 
 
-	for category , wrapper in pairs( stats ) do
-		if type( category ) == 'table' then
-			o[ category ] = {}
-			for type , value in pairs( wrappers ) do
-				o[ category ][ type ] = value
-			end
-
-		else
-			o[ category ] = wrapper
-		end
+	for category , wrapper in pairs( config ) do
+		o[ category ] = wrapper
 	end
+	config = nil
 
 	return o
-
 end
 ---=== Helpers =======
 	function generate_random_race( point_value )
 		local temp_stats = {}
 
 	end
+
+function race:get_name()
+	return self.name
+end
 
 
 

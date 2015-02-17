@@ -1,0 +1,24 @@
+
+TODO
+
+Cleaning
+	-gui.lua by starting a gui.config file for presets.
+	-love.update, getting a little long
+	-think about consolidating game_mode_scripts somehow?
+
+Race Creation
+	DONE	highlight text choice
+	DONE 	show main screen all choices
+	DONE	clear name selection
+	-race creation graphic menu
+	-race not clearing between uses
+
+Misc
+	-start screen graphic/anim
+	-help / command screen for new players
+	-game stages, i.e. Creation/Young World/Age of War/etc.
+
+Races
+	-O2 file
+	-sprites :(
+	-AI

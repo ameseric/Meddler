@@ -11,7 +11,7 @@ local default_race = {
 	,config = {
 		Head = { Build={ cost=0 , name="Normal" } , Modifier={ cost=0 , name="None" } }
 		,Torso = { Base={ cost=0 , name="Skin"} , Build={ cost=0,name="Medium"} , Modifier={cost=0,name="None"} }
-		,Limbs = { Build={cost=0,name="Sapien"} , Base={cost=0,name="Humanoid"} , Modifier={cost=0,name="None"} , Tip={cost=0,name="Digits"} }
+		,Limbs = { Build={cost=0,name="Medium"} , Base={cost=0,name="Humanoid"} , Modifier={cost=0,name="None"} , Tip={cost=0,name="Digits"} }
 		,Mental = { Build={ name="Zealous" , cost=0 , effects={Boldness=2} } }
 		,Cultural = { Build={ name="Sacrificial" , cost=0} }
 	}
@@ -109,10 +109,11 @@ end
 
 powers = {}
 
-function powers:resolve( key , tile , meddler , race_creation_flags )
+function powers:resolve( key , tile , meddler , race_creation_flags , turn_action_flags )
 	local is_player_done = false
+	local taf = turn_action_flags
 
-	if give_tree then
+	if taf._givetree then
 		if key == 'l' then 
 			is_player_done = create_race( meddler , race_creation_flags )
 
@@ -120,7 +121,7 @@ function powers:resolve( key , tile , meddler , race_creation_flags )
 			is_player_done = Bless( tile , meddler )
 		end
 
-	elseif take_tree then		
+	elseif taf._taketree then		
 		if key == 'l' then
 			is_player_done = Sacrifice( tile , meddler )
 
@@ -128,7 +129,7 @@ function powers:resolve( key , tile , meddler , race_creation_flags )
 			is_player_done = Curse( tile )
 		end
 
-	elseif alter_tree then
+	elseif taf._altertree then
 		is_player_done = true
 		--if key == 'l' then change_life()
 		--if key == 'g' then Change_land() end

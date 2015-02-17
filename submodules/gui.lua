@@ -69,7 +69,7 @@ end
 		end
 	end
 
-function gui:draw( scale , list_of_powers , name , eminence , race_creation_flags )
+function gui:draw( scale , list_of_powers , name , eminence , race_creation_flags , turn_action_flags)
 	local rcf = race_creation_flags
 
 	love.graphics.draw( self.gui_image , self.x_draw_point , self.y_draw_point , 0 , 4*window_factor , 2.7*window_factor )
@@ -86,7 +86,7 @@ function gui:draw( scale , list_of_powers , name , eminence , race_creation_flag
 	end
 
 	if player_turn then
-		self:draw_player_options( list_of_powers )
+		self:draw_player_options( list_of_powers , turn_action_flags )
 	end
 
 	if rcf._status then
@@ -96,7 +96,8 @@ function gui:draw( scale , list_of_powers , name , eminence , race_creation_flag
 end
 
 --=====/ Additional Draws /=====
-	function gui:draw_player_options( list_of_powers )
+	function gui:draw_player_options( list_of_powers , turn_action_flags )
+		local taf = turn_action_flags
 		local text = ""
 
 		if not list_of_powers then
@@ -110,33 +111,30 @@ end
 		end
 
 		if choices then
-			if top_layer then text = "Choices"
-			elseif give_tree then text = "Give"
-			elseif take_tree then text = "Take"
-			elseif alter_tree then text = "Alter"
+			if top_layer() then text = "Choices"
+			elseif taf._givetree then text = "Give"
+			elseif taf._taketree then text = "Take"
+			elseif taf._altertree then text = "Alter"
 			end
 		else
 			text = "Powers"
 		end
 
-		set_font( font_title ); set_color( "black" );
-		--lprint( text , gui.x_choices , gui.y_draw_point + gui.margin*4 )
 		set_color( 'grey' ); set_font( font_large )
-
 		if choices then
 			if top_layer() then
 				lprint( 'Give: g' , gui.x_choices , gui.y_draw_point + gui.margin*7 )
 				lprint( 'Take: t' , gui.x_choices , gui.y_draw_point + gui.margin*10 )
 				lprint( 'Alter: a' , gui.x_choices , gui.y_draw_point + gui.margin*13 )
-			elseif give_tree then
+			elseif taf._givetree then
 				lprint( 'Life: l' , gui.x_choices , gui.y_draw_point + gui.margin*7 )
 				lprint( 'Blessing: b' , gui.x_choices , gui.y_draw_point + gui.margin*10 )
 				--lprint( 'Alter: a' , gui.x_choices , gui.y_draw_point + gui.margin*10 )
-			elseif take_tree then
+			elseif taf._taketree then
 				lprint( 'Life: l' , gui.x_choices , gui.y_draw_point + gui.margin*7 )
 				lprint( 'Blessing: b' , gui.x_choices , gui.y_draw_point + gui.margin*10 )
 				lprint( 'Land: g' , gui.x_choices , gui.y_draw_point + gui.margin*13 )
-			elseif alter_tree then
+			elseif taf._altertree then
 				lprint( 'Life: l' , gui.x_choices , gui.y_draw_point + gui.margin*7 )
 				lprint( 'Land: g' , gui.x_choices , gui.y_draw_point + gui.margin*10 )
 				lprint( 'Law: a' , gui.x_choices , gui.y_draw_point + gui.margin*13 )
@@ -177,39 +175,9 @@ end
 			lprint( "(4) Cultural Aspect" , x , y*3 )
 
 			lprint( "Name: "..rcf.race.name , x_3 , y*4 );	lprint( "Cost: "..rcf.race.cost , x+xmod*7 , y*4 )
-
 			local draw_order = { "break","Attack","Defense","Projection","Will","Move","Profile","Skill","break","Industry","Reproduction",
 						"Boldness","Upkeep","Order","break","Mental","Cultural","Head","Torso","Limbs" }
-
-			local x_header , x_value , y_overview
-			local x_count , y_count = 1 , 1
-			for i , name in ipairs( draw_order ) do
-
-				if name == 'break' then
-					x_header = x + xmod*x_count
-					x_value = x + xmod*(x_count+2.2)
-					y_overview = y*4.25
-					y_count = 1
-					x_count = x_count + 3.5
-
-				else
-					set_color( 'white' );
-					lprint( name..": " , x_header , y_overview )
-					set_color( 'green')
-					if rcf.race.config[ name ] then
-						local race = rcf.race.config[name]
-						if race.Base then
-							lprint( race.Base.name.." / "..race.Build.name , x_value , y_overview )
-						else
-							lprint( race.Build.name , x_value , y_overview )
-						end
-					else
-						lprint( rcf.race[ name ] , x_value , y_overview )
-					end
-					y_count = y_count + 1
-					y_overview = y*(4+(0.25*y_count))
-				end
-			end
+			self:draw_toplevel_overview( rcf , x , y , draw_order , xmod )
 
 		elseif rcf._name then
 			x = self.x_create_life + self.margin*6
@@ -304,7 +272,39 @@ end
 		end
 	end
 
+	--=====/ Helpers /=========
+		function gui:draw_toplevel_overview( rcf , x , y , draw_order , xmod )
+			local x_header , x_value , y_overview
+			local x_count , y_count = 1 , 1
+			for i , name in ipairs( draw_order ) do
 
+				if name == 'break' then
+					x_header = x + xmod*x_count
+					x_value = x + xmod*(x_count+2.2)
+					y_overview = y*4.25
+					y_count = 1
+					x_count = x_count + 3.5
+
+				else
+					set_color( 'white' );
+					lprint( name..": " , x_header , y_overview )
+					set_color( 'green')
+					if rcf.race.config[ name ] then
+						local race = rcf.race.config[name]
+						if race.Base then
+							lprint( race.Base.name.." / "..race.Build.name , x_value , y_overview )
+						else
+							lprint( race.Build.name , x_value , y_overview )
+						end
+					else
+						lprint( rcf.race[ name ] , x_value , y_overview )
+					end
+					y_count = y_count + 1
+					y_overview = y*(4+(0.25*y_count))
+				end
+			end
+
+		end
 
 
 
