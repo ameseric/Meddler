@@ -16,37 +16,6 @@
 	local img_dir , sound_dir , save_dir = "images/" , "sounds/" , "../saves"
 	local scale = 2
 
-
-	local rcf = { --ra_ce_creation_flags
-		race = {}
-		,_status = false
-		,_toplevel = false
-		,_name = false
-		,_mental = false
-		,_cultural = false
-		,_phys_top = false
-		,_phys_head = false
-		,_phys_torso = false
-		,_phys_limbs = false
-		,_finished = true
-	}
-
-	local taf = { --turn_action_fl_ags
-		_give_tree = false
-		,_take_tree = false
-		,_alter_tree = false
-	}
-
-	local gf = {		--game_fl_ags
-		_player_turn = false
-		,_in_start_screen = false
-		,_in_game_actual = false
-		,_in_new_game_options = false
-		,_choice = true
-		,_loading_game = false
-		,_just_started_game = false
-	}
-
 	--World objects
 	list_of_current_races = {}
 	local selected_tile = nil
@@ -65,6 +34,7 @@
 
 	--=== Helpers =====
 		local function load_libraries()
+			__ = require 'state_machine'
 			keystrokes = require "keystrokes"
 			rules = require 'tile_rules';	race_rules = require 'race_rules'
 			genesis = require "genesis";	meddler = require "meddler"
@@ -119,10 +89,10 @@
 
 		keystrokes:clear( 'values' ) --only triggers at start of keystrokes
 
-		if in_start_screen then
+		if __:at_start_screen then
 			--start_screen:update_flags()
 
-		elseif in_new_game_options then
+		elseif __:at_new_game_options then
 			if not keystrokes:are_reading() and not keystrokes:finished() then 
 				keystrokes:start_reading( "Enter Meddler Name: " , 500 , 500 )
 			end
@@ -135,22 +105,17 @@
 				keystrokes:ack()
 			end
 
-		elseif in_game_actual then
-			toggle( just_started_game , )
-			if just_started_game then
-				love.audio.play( sounds.bgm )
-				just_started_game = false
-			end
-			
-			if game_flags._player_turn then
-				game_actual:race_creation_update( rcf , player , selected_tile )
-				if not rcf._status then
+		elseif __:at_game_actual then
+			if __:just_started then love.audio.play( sounds.bgm ) end			
+			if __:is_player_turn then
+				game_actual:race_creation_update( player , selected_tile )
+				if not __:making_race then
 					build = disp:move()
 				end
 			
 			else
 				game_actual:update()
-				------------------player_turn = true
+				__:start_player_turn()
 				build = true
 			end
 
@@ -164,15 +129,15 @@
 
 	function love.draw()
 
-		if in_start_screen then
+		if __:at_start_screen then
 			set_color( 'grey' ); set_font( font_title )
 			start_screen:draw()
 
-		elseif in_new_game_options then
+		elseif __:at_new_game_options then
 			--nothing to see here...
 
-		elseif in_game_actual then
-			game_actual:draw( scale , player , rcf , turn_action_flags )
+		elseif __:at_game_actual then
+			game_actual:draw( scale , player )
 
 		end
 
@@ -205,21 +170,20 @@
 			keystrokes:process( key )
 		else
 
-			if in_start_screen then
+			if __:at_start_screen then
 				if key == 'n' then
-					in_start_screen = false;
-					in_new_game_options = true;
+					__:start_screen_to_new
 				elseif key == 'nope' then
-					in_start_screen = false
-					load_game()
-					in_game_actual = true
+					--in_start_screen = false
+					--load_game()
+					--in_game_actual = true
 				end
 
-			elseif in_new_game_options then
+			elseif __:at_new_game_options then
 				--nothing
 
-			elseif game_flags._in_game_actual and game_flags._player_turn then
-				game_actual:keypress( key , scale , player , selected_tile , rcf , turn_action_flags )
+			elseif __:is_player_turn then
+				game_actual:keypress( key , scale , player , selected_tile )
 			end
 
 		end
@@ -229,14 +193,14 @@
 	function love.mousepressed( x , y , button )
 		pressed_x = x; 	pressed_y = y --used for calculating display movement off of mouse press / distance
 
-		if in_start_screen then
+		if __:at_start_screen then
 			--nothing
 
-		elseif in_new_game_options then
+		elseif __:at_new_game_options then
 			--nothing
 
-		elseif in_game_actual then
-			if rcf._status then
+		elseif __:at_game_actual then
+			if __:making_race then
 				pressed_y = nil; pressed_x = nil
 			end
 		end
@@ -245,13 +209,13 @@
 	function love.mousereleased( x , y , button )
 		pressed_x = nil; pressed_y = nil;
 
-		if in_start_screen then
+		if __:at_start_screen then
 			--stuff
 
-		elseif in_new_game_options then
+		elseif __:at_new_game_options then
 			--stuff
 
-		elseif in_game_actual then
+		elseif __:at_game_actual then
 			local tile , x , y = atlas:get_tile( x , y , 'translate' )
 			disp:gui_select( tile , ttp(x) , ttp(y)  )
 
@@ -262,28 +226,6 @@
 			end
 
 		end
-	end
-
-
---========== State Flag Functions =============
-	--These need to be global in order for sub-modules to change flags if needed.
-
-	function top_layer()
-		local taf = turn_action_flags
-		return not ( taf._givetree or taf._altertree or taf._taketree )
-	end
-
-	function change_tree_flags( t )
-		local taf = turn_action_flags
-		toggle( t=="n" , taf , {"_givetree",'_altertree','_taketree'} , false )
-		toggle( t=='g' , taf , {"_givetree"} )
-		toggle( t=='t' , taf , {"_taketree"} )
-		toggle( t=='a' , taf , {"_altertree"} )
-	end
-
-	function end_player_turn()
-		game_flags._player_turn = false
-		change_tree_flags( 'n' )
 	end
 
 
@@ -335,23 +277,11 @@
 
 		atlas:set_batch( images.tileset , (disp.tile_height+2) * (disp.tile_width+2) ) --extra 2 for buffer to show partial tiles
 
-		if in_game_actual then
+		if __:at_game_actual then
 			atlas:build_batch()
 		end
 
 		set_fonts()
-	end
-
-	function toggle( switch , tble , values , set )
-		if switch then
-			for i , value in ipairs( values ) do
-				if set == true or set == false then
-					tble[ value ] = set
-				else
-					tble[ value ] = not tble[ value ]
-				end
-			end
-		end
 	end
 
 	function alpha_shift( char )
@@ -367,23 +297,6 @@
 			end
 		end
 	end
-
-
---=====/  Race Management Functions /===============
---may be moved at later date
-
-	function draw_races()
-		for race_name , race in pairs( list_of_current_races ) do
-			race:draw()
-		end
-	end
-
-	function update_races()
-		for race_name , race in pairs( list_of_current_races ) do
-			race:update()
-		end
-	end
-
 
 
 --========= Love Wrapper Functions ===================
