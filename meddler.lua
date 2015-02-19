@@ -40,8 +40,16 @@ function meddler:new( is_player , name )
 end
 
 
-function meddler:change_emi( value )
+function meddler:purchased( value )
+	self.eminence = self.eminence - value
+end
+
+function meddler:gained( value )
 	self.eminence = self.eminence + value
+end
+
+function meddler:can_afford( value )
+	return self.eminence >= value
 end
 
 

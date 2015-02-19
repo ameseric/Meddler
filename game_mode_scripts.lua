@@ -105,6 +105,25 @@ gs.name = "game_actual_scripts"
 		self:update_turn_stats()
 	end
 
+	function gs:race_creation_update( rcf , player , tile )
+		if rcf._name and keystrokes:finished() then
+			rcf.race.name = keystrokes:get_strokes()
+			keystrokes:ack()
+			toggle( true , rcf , {"_toplevel","_name"} )
+
+		elseif rcf._finished and rcf._status then
+			if player:can_afford( rcf.race.cost ) then
+				dialogue( player.name.." has created the race "..rcf.race.name.."!" )
+				toggle( true , rcf , {'_toplevel','_status'} )
+				player:purchased( rcf.race.cost )
+				race_manager:add_new_race( rcf.race , tile )
+
+			else
+				dialogue( 'Insufficient eminence to create race. Reduce cost.')
+			end
+		end
+	end
+
 	function gs:keypress( key , scale , player , selected_tile , race_creation_flags , turn_action_flags )
 		local is_player_done = false
 		local rcf = race_creation_flags
@@ -155,13 +174,9 @@ gs.name = "game_actual_scripts"
 					keystrokes:start_reading()
 				end
 
-				if key == 'enter' then
-					_toplevel = false
-					_status = false
-					_finished = true
-				end
+				toggle( key=='return' , rcf , {'_finished'} )--,'_toplevel','_status'} )
 
-				toggle( is_escape_key( key ) , rcf , {"_status" , "_toplevel"} )
+				toggle( is_escape_key( key ) , rcf , {"_status" , "_toplevel" , '_finished'} )
 				toggle( key=='2' , rcf , {"_phys_top" , "_toplevel"} )
 				toggle( key=='3' , rcf , {"_mental" , "_toplevel"} )
 				toggle( key=='4' , rcf , {"_cultural" , "_toplevel"} )

@@ -17,12 +17,7 @@
 	local scale = 2
 
 
-	--State Flags
-	player_turn = false
-	in_start_screen , in_game_actual , in_new_game_options = false , false , false
-	choices = true
-
-	local race_creation_flags = {
+	local rcf = { --ra_ce_creation_flags
 		race = {}
 		,_status = false
 		,_toplevel = false
@@ -33,20 +28,27 @@
 		,_phys_head = false
 		,_phys_torso = false
 		,_phys_limbs = false
+		,_finished = true
 	}
 
-	local turn_action_flags = {
+	local taf = { --turn_action_fl_ags
 		_give_tree = false
 		,_take_tree = false
 		,_alter_tree = false
 	}
 
-	loading_game = false
-
-
+	local gf = {		--game_fl_ags
+		_player_turn = false
+		,_in_start_screen = false
+		,_in_game_actual = false
+		,_in_new_game_options = false
+		,_choice = true
+		,_loading_game = false
+		,_just_started_game = false
+	}
 
 	--World objects
-	--race_being_created = {}
+	list_of_current_races = {}
 	local selected_tile = nil
 	local player = nil
 	npc_list , sounds , images = {} , {} , {}
@@ -64,13 +66,11 @@
 	--=== Helpers =====
 		local function load_libraries()
 			keystrokes = require "keystrokes"
-			--require "strict"
-
 			rules = require 'tile_rules';	race_rules = require 'race_rules'
 			genesis = require "genesis";	meddler = require "meddler"
 			atlas 	= require "atlas";		race = require 'race'
 			tiles 	= require "tile";		powers = require "powers"
-			disp 	= require "display"
+			disp 	= require "display";	race_manager = require 'race_manager'
 
 			wrapper = require "game_mode_scripts"
 			start_screen = wrapper.sss;
@@ -114,7 +114,6 @@
 		in_start_screen = true
 	end
 
-
 	function love.update( dt )
 		local build
 
@@ -137,33 +136,27 @@
 			end
 
 		elseif in_game_actual then
-
+			toggle( just_started_game , )
 			if just_started_game then
 				love.audio.play( sounds.bgm )
 				just_started_game = false
 			end
-
-			if race_creation_flags._name and keystrokes:finished() then
-				local rcf = race_creation_flags
-				rcf.race.name = keystrokes:get_strokes()
-				keystrokes:ack()
-				toggle( true , rcf , {"_toplevel","_name"} )
-			end
-
-			if not race_creation_flags._status then
-				build = disp:move()
-			end
-
-			if not player_turn then			
+			
+			if game_flags._player_turn then
+				game_actual:race_creation_update( rcf , player , selected_tile )
+				if not rcf._status then
+					build = disp:move()
+				end
+			
+			else
 				game_actual:update()
-				player_turn = true
+				------------------player_turn = true
 				build = true
 			end
 
 			if build then
 				atlas:build_batch()
 			end
-
 		end
 	end
 
@@ -179,7 +172,7 @@
 			--nothing to see here...
 
 		elseif in_game_actual then
-			game_actual:draw( scale , player , race_creation_flags , turn_action_flags )
+			game_actual:draw( scale , player , rcf , turn_action_flags )
 
 		end
 
@@ -225,8 +218,8 @@
 			elseif in_new_game_options then
 				--nothing
 
-			elseif in_game_actual and player_turn then
-				game_actual:keypress( key , scale , player , selected_tile , race_creation_flags , turn_action_flags )
+			elseif game_flags._in_game_actual and game_flags._player_turn then
+				game_actual:keypress( key , scale , player , selected_tile , rcf , turn_action_flags )
 			end
 
 		end
@@ -243,7 +236,7 @@
 			--nothing
 
 		elseif in_game_actual then
-			if race_creation_flags._status then
+			if rcf._status then
 				pressed_y = nil; pressed_x = nil
 			end
 		end
@@ -289,7 +282,7 @@
 	end
 
 	function end_player_turn()
-		player_turn = false
+		game_flags._player_turn = false
 		change_tree_flags( 'n' )
 	end
 
@@ -374,6 +367,23 @@
 			end
 		end
 	end
+
+
+--=====/  Race Management Functions /===============
+--may be moved at later date
+
+	function draw_races()
+		for race_name , race in pairs( list_of_current_races ) do
+			race:draw()
+		end
+	end
+
+	function update_races()
+		for race_name , race in pairs( list_of_current_races ) do
+			race:update()
+		end
+	end
+
 
 
 --========= Love Wrapper Functions ===================

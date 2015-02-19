@@ -53,6 +53,8 @@ function tile:get_type() return self.type end
 
 function tile:passable() return self.is_passable and not self.holds end
 
+function tile:habitable() return (self.type == 'Forest' or self.type == 'Plain' ) end
+
 function tile:get_resident() return self.holds end
 
 --function tile:get_speech() return self.holds:get_speech() end

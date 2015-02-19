@@ -82,6 +82,22 @@ function race:get_name()
 	return self.name
 end
 
+function race:genesis( tile )
+	self:new_structure( 'city' , tile )
+end
+
+function race:new_structure( type , tile )
+	--stuff
+end
+
+function race:draw()
+	--stuff
+end
+
+function race:update()
+	--stuff
+end
+
 
 
 

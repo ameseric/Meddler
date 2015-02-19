@@ -54,17 +54,19 @@ local function Bless( tile , meddler )
 end
 
 
-local function create_race( meddler , race_creation_flags )
+local function create_race( meddler , race_creation_flags , tile )
 	local rcf = race_creation_flags
 
-	if meddler.eminence <= 0 then
-		dialogue( "lack_emi" )
-		return false
+	if not tile then
+		dialogue( "lack_target" )
+
+	elseif not tile:passable() or not tile:habitable() then
+		dialogue( "Tile is not clear. Please select a clear plain or forest." )
 
 	else
 		dialogue( meddler.name.." is creating a race!" )
-		rcf._status = true
-		rcf._toplevel = true
+		toggle( true , rcf , {'_status','_toplevel','_finished'} )
+		print( rcf._finished )
 		rcf.race = default_race
 
 		return true
@@ -115,7 +117,7 @@ function powers:resolve( key , tile , meddler , race_creation_flags , turn_actio
 
 	if taf._givetree then
 		if key == 'l' then 
-			is_player_done = create_race( meddler , race_creation_flags )
+			is_player_done = create_race( meddler , race_creation_flags , tile )
 
 		elseif key == 'b' then 
 			is_player_done = Bless( tile , meddler )
