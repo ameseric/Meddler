@@ -69,8 +69,7 @@ end
 		end
 	end
 
-function gui:draw( scale , list_of_powers , name , eminence , race_creation_flags , turn_action_flags)
-	local rcf = race_creation_flags
+function gui:draw( scale , list_of_powers , name , eminence )
 
 	love.graphics.draw( self.gui_image , self.x_draw_point , self.y_draw_point , 0 , 4*window_factor , 2.7*window_factor )
 	set_font( font_med )
@@ -85,19 +84,18 @@ function gui:draw( scale , list_of_powers , name , eminence , race_creation_flag
 		draw_tile_info( scale )
 	end
 
-	if player_turn then
+	if __:is_player_turn() then
 		self:draw_player_options( list_of_powers , turn_action_flags )
 	end
 
-	if rcf._status then
-		self:draw_race_creation( rcf )
+	if __:making_race() then
+		self:draw_race_creation()
 	end
 
 end
 
 --=====/ Additional Draws /=====
-	function gui:draw_player_options( list_of_powers , turn_action_flags )
-		local taf = turn_action_flags
+	function gui:draw_player_options( list_of_powers )
 		local text = ""
 
 		if not list_of_powers then
@@ -110,31 +108,31 @@ end
 			end
 		end
 
-		if choices then
-			if top_layer() then text = "Choices"
-			elseif taf._givetree then text = "Give"
-			elseif taf._taketree then text = "Take"
-			elseif taf._altertree then text = "Alter"
+		if __:choosing_trees() then
+			if __:top_layer() then text = "Choices"
+			elseif __.in_givetree() then text = "Give"
+			elseif __.in_taketree() then text = "Take"
+			elseif __.in_altertree() then text = "Alter"
 			end
 		else
 			text = "Powers"
 		end
 
 		set_color( 'grey' ); set_font( font_large )
-		if choices then
-			if top_layer() then
+		if __:choosing_trees() then
+			if __:top_layer() then
 				lprint( 'Give: g' , gui.x_choices , gui.y_draw_point + gui.margin*7 )
 				lprint( 'Take: t' , gui.x_choices , gui.y_draw_point + gui.margin*10 )
 				lprint( 'Alter: a' , gui.x_choices , gui.y_draw_point + gui.margin*13 )
-			elseif taf._givetree then
+			elseif __:in_givetree() then
 				lprint( 'Life: l' , gui.x_choices , gui.y_draw_point + gui.margin*7 )
 				lprint( 'Blessing: b' , gui.x_choices , gui.y_draw_point + gui.margin*10 )
 				--lprint( 'Alter: a' , gui.x_choices , gui.y_draw_point + gui.margin*10 )
-			elseif taf._taketree then
+			elseif __:in_taketree() then
 				lprint( 'Life: l' , gui.x_choices , gui.y_draw_point + gui.margin*7 )
 				lprint( 'Blessing: b' , gui.x_choices , gui.y_draw_point + gui.margin*10 )
 				lprint( 'Land: g' , gui.x_choices , gui.y_draw_point + gui.margin*13 )
-			elseif taf._altertree then
+			elseif __:in_altertree() then
 				lprint( 'Life: l' , gui.x_choices , gui.y_draw_point + gui.margin*7 )
 				lprint( 'Land: g' , gui.x_choices , gui.y_draw_point + gui.margin*10 )
 				lprint( 'Law: a' , gui.x_choices , gui.y_draw_point + gui.margin*13 )
@@ -149,15 +147,14 @@ end
 	end
 
 
-	function gui:draw_race_creation( race_creation_flags )
-		local rcf = race_creation_flags
-
+	function gui:draw_race_creation()
 		set_color( 'grey' )
 		love.graphics.rectangle( 'fill' , self.x_create_life , 30 , self.x_create_life*2 , self.y_create_life )
 		set_color( 'white' )
 
 		local x = self.x_create_life + self.margin
 		local y = self.y_create_life / 7
+		local race = __:get_race()
 
 		local xmod = (x*2)/14
 
@@ -167,19 +164,19 @@ end
 		local x_5 = x + xmod*5
 		local x_8 = x + xmod*8
 
-		if rcf._toplevel then
+		if __:race_treetop() then
 			lprint( "New Race Creation" , x_5 , y*1 )
 			lprint( "(1) Name" , x , y*1.5 )					
 			lprint( "(2) Physical Characteristics" , x , y*2 )
 			lprint( "(3) Mental Characteristics " , x , y*2.5 )
 			lprint( "(4) Cultural Aspect" , x , y*3 )
 
-			lprint( "Name: "..rcf.race.name , x_3 , y*4 );	lprint( "Cost: "..rcf.race.cost , x+xmod*7 , y*4 )
+			lprint( "Name: "..race.name , x_3 , y*4 );	lprint( "Cost: "..race.cost , x+xmod*7 , y*4 )
 			local draw_order = { "break","Attack","Defense","Projection","Will","Move","Profile","Skill","break","Industry","Reproduction",
 						"Boldness","Upkeep","Order","break","Mental","Cultural","Head","Torso","Limbs" }
-			self:draw_toplevel_overview( rcf , x , y , draw_order , xmod )
+			self:draw_toplevel_overview( race , x , y , draw_order , xmod )
 
-		elseif rcf._name then
+		elseif __:making_race_name() then
 			x = self.x_create_life + self.margin*6
 			keystrokes:set( "Enter Name: " , x_5 , y*3.5 , font_med )
 
@@ -188,25 +185,22 @@ end
 			local names = {}
 			local option_draw = {}
 
-			if rcf._phys_head then
-				option_draw = race_rules.Head; name = "Head"
-			elseif rcf._phys_torso then
-				option_draw = race_rules.Torso; name = "Torso"
-			elseif rcf._phys_limbs then
-				option_draw = race_rules.Limbs; name = "Limbs"
-			elseif rcf._cultural then
-				option_draw = race_rules.Cultural; name="Cultural"
-			elseif rcf._mental then
-				option_draw = race_rules.Mental; name="Mental"
-			elseif rcf._phys_top then
-				option_draw[1] = rcf.race.config.Head;
-				option_draw[2] = rcf.race.config.Torso;
-				option_draw[3] = rcf.race.config.Limbs;
+			local choices = { _phys_head='Head' , _phys_torso='Torso' , _phys_limbs='Limbs' , _cultural='Cultural' , _mental='Mental' }
+			local choice = __:case( choices )
+
+			if choice then
+				option_draw = race_rules[ choice ]
+				name = choice
+			else
+				option_draw[1] = race.config.Head;
+				option_draw[2] = race.config.Torso;
+				option_draw[3] = race.config.Limbs;
 				names = { "Heads" , "Torso" , "Limbs" }
 			end
+			choice , choices = nil , nil
 
 
-			if rcf._phys_top then --top menu selecton, Head/Torso/Limbs
+			if #names > 2 then --top menu selecton, Head/Torso/Limbs
 				local num = 1
 
 				for i , body_part_categories in ipairs( option_draw ) do
@@ -238,7 +232,7 @@ end
 					for i , choice in ipairs( choices ) do
 						set_font( font_small )
 
-						if rcf.race.config[ name ][ category ].name == choice.name then
+						if race.config[ name ][ category ].name == choice.name then
 							set_color( 'green' ); set_font( font_med )
 						end
 
@@ -273,7 +267,7 @@ end
 	end
 
 	--=====/ Helpers /=========
-		function gui:draw_toplevel_overview( rcf , x , y , draw_order , xmod )
+		function gui:draw_toplevel_overview( race , x , y , draw_order , xmod )
 			local x_header , x_value , y_overview
 			local x_count , y_count = 1 , 1
 			for i , name in ipairs( draw_order ) do
@@ -289,15 +283,15 @@ end
 					set_color( 'white' );
 					lprint( name..": " , x_header , y_overview )
 					set_color( 'green')
-					if rcf.race.config[ name ] then
-						local race = rcf.race.config[name]
-						if race.Base then
-							lprint( race.Base.name.." / "..race.Build.name , x_value , y_overview )
+					if race.config[ name ] then
+						local limb = race.config[name]
+						if limb.Base then
+							lprint( limb.Base.name.." / "..limb.Build.name , x_value , y_overview )
 						else
-							lprint( race.Build.name , x_value , y_overview )
+							lprint( limb.Build.name , x_value , y_overview )
 						end
 					else
-						lprint( rcf.race[ name ] , x_value , y_overview )
+						lprint( race[ name ] , x_value , y_overview )
 					end
 					y_count = y_count + 1
 					y_overview = y*(4+(0.25*y_count))

@@ -106,8 +106,8 @@ local gui = require 'gui'
 
 
 --====== GUI calls =========
-	function display:draw_gui( scale , player , race_being_created , turn_action_flags )
-		gui:draw( scale , nil , player.name , player.eminence , race_being_created , turn_action_flags )
+	function display:draw_gui( scale , player )
+		gui:draw( scale , nil , player.name , player.eminence )
 	end
 
 	function display:gui_select( tile , x , y )

@@ -29,17 +29,6 @@ sss = {}
 ngs = {}
 ngs.name = "new_game_scripts"
 --========/ New Game Option Scripts /===========
-	function ngs:update_setup_flags()
-
-		if keystrokes:finished() then
-			in_new_game_options = false
-			just_started_game = true
-			player_turn = true
-			in_game_actual = true
-		end
-	end
-
-
 	function ngs:set_new_game( world_width , world_height , scale )
 		--World Creation
 		math.randomseed( os.time() )	--set pseudo-random seed value for map generation
@@ -92,10 +81,10 @@ gs.name = "game_actual_scripts"
 	end
 
 
-	function gs:draw( scale , player , race_creation_flags , turn_action_flags )
+	function gs:draw( scale , player )
 		set_color( 'white' );
 		atlas:draw( scale )
-		disp:draw_gui( scale , player , race_creation_flags , turn_action_flags )
+		disp:draw_gui( scale , player )
 		if _debug then debug_GUI() end
 	end
 
@@ -105,18 +94,17 @@ gs.name = "game_actual_scripts"
 		self:update_turn_stats()
 	end
 
-	function gs:race_creation_update( rcf , player , tile )
-		if rcf._name and keystrokes:finished() then
-			rcf.race.name = keystrokes:get_strokes()
-			keystrokes:ack()
-			toggle( true , rcf , {"_toplevel","_name"} )
+	function gs:race_creation_update( player , tile )
+		if __:making_race_name() and keystrokes:finished() then
+			__:set_race_name()
 
-		elseif rcf._finished and rcf._status then
-			if player:can_afford( rcf.race.cost ) then
-				dialogue( player.name.." has created the race "..rcf.race.name.."!" )
-				toggle( true , rcf , {'_toplevel','_status'} )
-				player:purchased( rcf.race.cost )
-				race_manager:add_new_race( rcf.race , tile )
+		elseif __:finished_making_race() then
+			local temp_race = __:get_race()
+
+			if player:purchase( temp_race.cost ) then
+				dialogue( player.name.." has created the race "..temp_race.name.."!" )
+				race_manager:add_new_race( temp_race.cost , tile )
+				__:stop_making_race()
 
 			else
 				dialogue( 'Insufficient eminence to create race. Reduce cost.')
@@ -124,13 +112,13 @@ gs.name = "game_actual_scripts"
 		end
 	end
 
-	function gs:keypress( key , scale , player , selected_tile , race_creation_flags , turn_action_flags )
+	function gs:keypress( key , scale , player , selected_tile )
 		local is_player_done = false
-		local rcf = race_creation_flags
 
-
-		if rcf._status then
-			self:race_creation_keytree( rcf , key )
+		if __:making_race() then
+			--self:race_creation_keytree( key )
+			local limb_name = __:race_creation_keytree( key )
+			self:get_option( limb_name )
 
 		else
 			if key == '-' and scale > 1 then
@@ -146,28 +134,28 @@ gs.name = "game_actual_scripts"
 				configure_screen_settings( true )
 
 			elseif key == 'p' then
-				choices = not choices
+				__:toggle_choice()
 
-			elseif top_layer() then
-				change_tree_flags( key )
-			elseif not top_layer() then
-				if is_escape_key( key ) then
-					change_tree_flags( 'n' )
-				else
-					is_player_done = powers:resolve( key , selected_tile , player , race_creation_flags , turn_action_flags )
-				end
+			elseif __:top_layer() then
+				__:change_tree_flags( key )
+			else
+				__:change_tree_flags( is_escape_key(key) )
+				is_player_done = powers:resolve( key , selected_tile , player )
 			end
 		end
 
 
 		if is_player_done then
-			end_player_turn()
+			__:end_player_turn()
 		end
 	end
 
 	--====/ Helpers /=========
-		function gs:race_creation_keytree( rcf , key )
-			if rcf._toplevel then
+	--[[
+		function gs:race_creation_keytree( key )
+			if __:race_toplevel then
+
+				__:
 
 				if key == '1' then
 					toggle( true , rcf , {"_name","_toplevel"} )
@@ -213,16 +201,17 @@ gs.name = "game_actual_scripts"
 
 			end
 		end
-
+--]]
 		--=====/ Helpers /===============
-			function gs:get_option( key , rcf , limb )
+			function gs:get_option( key , limb )
 				key = alpha_shift( key )
 				local offset = 0
+				local race = __:get_race()
 				if key then
 					for i,j in pairs( race_rules[ limb ] ) do
 						if key > offset and key <= (#j+offset) then
-							self:update_race( rcf.race , j[key-offset] , rcf.race.config[limb][i] )
-							rcf.race.config[ limb ][ i ] = j[key-offset]
+							self:update_race( race , j[key-offset] , race.config[limb][i] )
+							race.config[ limb ][ i ] = j[key-offset]
 						end
 						offset = offset + #j
 					end

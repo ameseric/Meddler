@@ -81,7 +81,7 @@
 		load_libraries()
 		load_environment() --load images , sounds , and fonts. Display is set within.
 		configure_screen_settings( true ) --sets display, GUI, and fonts based on current window_factor
-		in_start_screen = true
+		__:start_game()
 	end
 
 	function love.update( dt )
@@ -89,27 +89,26 @@
 
 		keystrokes:clear( 'values' ) --only triggers at start of keystrokes
 
-		if __:at_start_screen then
+		if __:at_start_screen() then
 			--start_screen:update_flags()
 
-		elseif __:at_new_game_options then
+		elseif __:at_new_game_options() then
 			if not keystrokes:are_reading() and not keystrokes:finished() then 
 				keystrokes:start_reading( "Enter Meddler Name: " , 500 , 500 )
 			end
 
-			ngo:update_setup_flags()
-
 			if keystrokes:finished() then
+				__:new_game_to_game_actual()
 				player = meddler:new( true , keystrokes:get_strokes() )
 				ngo:set_new_game( world_width , world_height , scale )
 				keystrokes:ack()
 			end
 
-		elseif __:at_game_actual then
-			if __:just_started then love.audio.play( sounds.bgm ) end			
-			if __:is_player_turn then
+		elseif __:at_game_actual() then
+			if __:just_started() then love.audio.play( sounds.bgm ) end			
+			if __:is_player_turn() then
 				game_actual:race_creation_update( player , selected_tile )
-				if not __:making_race then
+				if not __:making_race() then
 					build = disp:move()
 				end
 			
@@ -129,14 +128,14 @@
 
 	function love.draw()
 
-		if __:at_start_screen then
+		if __:at_start_screen() then
 			set_color( 'grey' ); set_font( font_title )
 			start_screen:draw()
 
-		elseif __:at_new_game_options then
+		elseif __:at_new_game_options() then
 			--nothing to see here...
 
-		elseif __:at_game_actual then
+		elseif __:at_game_actual() then
 			game_actual:draw( scale , player )
 
 		end
@@ -144,7 +143,6 @@
 		if keystrokes:are_reading() then
 			keystrokes:draw()
 		end
-
 	end
 
 
@@ -170,19 +168,19 @@
 			keystrokes:process( key )
 		else
 
-			if __:at_start_screen then
+			if __:at_start_screen() then
 				if key == 'n' then
-					__:start_screen_to_new
+					__:start_screen_to_new_game()
 				elseif key == 'nope' then
 					--in_start_screen = false
 					--load_game()
 					--in_game_actual = true
 				end
 
-			elseif __:at_new_game_options then
+			elseif __:at_new_game_options() then
 				--nothing
 
-			elseif __:is_player_turn then
+			elseif __:is_player_turn() then
 				game_actual:keypress( key , scale , player , selected_tile )
 			end
 
@@ -193,14 +191,14 @@
 	function love.mousepressed( x , y , button )
 		pressed_x = x; 	pressed_y = y --used for calculating display movement off of mouse press / distance
 
-		if __:at_start_screen then
+		if __:at_start_screen() then
 			--nothing
 
-		elseif __:at_new_game_options then
+		elseif __:at_new_game_options() then
 			--nothing
 
-		elseif __:at_game_actual then
-			if __:making_race then
+		elseif __:at_game_actual() then
+			if __:making_race() then
 				pressed_y = nil; pressed_x = nil
 			end
 		end
@@ -209,13 +207,13 @@
 	function love.mousereleased( x , y , button )
 		pressed_x = nil; pressed_y = nil;
 
-		if __:at_start_screen then
+		if __:at_start_screen() then
 			--stuff
 
-		elseif __:at_new_game_options then
+		elseif __:at_new_game_options() then
 			--stuff
 
-		elseif __:at_game_actual then
+		elseif __:at_game_actual() then
 			local tile , x , y = atlas:get_tile( x , y , 'translate' )
 			disp:gui_select( tile , ttp(x) , ttp(y)  )
 
@@ -266,7 +264,10 @@
 	end
 
 	function is_escape_key( key )
-		return key == 'escape' or key == 'n' or key == 'q'
+		if key == 'escape' or key == 'n' or key == 'q' then
+			return 'escape'
+		end
+		return key
 	end
 
 	function configure_screen_settings( perform_disp_setup )
@@ -277,7 +278,7 @@
 
 		atlas:set_batch( images.tileset , (disp.tile_height+2) * (disp.tile_width+2) ) --extra 2 for buffer to show partial tiles
 
-		if __:at_game_actual then
+		if __:at_game_actual() then
 			atlas:build_batch()
 		end
 
@@ -285,7 +286,7 @@
 	end
 
 	function alpha_shift( char )
-		local chars = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t'}
+		local chars = {'a','b','c','d','e','f','g','h','i','j','k','l','m','o','p','r','s','t'}
 
 		if type(char) == 'number' then
 			return chars[ char ]

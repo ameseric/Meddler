@@ -39,20 +39,19 @@ function meddler:new( is_player , name )
 	return new_meddler
 end
 
-
-function meddler:purchased( value )
-	self.eminence = self.eminence - value
-end
-
 function meddler:gained( value )
 	self.eminence = self.eminence + value
 end
 
-function meddler:can_afford( value )
-	return self.eminence >= value
+function meddler:purchase( value )
+	if self.eminence >= value then
+		self.eminence = self.eminence - value
+		return true
+	else
+		dialogue( 'lack_emi' )
+		return false
+	end
 end
-
-
 
 
 

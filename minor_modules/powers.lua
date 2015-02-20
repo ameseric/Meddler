@@ -3,15 +3,44 @@
 	Different functions relating to Meddler powers.
 
 ]]
+local default_race = {	
+	name = "None"
+	,cost = 0
+	,config = {
+		Head = { Build={ cost=0 , name="Normal" } , Modifier={ cost=0 , name="None" } }
+		,Torso = { Base={ cost=0 , name="Skin"} , Build={ cost=0,name="Medium"} , Modifier={cost=0,name="None"} }
+		,Limbs = { Build={cost=0,name="Medium"} , Base={cost=0,name="Humanoid"} , Modifier={cost=0,name="None"} , Tip={cost=0,name="Digits"} }
+		,Mental = { Build={ name="Zealous" , cost=0 , effects={Boldness=2} } }
+		,Cultural = { Build={ name="Sacrificial" , cost=0} }
+	}
 
+	,traits = {}
+
+	,Attack = 1
+	,Defense = 1
+	,Projection = 1
+	,Will = 1
+	,Move = 3
+	,Profile = 1
+	,Skill = 1
+
+	,Industry = 1
+	,Boldness = 0
+	,Order = 0
+	,Reproduction = 0
+	,Upkeep = 0
+
+	,head_sprite = nil
+	,limb_sprite = nil
+	,torso_sprite = nil
+}
 
 local function Bless( tile , meddler )
 	if not tile then
 		dialogue( "lack_target" )
 		return false
 
-	elseif meddler.eminence <= 0 then
-		dialogue( "lack_emi")
+	elseif meddler:purchase( 4 ) then
 		return false
 
 	else
@@ -22,16 +51,17 @@ local function Bless( tile , meddler )
 end
 
 
-local function create_race( meddler )
-	if meddler.eminence <= 0 then
-		dialogue( "lack_emi" )
-		return false
+local function create_race( meddler , tile )
+	if not tile then
+		dialogue( "lack_target" )
+
+	elseif not tile:passable() or not tile:habitable() then
+		dialogue( "Tile is not clear. Please select a clear plain or forest." )
 
 	else
 		dialogue( meddler.name.." is creating a race!" )
-		creating_race = true
-		creating_race_top_level = true
-		race_being_created = { name = "None" , mental = "None" , culture = "None" }
+		__:start_making_race( default_race )
+
 		return true
 	end
 end
@@ -45,12 +75,12 @@ local function Sacrifice( tile , meddler )
 		if not unit then
 			dialogue( "lack_target")
 			return false
-		else
+		elseif meddler:purchase( 5 ) then
 			tile:set_ocpied()
-			meddler:change_emi( 5 )
 			return true
 		end
 	end
+	return false
 end
 
 
@@ -58,11 +88,12 @@ local function Curse( tile )
 	if not tile then
 		dialogue( "lack_target")
 		return false
-	else
+	elseif meddler:purchase( 5 ) then
 		tile.rate = 0
 		tile.timer = 4
 		return true
 	end
+	return false
 end
 
 local function Change_land( tile )
@@ -77,7 +108,7 @@ powers = {}
 function powers:resolve( key , tile , meddler )
 	local is_player_done = false
 
-	if give_tree then
+	if __:in_givetree() then
 		if key == 'l' then 
 			is_player_done = create_race( meddler )
 
@@ -85,7 +116,7 @@ function powers:resolve( key , tile , meddler )
 			is_player_done = Bless( tile , meddler )
 		end
 
-	elseif take_tree then		
+	elseif __:in_taketree() then		
 		if key == 'l' then
 			is_player_done = Sacrifice( tile , meddler )
 
@@ -93,7 +124,7 @@ function powers:resolve( key , tile , meddler )
 			is_player_done = Curse( tile )
 		end
 
-	elseif alter_tree then
+	elseif __:in_altertree() then
 		is_player_done = true
 		--if key == 'l' then change_life()
 		--if key == 'g' then Change_land() end
@@ -122,48 +153,6 @@ end
 	,'Knowing'	--1,1,2
 	]]
 
-
-
-
-
---[[
-function powers.Harvest( city , atlas.world , med )
-	local x , y = city.location
-	powers.inf( 10 , med )
-
-	for i=0,2 do
-		for j=0,2 do
-			if atlas.world[ i+x ][ j+y ].type == 'farm' then
-				city.wealth = city.wealth + 50
-			end
-		end
-	end
-end
-
-function powers.Observe()
-	stuff
-end
-
-
-function powers.Wander()
-	--all races created by this Meddler are granted +1 activity for the turn
-end
-
-
-function powers.Warp( med , world , loc_a , loc_b ) --switches any two tiles of the world map
-	powers.inf( 10 , med )
-
-	local temp = world[ loc_a.x ][ loc_a.y ]
-	world[ loc_a.x ][ loc_a.y ] = world[ loc_b.x ][ loc_b.y ]
-	world[ loc_b.x ][ loc_b.y ] = temp
-end
-
-
-
-function powers.inf( cost , med )
-	med.influence = med.influence - cost
-end
---]]
 
 
 return powers
