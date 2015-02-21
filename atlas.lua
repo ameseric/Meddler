@@ -29,47 +29,83 @@ function atlas:build_batch()
 	self.sprite_batch:clear()
 
 	for x = -1 , disp.tile_width do --extra 1's are for buffer , partial tiles
+		local i = disp:tile_pos( 'x' ) + x
+
 		for y = -1 , disp.tile_height do
-			local i = x + disp:x_tile_pos()
-			local j = y + disp:y_tile_pos()
-			if self:in_bounds( i , j ) then
-				local type = self.world[i][j].type
-				local quad = rules:get_quad( type )
-				self.sprite_batch:add( quad , i*TS , j*TS )
-			end
+			local j = disp:tile_pos( 'y' ) + y
+			k , l = self:tile_wrap_around( i , j )
+
+			local type = self.world[k][l].type
+			local quad = rules:get_quad( type )
+			self.sprite_batch:add( quad , i*TS , j*TS )
 		end
 	end
 	self.sprite_batch:unbind()
 end
+
 
 function atlas:draw( scale )
 	love.graphics.draw( self.sprite_batch , -disp.x_pix_pos , -disp.y_pix_pos , 0 , scale , scale ) --for buffer
 end
 
 function atlas:in_bounds( x , y )
-	return x >= 0 and x < self.world_width_tile and y >= 0 and y < self.world_height_tile
+	if x and y then
+		return x >= 0 and x < self.world_width_tile and y >= 0 and y < self.world_height_tile
+	elseif x then
+		return x >= 0 and x < self.world_width_tile
+	elseif y then
+		return y >= 0 and y < self.world_height_tile
+	end
 end
 
-function atlas:get_tile( x , y , translate )
-	if translate then
-		x = pixel_to_tile( x + disp.x_pix_pos )
-		y = pixel_to_tile( y + disp.y_pix_pos )
+function atlas:get_tile( x , y , translate_pixel )
+
+	if translate_pixel then
+		x , y = pwa( x + disp.x_pix_pos , y + disp.y_pix_pos )
+		x = pixel_to_tile( x )
+		y = pixel_to_tile( y )
 	end
-	return self.world[ x ][ y ] , x , y
+	return self.world[ x ][ y ]
 end
 
 
 --===== Helpers ======
 	function atlas:world_width_pix()
-		return tile_to_pixel( self.world_width_tile)
+		return ttp( self.world_width_tile )
 	end
 
 	function atlas:world_height_pix()
-		return tile_to_pixel( self.world_height_tile)
+		return ttp( self.world_height_tile )
 	end
 
+	function atlas:tile_wrap_around( x , y )
+		x , y = ttp( x ) , ttp(y)
+		x , y = self:pixel_wrap_around( x , y )
+		x , y = ptt(x) , ptt(y)
 
+		return x , y
+	end
 
+	function atlas:pixel_wrap_around( x , y )
+		if x >= self:world_width_pix() then
+			x = x - self:world_width_pix()
+		elseif x < 0 then
+			x = self:world_width_pix() + x
+		end		
 
+		if y >= self:world_height_pix() then
+			y = y - self:world_height_pix()
+		elseif y < 0 then
+			y = self:world_height_pix() + y
+		end
+
+		return x , y
+	end
 
 return atlas
+
+
+
+
+
+

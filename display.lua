@@ -68,8 +68,8 @@ local gui = require 'gui'
 
 		end
 
-
-		self:in_bounds()
+		--self:in_bounds()
+		self.x_pix_pos , self.y_pix_pos = pwa( self.x_pix_pos , self.y_pix_pos )
 		return old_x ~= self.x_pix_pos or old_y ~= self.y_pix_pos
 	end
 	--===== Helpers =======
@@ -125,11 +125,12 @@ local gui = require 'gui'
 
 
 
-function display:x_tile_pos()
-	return pixel_to_tile( self.x_pix_pos )
-end
-function display:y_tile_pos()
-	return pixel_to_tile( self.y_pix_pos )
+function display:tile_pos( value )
+	if value == 'x' then return ptt( self.x_pix_pos )
+	elseif value == 'y' then return ptt( self.y_pix_pos )
+	end
+
+	return ptt( self.x_pix_pos ) , ptt( self.y_pix_pos )
 end
 
 

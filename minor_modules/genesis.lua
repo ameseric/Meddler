@@ -56,7 +56,7 @@ function genesis:create( width , height )
 		world[ x ] = {}
 		for y = 0,height-1 do
 			local type = random_tile_type( world , x , y )
-			world[ x ][ y ] = tiles:new( type )
+			world[ x ][ y ] = tiles:new( type , x , y )
 			
 			if border_debug( x , y , width , height ) then
 				world[ x ][ y ] = tiles:new( 'Mountain' , x , y )

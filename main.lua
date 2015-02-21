@@ -205,8 +205,8 @@
 			--stuff
 
 		elseif __:at_game_actual() then
-			local tile , x , y = atlas:get_tile( x , y , 'translate' )
-			disp:gui_select( tile , ttp(x) , ttp(y)  )
+			local tile = atlas:get_tile( x , y , 'translate' )
+			disp:gui_select( tile )
 
 			if tile == selected_tile then
 				selected_tile = nil
@@ -236,6 +236,13 @@
 		function pixel_to_tile( unit ) 
 			return math.floor( unit / (TS*scale) )
 		end
+
+	function pwa( x , y )
+		return atlas:pixel_wrap_around( x , y )
+	end
+	function twa( x , y )
+		return atlas:tile_wrap_around( x , y )
+	end
 
 	function dialogue( text )
 		if text == 'lack_emi' then

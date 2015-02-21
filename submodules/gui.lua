@@ -4,8 +4,6 @@ gui = {
 	gui_image = nil
 	,selected_tile = false
 	,tile = nil
-	,tile_x = 0
-	,tile_y = 0
 	,tileset = nil
 	,message_log = {}
 }
@@ -39,8 +37,8 @@ end
 		end
 		local function draw_tile_select( scale )
 			set_color( 'white' )
-			love.graphics.rectangle( 'line' , gui.tile_x - disp.x_pix_pos , gui.tile_y - disp.y_pix_pos ,
-												 TS*scale , TS*scale )
+			local tile_x , tile_y = gui.tile:get_draw_pos()
+			love.graphics.rectangle( 'line' , tile_x , tile_y , TS*scale , TS*scale )
 		end
 		local function draw_main_gui_text( x )
 			lprint( gui.tile.type , x , gui.y_draw_point + gui.margin * 10 )
@@ -98,15 +96,14 @@ end
 	function gui:draw_player_options( list_of_powers )
 		local text = ""
 
-		if not list_of_powers then
-			list_of_powers = {}
-		end
+		if not list_of_powers then list_of_powers = {"None"} end
+		--[[
 		local diff = 4 - #list_of_powers
 		if diff ~= 0 then
 			for i=1,diff do
 				table.insert( list_of_powers , "None" )
 			end
-		end
+		end--]]
 
 		if __:choosing_trees() then
 			if __:top_layer() then text = "Choices"
@@ -309,9 +306,7 @@ function gui:add_dialogue( text )
 end
 
 
-function gui:select( tile , x , y )
-	self.tile_x = x
-	self.tile_y = y
+function gui:select( tile )
 
 	if self.tile == tile then
 		self.selected_tile = not self.selected_tile

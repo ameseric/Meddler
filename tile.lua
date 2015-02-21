@@ -52,6 +52,13 @@ end
 
 
 function tile:get_type() return self.type end
+function tile:get_loc_pos() return self.x , self.y end
+function tile:get_draw_pos()
+	local x = ttp( self.x ) - disp.x_pix_pos
+	local y = ttp( self.y ) - disp.y_pix_pos
+	return pwa( x , y )
+end
+
 
 function tile:passable() return self.is_passable and not self.holds end
 
