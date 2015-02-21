@@ -55,7 +55,7 @@ config = {
 
 ]]
 
-function race:new( config )
+function race:new( config , tile )
 	local o  = {}
 	setmetatable( o , self )
 	self.__index = self
@@ -64,11 +64,14 @@ function race:new( config )
 		generate_random_race( config )
 	end
 
+	self.unit_sprite = images.unit_sprites
 
 	for category , wrapper in pairs( config ) do
 		o[ category ] = wrapper
 	end
 	config = nil
+
+	self:new_structure( 'Village' , tile )
 
 	return o
 end
@@ -82,16 +85,13 @@ function race:get_name()
 	return self.name
 end
 
-function race:genesis( tile )
-	self:new_structure( 'city' , tile )
-end
-
 function race:new_structure( type , tile )
-	--stuff
+	--atlas:make_structure( type , tile.x , tile.y )
+	tile.type = type
 end
 
 function race:draw()
-	print( "Drawing "..self.name )
+	--stuff
 end
 
 function race:update()

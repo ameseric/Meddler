@@ -26,7 +26,7 @@ function unit:new( race , type )
 
 	u.race = race
 
-	for category , wrapper in pairs( race )
+	for category , wrapper in pairs( race ) do
 		if type( category ) == 'table' then
 			u[ category ] = wrapper.value
 		end

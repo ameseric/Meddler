@@ -22,3 +22,8 @@ Races
 	-O2 file
 	-sprites :(
 	-AI
+
+Map Generation
+	-borders? continents?
+	-new game options ( x , y )
+	-second-pass generation

@@ -13,7 +13,6 @@
 	window_factor = 0.75
 
 	local world_width , world_height = 100 , 100
-	local img_dir , sound_dir , save_dir = "images/" , "sounds/" , "../saves"
 	local scale = 2
 
 	--World objects
@@ -30,44 +29,33 @@
 
 --========== Core Love Functions ===============
 
-
-
 	--=== Helpers =====
 		local function load_libraries()
-			__ = require 'state_machine'
-			keystrokes = require "keystrokes"
-			rules = require 'tile_rules';	race_rules = require 'race_rules'
-			genesis = require "genesis";	meddler = require "meddler"
-			atlas 	= require "atlas";		race = require 'race'
-			tiles 	= require "tile";		powers = require "powers"
-			disp 	= require "display";	race_manager = require 'race_manager'
+			--=== Primary Modules ====
+			meddler 		= require "meddler"
+			atlas 			= require "atlas";
+			tiles 			= require "tile";
+			disp 			= require "display";
+			wrapper 		= require "game_mode_scripts"
+			race 			= require 'race'
+			unit			= require 'unit'
+			start_screen 	= wrapper.sss;
+			ngo 			= wrapper.ngo;
+			game_actual 	= wrapper.ga
 
-			wrapper = require "game_mode_scripts"
-			start_screen = wrapper.sss;
-			ngo = wrapper.ngo;
-			game_actual = wrapper.ga
+			--=== Minor Modules ====
+			keystrokes 		= require "keystrokes"
+			genesis 		= require "genesis";
+			powers 			= require "powers"
+			race_manager 	= require 'race_manager'
+			race_rules 		= require 'race_rules'
+			__ 				= require 'state_machine'
+			rules 			= require 'tile_rules';
+
+			--=== Sub/Loader Modules ====
+			--gui.lua, display.lua
+			--npcs.lua
 		end
-
-		--==== Helpers ======
-			local function load_images()
-				local natural_tiles = love.graphics.newImage( img_dir.."natural_tiles.png" )
-				natural_tiles:setFilter( 'nearest' )
-				images.tileset = natural_tiles
-
-				local gui_image = love.graphics.newImage( img_dir.."main_gui.png" )
-				gui_image:setFilter( 'nearest' )
-				images.gui_image = gui_image
-			end
-
-			local function load_sounds()
-				sounds.bgm = love.audio.newSource( sound_dir.."rolling_hills.mp3" , "stream" )
-			end
-		local function load_environment()
-			load_images()
-			load_sounds()
-			love.keyboard.setKeyRepeat( true )
-		end
-
 		local function setup_run_flags()
 			for i , v in ipairs( arg ) do
 				if v == '-d' or '--debug' then _debug = true
@@ -76,10 +64,14 @@
 			end
 		end
 
-	function love.load()							--initial values and files to load for gameplay
-		setup_run_flags()
+	function love.load()				--initial values and files to load for gameplay
+		setup_run_flags() 
 		load_libraries()
-		load_environment() --load images , sounds , and fonts. Display is set within.
+
+		local wrapper = require 'game_media'
+		images , sounds = wrapper.images , wrapper.sounds
+
+		love.keyboard.setKeyRepeat( true )
 		configure_screen_settings( true ) --sets display, GUI, and fonts based on current window_factor
 		__:start_game()
 	end
@@ -137,7 +129,6 @@
 
 		elseif __:at_game_actual() then
 			game_actual:draw( scale , player )
-
 		end
 
 		if keystrokes:are_reading() then

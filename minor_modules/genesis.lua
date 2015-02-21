@@ -33,9 +33,6 @@ local genesis = {}
 		end
 	end
 
-	local function check_neighbor_tiles()
-	end
-
 	local function border_debug( x , y , width , height )
 		if x == 0 or x == width or y == 0 or y == height then
 			return true
@@ -62,11 +59,11 @@ function genesis:create( width , height )
 			world[ x ][ y ] = tiles:new( type )
 			
 			if border_debug( x , y , width , height ) then
-				world[ x ][ y ] = tiles:new( 'Mountain' )
+				world[ x ][ y ] = tiles:new( 'Mountain' , x , y )
 			end
 
 			if center_debug( x , y , width , height ) then
-				world[ x ][ y ] = tiles:new( 'Mountain' )
+				world[ x ][ y ] = tiles:new( 'Mountain' , x , y )
 			end
 		end
 	end

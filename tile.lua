@@ -13,12 +13,14 @@ local tile = {
 
 
 
-function tile:new( type )
+function tile:new( type , x , y )
 	new_tile = {}
 	setmetatable( new_tile, self )
 	self.__index = self
 	new_tile.type = type
 	new_tile.is_ocpied = false
+
+	new_tile.x , new_tile.y = x , y 
 
 	for k,v in pairs( rules.total_set[type] ) do --watch out for tables
 		new_tile[k] = v

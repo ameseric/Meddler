@@ -10,8 +10,6 @@ race_manager = {
 function race_manager:add_new_race( config , tile )
 	local new_race = race:new( config , tile )
 	list_of_current_races[ config.name ] = new_race
-
-
 end
 
 
