@@ -49,7 +49,7 @@ sm = {}
 	end
 
 	function sm:case( flag_calls )
-		for flag_name , call in ipairs( flag_calls ) do
+		for flag_name , call in pairs( flag_calls ) do
 			if flags[ flag_name ] then
 				if type( call ) == 'function' then
 					return call() , flag_name
@@ -78,6 +78,7 @@ sm = {}
 	--=====/ Toggles /=====
 	function sm:start_game() flags._in_start_screen = true end
 	function sm:change_tree_flags( t )
+		if not t then return end
 		self:toggle( t=="escape" , {"_givetree",'_altertree','_taketree'} , false )
 		self:toggle( t=='g' , {"_givetree"} )
 		self:toggle( t=='t' , {"_taketree"} )
@@ -86,7 +87,7 @@ sm = {}
 
 	function sm:end_player_turn()
 		flags._player_turn = false
-		change_tree_flags( 'escape' )
+		self:change_tree_flags( 'escape' )
 	end
 
 	function sm:just_started()
@@ -123,49 +124,49 @@ sm = {}
 	end
 
 	function sm:start_making_race( race )
-		self:toggle( true , {'_race_status','_race_toplevel'})
+		self:toggle( true , {'_race_status','_race_toplevel','_race_finished'})
 		flags.race = race
 	end
 
 	function sm:race_creation_keytree( key )
 		if flags._race_toplevel then
 			if key == '1' then
-				self:toggle( true , rcf , {"_name","_race_toplevel"} )
+				self:toggle( true , {"_race_name","_race_toplevel"} )
 				keystrokes:start_reading()
 			end
 			self:toggle( key=='2' , {"_phys_top" , "_race_toplevel"} )
 			self:toggle( key=='3' , {"_mental" , "_race_toplevel"} )
 			self:toggle( key=='4' , {"_cultural" , "_race_toplevel"} )
 			self:toggle( key=='return' , {'_race_finished'} )
-			self:toggle( is_escape_key( key )=='escape' , {"_status" , "_race_toplevel" , '_race_finished'} )
+			self:toggle( is_escape_key( key ) , {"_race_status" , "_race_toplevel" , '_race_finished'} )
 
 		elseif flags._race_name then
 			--doesn't matter, keypress will grab it.
 
 		elseif flags._phys_top then
-			self:toggle( is_escape_key( key )=='escape' , {"_race_toplevel" , "_phys_top"} )
+			self:toggle( is_escape_key( key ) , {"_race_toplevel" , "_phys_top"} )
 			self:toggle( key == '1' , {"_phys_head" , "_phys_top"} )
 			self:toggle( key == '2' , {"_phys_torso" ,  "_phys_top"} )
 			self:toggle( key == '3' , {"_phys_limbs" ,  "_phys_top"} )
 
 		elseif flags._phys_head then				
-			self:toggle( is_escape_key( key )=='escape' , {"_phys_head" , "_phys_top"} )
+			self:toggle( is_escape_key( key ) , {"_phys_head" , "_phys_top"} )
 			return 'Head'
 
 		elseif flags._phys_limbs then
-			self:toggle( is_escape_key( key )=='escape' , {"_phys_top" , "_phys_limbs"} )
+			self:toggle( is_escape_key( key ) , {"_phys_top" , "_phys_limbs"} )
 			return 'Limbs'
 
 		elseif flags._phys_torso then
-			self:toggle( is_escape_key( key )=='escape' , {"_phys_top" , "_phys_torso"})
+			self:toggle( is_escape_key( key ) , {"_phys_top" , "_phys_torso"})
 			return 'Torso'
 
 		elseif flags._mental then
-			self:toggle( is_escape_key( key )=='escape' , {"_mental" , "_race_toplevel"})
+			self:toggle( is_escape_key( key ) , {"_mental" , "_race_toplevel"})
 			return 'Mental'
 
 		elseif flags._cultural then
-			self:toggle( is_escape_key( key )=='escape' , {"_cultural" , "_race_toplevel"})
+			self:toggle( is_escape_key( key ) , {"_cultural" , "_race_toplevel"})
 			return 'Cultural'
 
 		end

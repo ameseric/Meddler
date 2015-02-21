@@ -267,7 +267,7 @@
 		if key == 'escape' or key == 'n' or key == 'q' then
 			return 'escape'
 		end
-		return key
+		return false
 	end
 
 	function configure_screen_settings( perform_disp_setup )

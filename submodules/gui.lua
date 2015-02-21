@@ -85,7 +85,7 @@ function gui:draw( scale , list_of_powers , name , eminence )
 	end
 
 	if __:is_player_turn() then
-		self:draw_player_options( list_of_powers , turn_action_flags )
+		self:draw_player_options( list_of_powers )
 	end
 
 	if __:making_race() then

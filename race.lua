@@ -91,7 +91,7 @@ function race:new_structure( type , tile )
 end
 
 function race:draw()
-	--stuff
+	print( "Drawing "..self.name )
 end
 
 function race:update()

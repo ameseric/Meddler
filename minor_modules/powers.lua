@@ -110,7 +110,7 @@ function powers:resolve( key , tile , meddler )
 
 	if __:in_givetree() then
 		if key == 'l' then 
-			is_player_done = create_race( meddler )
+			is_player_done = create_race( meddler , tile )
 
 		elseif key == 'b' then 
 			is_player_done = Bless( tile , meddler )

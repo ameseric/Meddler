@@ -69,13 +69,6 @@ gs.name = "game_actual_scripts"
 	end
 
 
-	function gs:time_passes()
-		--races_turn_by_ini()
-		self:natural_events()
-	end
-
-
-
 	function gs:update_turn_stats()
 		turn_count = turn_count + 1
 	end
@@ -84,13 +77,14 @@ gs.name = "game_actual_scripts"
 	function gs:draw( scale , player )
 		set_color( 'white' );
 		atlas:draw( scale )
+		race_manager:draw()
 		disp:draw_gui( scale , player )
 		if _debug then debug_GUI() end
 	end
 
 	function gs:update()
-		--npcs_turn()
-		self:time_passes()
+		race_manager:update()
+		self:natural_events()
 		self:update_turn_stats()
 	end
 
@@ -103,7 +97,7 @@ gs.name = "game_actual_scripts"
 
 			if player:purchase( temp_race.cost ) then
 				dialogue( player.name.." has created the race "..temp_race.name.."!" )
-				race_manager:add_new_race( temp_race.cost , tile )
+				race_manager:add_new_race( temp_race , tile )
 				__:stop_making_race()
 
 			else
@@ -118,7 +112,9 @@ gs.name = "game_actual_scripts"
 		if __:making_race() then
 			--self:race_creation_keytree( key )
 			local limb_name = __:race_creation_keytree( key )
-			self:get_option( limb_name )
+			if limb_name then
+				self:get_option( key , limb_name )
+			end
 
 		else
 			if key == '-' and scale > 1 then
@@ -150,58 +146,6 @@ gs.name = "game_actual_scripts"
 		end
 	end
 
-	--====/ Helpers /=========
-	--[[
-		function gs:race_creation_keytree( key )
-			if __:race_toplevel then
-
-				__:
-
-				if key == '1' then
-					toggle( true , rcf , {"_name","_toplevel"} )
-					keystrokes:start_reading()
-				end
-
-				toggle( key=='return' , rcf , {'_finished'} )--,'_toplevel','_status'} )
-
-				toggle( is_escape_key( key ) , rcf , {"_status" , "_toplevel" , '_finished'} )
-				toggle( key=='2' , rcf , {"_phys_top" , "_toplevel"} )
-				toggle( key=='3' , rcf , {"_mental" , "_toplevel"} )
-				toggle( key=='4' , rcf , {"_cultural" , "_toplevel"} )
-
-
-			elseif rcf._name then
-				--doesn't matter, keypress will grab it.
-
-			elseif rcf._phys_top then
-				toggle( is_escape_key( key ) , rcf , {"_toplevel" , "_phys_top"} )
-				toggle( key == '1' , rcf , {"_phys_head" , "_phys_top"} )
-				toggle( key == '2' , rcf , {"_phys_torso" ,  "_phys_top"} )
-				toggle( key == '3' , rcf , {"_phys_limbs" ,  "_phys_top"} )
-
-			elseif rcf._phys_head then				
-				toggle( is_escape_key( key ) , rcf , {"_phys_head" , "_phys_top"} )
-				self:get_option( key , rcf , 'Head' )
-
-			elseif rcf._phys_limbs then
-				toggle( is_escape_key( key ) , rcf , {"_phys_top" , "_phys_limbs"} )
-				self:get_option( key , rcf , 'Limbs' )
-
-			elseif rcf._phys_torso then
-				toggle( is_escape_key( key ) , rcf , {"_phys_top" , "_phys_torso"})
-				self:get_option( key , rcf , 'Torso' )
-
-			elseif rcf._mental then
-				toggle( is_escape_key( key ) , rcf , {"_mental" , "_toplevel"})
-				self:get_option( key , rcf , "Mental" )
-
-			elseif rcf._cultural then
-				toggle( is_escape_key( key ) , rcf , {"_cultural" , "_toplevel"})
-				self:get_option( key , rcf , "Cultural" )
-
-			end
-		end
---]]
 		--=====/ Helpers /===============
 			function gs:get_option( key , limb )
 				key = alpha_shift( key )
