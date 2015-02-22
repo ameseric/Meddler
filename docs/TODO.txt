@@ -1,5 +1,9 @@
 
 TODO
+	CRITICAL
+		Race turn / Decision AI / Unit AI
+		game phases
+		enemy races / roaming monsters
 
 Cleaning
 	-gui.lua by starting a gui.config file for presets.

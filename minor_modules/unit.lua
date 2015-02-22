@@ -4,7 +4,7 @@
 ]]
 
 
-unit = {
+local unit = {
 	
 	life = 0
 	,head = 0
@@ -39,26 +39,38 @@ end
 --======/ Helpers /============
 	function unit:generate_unit_stats( type , u )
 		if type:match( "infantry" )  then
-			u.upper_limb = u.upper_limb + math.floor( u.upper_limb * .2 )
+			u.attack = percent_inc( u.attack , 0.2 )
 
 		elseif type:match( "heavy" ) then
-			u.torso = u.torso + math.floor( u.torso * 0.2 )
+			u.defense = percent_inc( u.defense , 0.2 )
 
 		elseif type:match( "heavy infantry" ) then
-			u.lower_limb = u.lower_limb - math.floor( u.lower_limb * 0.4 )
+			u.move = percent_inc( u.move , -0.4 )
 
 		elseif type:match( "light calvary" ) then
-			u.lower_limb = u.lower_limb + math.floor( u.lower_limb * 0.4 )
+			u.move = percent_inc( u.move , 0.4 )
 
 		elseif type:match( "heavy calvary" ) then
-			u.lower_limb = u.lower_limb + math.floor( u.lower_limb * 0.2 )
+			u.move = perdcent_inc( u.move , 0.2 )
 
 		end
 	end
 
+function unit:give_command( command , override )
+	if self.order and not override then
+		return false
+	else
+		self.order = command
+		return true
+	end
+end
 
 function unit:draw()
 	--No sprite yet, so redundant.
+end
+
+function unit:update()
+	--stuff
 end
 
 return unit

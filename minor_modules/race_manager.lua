@@ -1,6 +1,6 @@
 
 
-race_manager = {
+local race_manager = {
 	
 	list_of_current_races = {}
 	,list_of_monsters = {}

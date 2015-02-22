@@ -17,7 +17,7 @@
 ]]
 
 
-display = {
+local display = {
 	x_pix_pos = 0
 	,y_pix_pos = 0
 }
