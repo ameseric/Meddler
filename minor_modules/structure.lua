@@ -28,6 +28,13 @@ function structure:new( type , tile )
 	return s
 end
 
+function structure:update()
+	-- check order countdown
+	-- if complete, execute order.
+
+
+
+
 function structure:give_command( command )
 	if self.order then
 		return false
@@ -36,6 +43,8 @@ function structure:give_command( command )
 		return true
 	end
 end
+
+function structure:
 
 function structure:can_create( unit_type )
 	for i,v in ipairs( self.units ) do

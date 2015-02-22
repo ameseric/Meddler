@@ -5,6 +5,10 @@
 local race = {
 	--/ Globals
 	name = "Precursor"
+	,food = 10
+	,wood = 10
+	,stone = 10
+	,upkeep_base = { food=10,stone=2,wood=2 } --+5 food per unit, +2 stone&wood per settlement?
 	--/ Created during race creation
 
 }
@@ -99,21 +103,10 @@ function race:update() --main AI logic block
 		assign_military_orders( threats )
 	end
 
-	assign_building_projects()
+	assign_building_projects() --consider adding exploration projects for citizens/calvary units
 
-	--need to figure out resource_lock so AI can save up for expensive objects?
-
-	local ubp = get_unit_build_priority()  --based on how many turns active, boldness, reproduction
-	for each unit in ubp do
-		if can_support_cost( unit ) and no resource_lock then
-			for each available building do
-				if building:can_make( unit ) then
-					building:make( unit )
-				end
-			end
-		end
-	end
-
+	local resource_lock = false
+	assign_unit_production( resource_lock )
 
 	update_units()
 
@@ -128,7 +121,7 @@ end
 	end
 
 	function race:check_for_threats()
-		--stuff
+		--TODO
 	end
 
 	function race:assign_military_orders( threats )
@@ -153,35 +146,52 @@ end
 
 	function race:assign_building_projects()
 
-		local bbp = get_building_build_priority()
+		local sbp = get_structure_build_priority( #self.citizens )
 
-		for i,citizen in ipairs( self.citizens ) do
-			citizen:give_command(  ) --automatically a
-		end
-
-
-		for each availble citizen do
-			local collection_points = sum_collection_types()
-			for each collection_sum in collection_types() do
-				if collection_sum < self.upkeep[type]*1.25 then
-					make_new_collection_point( type )				--will assign citizen/builder units
+		for i,build in ipairs( sbp ) do
+			for i,citizen in ipairs( self.citizens ) do
+				if citizen:give_command( {type='build',target=build} ) then --if citizen accepts command, then move on
+					break
 				end
 			end
 		end
+	end
+	--======/ Helpers /=========
+		function race:get_structure_build_priority( num )
+			local sbp = {}
+
+			for k,v in pairs( self.upkeep_base ) do
+				if v*2 > self[ k ] then
+					table.insert( sbp , k )  --stone/food/wood
+				end
+			end
+
+			if #sbp >= num then return sbp end --don't have enough citizens to continue
+
+			--decide logic for military/town/temple building
+			--boldness/reproduction/order?
+
+			return sbp
+		end
 
 
-		for each available citizen do
-			check number of buildings (non-collection, village/town/city, fortress, beacon?, temple)
-				Order determines number of Temples / Beacons?
-				Boldness determines fortresses.
-				Industry/Reproduction determines civil centers (villages/towns/cities)
+	function race:assign_unit_production() --TODO
+
+		local ubp = get_unit_build_priority()  --based on how many turns active, boldness, reproduction
+
+		for i,unit in ipairs( ubp ) do
+			for i,structure in ipairs( self.buildings ) do
+				if structure:give_command( {type='build',target=unit} ) then --if citizen accepts command, then move on
+					break
+				end
 			end
 		end
 	end
 
-	function race:get_unit_build_priority()
-		--stuff
-	end
+	--===/ Helper /======
+		function race:get_unit_build_priority()
+			--TODO
+		end
 
 
 
