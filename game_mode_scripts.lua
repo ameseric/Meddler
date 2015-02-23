@@ -107,7 +107,7 @@ gs.name = "game_actual_scripts"
 	end
 
 	function gs:keypress( key , scale , player , selected_tile )
-		local is_player_done = false
+		local taken_action = false
 
 		if __:making_race() then
 			--self:race_creation_keytree( key )
@@ -136,12 +136,12 @@ gs.name = "game_actual_scripts"
 				__:change_tree_flags( key )
 			else
 				__:change_tree_flags( is_escape_key(key) )
-				is_player_done = powers:resolve( key , selected_tile , player )
+				__:taken_action = powers:resolve( key , selected_tile , player )
 			end
 		end
 
 
-		if is_player_done then
+		if __:taken_action() then
 			__:end_player_turn()
 		end
 	end

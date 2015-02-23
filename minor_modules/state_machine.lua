@@ -30,6 +30,8 @@ local flags = {
 	,_choice = true
 	,_loading_game = false
 	,_just_started_game = false
+	,_taken_action = false
+
 }
 
 

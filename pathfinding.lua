@@ -1,7 +1,7 @@
  -- Simple pathfinding utilities. Homemade, not that great, but does the job for now.
 
 
-path_finder = {}
+local path_finder = {}
 
 
 
@@ -11,10 +11,10 @@ path_finder = {}
 		local adj_tiles = {}
 
 		for j=-1,1,2 do
-			if map:get_passable( x , y+j ) then
+			if atlas:get_passable( x , y+j ) then
 				table.insert( adj_tiles , { x=x , y=y+j } )
 			end
-			if map:get_passable( x+j , y ) then
+			if atlas:get_passable( x+j , y ) then
 				table.insert( adj_tiles , { x=x+j , y=y } )
 			end
 		end
@@ -95,6 +95,21 @@ end
 
 function path_finder:get_dist( pt1 , pt2 )
 	return math.abs( pt1.x - pt2.x ) + math.abs( pt1.y - pt2.y )
+end
+
+function path_finder:get_adj_tiles( x , y )
+	local adj_tiles = {}
+
+	for j=-1,1,2 do
+		if atlas:get_passable( x , y+j ) then
+			table.insert( adj_tiles , atlas:get_tile( x , y+j ) )
+		end
+		if atlas:get_passable( x+j , y ) then
+			table.insert( adj_tiles , atlas:get_tile( x+j , y ) )
+		end
+	end
+
+	return adj_tiles
 end
 
 

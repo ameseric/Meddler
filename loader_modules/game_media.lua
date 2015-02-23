@@ -5,10 +5,11 @@ local img_dir , sound_dir , save_dir = "images/" , "sounds/" , "../saves"
 
 local images = {}
 local images_to_load = {
-	tileset 		= 'natural_tiles.png'
+	tileset 			= 'natural_tiles.png'
 	,gui_image 			= 'main_gui.png'
 	,unit_sprites 		= 'sample_unit.png'
-	,monster_sprites 	=  'sample_monster.png'
+	,monster_sprites 	= 'sample_monster.png'
+	,structures			= 'structures.png'
 }
 
 local sounds = {}

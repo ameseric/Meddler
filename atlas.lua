@@ -68,6 +68,11 @@ function atlas:get_tile( x , y , translate_pixel )
 	return self.world[ x ][ y ]
 end
 
+function atlas:get_passable( x , y )
+	local tile = self:get_tile( x , y )
+	return tile:passable()
+end
+
 
 --===== Helpers ======
 	function atlas:world_width_pix()

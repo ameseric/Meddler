@@ -38,7 +38,7 @@
 			disp 			= require "display";
 			wrapper 		= require "game_mode_scripts"
 			race 			= require 'race'
-			unit			= require 'unit'
+			--unit			= require 'unit'
 			start_screen 	= wrapper.sss;
 			ngo 			= wrapper.ngo;
 			game_actual 	= wrapper.ga
@@ -50,11 +50,13 @@
 			race_manager 	= require 'race_manager'
 			race_rules 		= require 'race_rules'
 			__ 				= require 'state_machine'
-			structure 		= require 'structure'
+			scout 			= require 'pathfinding'
+			--structure 		= require 'structure'
 
 			--=== Sub/Loader Modules ====
 			rules 			= require 'tile_rules';
-			struct_rules 	= require 'structure_rules'
+			--struct_rules 	= require 'structure_rules'
+			--unit_rules		= require 'unit_rules'
 			require 'util_functions'
 			--gui.lua, display.lua
 			--npcs.lua

@@ -7,8 +7,8 @@ local race = {
 	name = "Precursor"
 	,food = 10
 	,wood = 10
-	,stone = 10
-	,upkeep_base = { food=10,stone=2,wood=2 } --+5 food per unit, +2 stone&wood per settlement?
+	,mineral = 10
+	,upkeep_base = { food=10,mineral=2,wood=2 } --+5 food per unit, +2 mineral&wood per settlement?
 	--/ Created during race creation
 
 }
@@ -49,7 +49,7 @@ config = {
 
 ]]
 
-function race:new( config , tile )
+function race:new( config , tile , meddler )
 	local o  = {}
 	setmetatable( o , self )
 	self.__index = self
@@ -58,11 +58,11 @@ function race:new( config , tile )
 		generate_random_race( config )
 	end
 
-
 	o.unit_sprite = images.unit_sprites
 	o.buildings = {}
 	o.military = {}
 	o.citizens = {}
+	o.meddler = meddler
 
 	for category , wrapper in pairs( config ) do
 		o[ category ] = wrapper
@@ -70,7 +70,7 @@ function race:new( config , tile )
 	config = nil
 
 	o:new_structure( 'Village' , tile )
-	o.buildings[1]:give_command( {type='Citizen' , force=true , num=3} )
+	o.buildings[1]:give_command( {type='build unit', name='Citizen' , force=true , num=3} )
 
 	return o
 end
@@ -88,20 +88,55 @@ function race:new_structure( type , tile )
 	table.insert( self.buildings , structure:new( type , tile ) )
 end
 
+function race:add_unit( unit )
+	if unit.type == 'Citizen' then
+		table.insert( self.citizens , unit )
+	else
+		table.insert( self.military , unit )
+	end
+
+end
+
+function race:can_afford( resources )
+	for res_name,res_value in pairs( resources ) do
+		if self[ res_name ] < res_value then
+			return false
+		end
+	end
+	return true
+end
+
+function race:purchase( resources )
+	for res_name,res_value in pairs( resources ) do
+		self[ res_name ] = self[ res_name ] - res_value
+	end
+
+	return true
+end
+
+
+
+
 function race:draw()
-	for k,v in pairs( military ) do
+	for _,v in ipairs( self.buildings ) do
+		v:draw()
+	end
+
+	for _,v in ipairs( self.military ) do
 		v:draw()
 	end
 end
 
 function race:update() --main AI logic block
 
-	check_structure_orders()
+	update_structures() --decrement command timers
 
+	--[[
 	local threats = check_for_threats() --check 10 tile radius around all structures, 4 around all units
 	if threats then
 		assign_military_orders( threats )
 	end
+	--]]
 
 	assign_building_projects() --consider adding exploration projects for citizens/calvary units
 
@@ -114,7 +149,17 @@ function race:update() --main AI logic block
 end
 
 --======/ Helpers /=======
-	function race:check_structure_orders()
+	function race:update_units()
+		for _,unit in ipairs( self.military ) do
+			unit:update()
+		end
+
+		for _,unit in ipairs( self.citizens ) do
+			unit:update()
+		end
+	end
+
+	function race:update_structures()
 		for i , building in ipairs( self.buildings ) do
 			building:update()
 		end
@@ -127,7 +172,7 @@ end
 	function race:assign_military_orders( threats )
 
 		for i,unit in ipairs( self.military ) do
-			local min_distance = SOME_NUMBER------------------------------
+			local min_distance = 99--SOME_NUMBER------------------------------
 			local chosen_threat = nil
 			for i,threat in ipairs( threats ) do
 
@@ -149,9 +194,12 @@ end
 		local sbp = get_structure_build_priority( #self.citizens )
 
 		for i,build in ipairs( sbp ) do
-			for i,citizen in ipairs( self.citizens ) do
-				if citizen:give_command( {type='build',target=build} ) then --if citizen accepts command, then move on
-					break
+			if self:can_afford( build.cost ) then
+				for i,citizen in ipairs( self.citizens ) do
+					if citizen:give_command( {type='build' , target=build} ) then --if citizen accepts command, then move on
+						self:purchase( build.cost )
+						break
+					end
 				end
 			end
 		end
@@ -159,10 +207,12 @@ end
 	--======/ Helpers /=========
 		function race:get_structure_build_priority( num )
 			local sbp = {}
+			local key = {mineral='Quarry',wood='Lumberyard',food='Farm'}
 
 			for k,v in pairs( self.upkeep_base ) do
 				if v*2 > self[ k ] then
-					table.insert( sbp , k )  --stone/food/wood
+					local name = key[k]
+					table.insert( sbp , { type=name , cost=struct_rules[name].cost } )  --stone/food/wood
 				end
 			end
 

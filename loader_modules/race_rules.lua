@@ -111,25 +111,37 @@ local a = {}
 	a.Mental = {
 
 		Build = {
-			Zealous = 		{ Boldness=2 }
-			,Relaxed = 		{ Industry=-1 , Reproduction=2 }
-			,Greedy = 		{ Upkeep=-1 , Industry=1 }
-			,Focused = 		{ Reproduction=-1 , Industry=2 }
-			,Pious = 		{ Order=2 , Boldness=-1 }
-			,Reserved = 	{ Upkeep=-1 }
+			Zealous 	= { Boldness=2 }
+			,Relaxed 	= { Industry=-1 , Reproduction=2 }
+			,Greedy 	= { Upkeep=-1 , Industry=1 }
+			,Focused 	= { Reproduction=-1 , Industry=2 }
+			,Pious 		= { Order=2 , Boldness=-1 }
+			,Reserved 	= { Upkeep=-1 }
 		}
 	}
 
 
 	a.Cultural = {
 
-		Build = {
+		Build = { --Social
 			Sacrificial = { sac={desc="Increases Eminence gained and halves Order penalty for Take-Life."} }
-			,Caste = { a={desc="All Order penalties halved."} }
-			,Scholars = { a={desc="Upgrades cheaper?"} }
-			,Nomadic = { building_move={desc="Buildings can move 1 tile per turn."} }
-			,Militant = { a={desc="10% military stat increase, Heavy units available at Towns."} }
+			,Caste 		= { a={desc="All Order penalties halved."} }
+			,Scholars 	= { a={desc="Upgrades cheaper?"} }
+			,Nomadic 	= { building_move={desc="Buildings can move 1 tile per turn."} }
+			,Militant 	= { a={desc="10% military stat increase, Heavy units available at Towns."} }
 		}
+
+		,Aesthetic = {
+			Hive		= { a={desc="Large central mound structure."} }
+			,Frontier	= { a={desc="Scattering of smaller wood dwellings, generally used by explorers."} }
+			,Imperial	= { a={desc="Similar to Frontier, but uses more stone. Later structures are soley stone."} }
+			,Etheral	= { a={desc="Allows construction of mages at all buildings."} }
+			,Natural	= { a={desc="No stone or wood upkeep."} }
+			,Hallow		= { a={desc="Give bonuses to undead races, or those that practice magic."} }
+			
+		}
+
+		--,Biome = {
 
 	}
 

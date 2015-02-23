@@ -112,6 +112,21 @@
 
 	function lprint( text , x , y ) love.graphics.print( text , x , y ) end
 
+	function ldraw( image , x , y , scale_x , scale_y , quad , static , rotation )
+
+		if not static then
+			x = x - disp.x_pix_pos
+			y = y - disp.y_pix_pos
+		end
+
+		if quad then
+			love.graphics.draw( image , quad , x , y , rotation , scale_x , scale_y )
+		else
+			love.graphics.draw( image , x , y , rotation , scale_x , scale_y )
+		end
+
+	end
+
 
 
 

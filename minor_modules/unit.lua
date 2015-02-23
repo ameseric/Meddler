@@ -6,53 +6,61 @@
 
 local unit = {
 	
-	life = 0
-	,head = 0
-	,mind = 0
-	,upper_limb = 0
-	,torse = 0
-	,lower_limb = 0
+	Life = 1
+	,Attack = 0
+	,Defense = 0
+	,Projection = 0
+	,Will = 0
+	,Move = 0
+	,Profile = 0
+	,Skill = 0
 
-	,race = nil
+	,head_sprite = 0
+	,limb_sprite = 0
+	,torso_sprite = 0
 
+	,pixel_x = 0
+	,pixel_y = 0
+
+	,tile_x = 0
+	,tile_y = 0
 }
 
 
 
-function unit:new( race , type )
+function unit:new( race , type , tile )
 	local u = {}
 	setmetatable( u , self )
 	self.__index = self
 
-	u.race = race
-
-	for category , wrapper in pairs( race ) do
-		if type( category ) == 'table' then
-			u[ category ] = wrapper.value
+	if type ~= 'Citizen' then
+		for k,v in pairs( u ) do
+			u[k] = race[k]
 		end
 	end
 
-	generate_unit_stats( type , u )
+	u.race = race
+	u.type = type
+	u.pixel_x = ttp( tile.x )
+	u.pixel_y = ttp( tile.y )
+	u.cost = {}
+	generate_unit_stats( u )
 
 	return u
 end
 --======/ Helpers /============
-	function unit:generate_unit_stats( type , u )
-		if type:match( "infantry" )  then
-			u.attack = percent_inc( u.attack , 0.2 )
-
-		elseif type:match( "heavy" ) then
-			u.defense = percent_inc( u.defense , 0.2 )
-
-		elseif type:match( "heavy infantry" ) then
-			u.move = percent_inc( u.move , -0.4 )
-
-		elseif type:match( "light calvary" ) then
-			u.move = percent_inc( u.move , 0.4 )
-
-		elseif type:match( "heavy calvary" ) then
-			u.move = perdcent_inc( u.move , 0.2 )
-
+	function unit:generate_unit_stats( u ) --look at unit_rules for values
+		
+		for category,values in pairs( unit_rules[ u.type ] ) do
+			for value_name,value in pairs( values ) do
+				if value < 1 and value > -1 then
+					u[ value_name ] = percent_inc( u[value_name] , value )
+				elseif category == 'stats' then
+					u[ value_name ] = value
+				else
+					u[ category ][ value_name ] = value
+				end
+			end
 		end
 	end
 
@@ -65,12 +73,24 @@ function unit:give_command( command , override )
 	end
 end
 
-function unit:draw()
-	--No sprite yet, so redundant.
+function unit:draw()--placeholder, TODO
+	ldraw( images.unit_sprites , self.pixel_x , self.pixel_y , scale , scale )
 end
 
 function unit:update()
-	--stuff
+	--need to add "walking" here later, to move by pixel instead of tile
+	if self.order then
+		if self.order.type == 'attack' then
+			local dist = scout:get_distance( self , self.order.target ) --not correct
+
+			if dist == 1 then
+				self:attack( self.order.target )
+			else
+				self:move()
+			end
+
+		end
+	end
 end
 
 return unit

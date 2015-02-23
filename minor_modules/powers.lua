@@ -106,32 +106,32 @@ end
 powers = {}
 
 function powers:resolve( key , tile , meddler )
-	local is_player_done = false
+	local taken_action = false
 
 	if __:in_givetree() then
 		if key == 'l' then 
-			is_player_done = create_race( meddler , tile )
+			create_race( meddler , tile )
 
 		elseif key == 'b' then 
-			is_player_done = Bless( tile , meddler )
+			taken_action = Bless( tile , meddler )
 		end
 
 	elseif __:in_taketree() then		
 		if key == 'l' then
-			is_player_done = Sacrifice( tile , meddler )
+			taken_action = Sacrifice( tile , meddler )
 
 		elseif key == 'b' then
-			is_player_done = Curse( tile )
+			taken_action = Curse( tile )
 		end
 
 	elseif __:in_altertree() then
-		is_player_done = true
+		taken_action = true
 		--if key == 'l' then change_life()
 		--if key == 'g' then Change_land() end
 		--elseif key == 'a' then change_law()
 		--end
 	end
-	return is_player_done
+	return taken_action
 end
 
 

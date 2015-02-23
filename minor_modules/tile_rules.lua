@@ -32,8 +32,7 @@ rules.a = { --order matters! That's how the tile sprites are read, so don't chan
 				,resource = 'food'
 				,rate = 5
 				,lifetime = 10
-				,next_life = 'Desolate' --Desolate
-
+				,next_life = 'Desolate'
 			}
 			,{ 	type = 'Forest'
 				,is_passable = true
@@ -48,7 +47,7 @@ rules.a = { --order matters! That's how the tile sprites are read, so don't chan
 				,is_passable = true
 				,move_cost = 3
 				,prob = 10
-				,resource = 'stone'
+				,resource = 'mineral'
 				,rate = 2
 				,lifetime = 60
 				,next_life = 'Water'
@@ -88,7 +87,7 @@ rules.a = { --order matters! That's how the tile sprites are read, so don't chan
 				,rate = 6
 				,lifetime = 10
 				,next_life = 'Plain'
-			}
+			}--[[
 			,{ 	type = 'Village'
 				,is_passable = true
 				,move_cost = 1
@@ -97,7 +96,7 @@ rules.a = { --order matters! That's how the tile sprites are read, so don't chan
 				,rate = 0
 				,lifetime = -1
 				,next_life = 'none'
-			}
+			}--]]
 		}
 
 rules.total_set = {}
