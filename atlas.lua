@@ -7,12 +7,21 @@
 
 atlas = {
 	sprite_batch = nil
-	,world = nil
+	,world = {}
 }
 
 function atlas:set_world( world , x , y )
 	self.world = world
-
+--[[]
+	for i=0,x-1 do
+		self.world[i] = {}
+		for j=0,y-1 do
+			print( i , j )
+			self.world[i][j] = tiles:new( world[i][j] , i , j )
+			--self.world[i][j] = tiles:new( 'Mountain' , i , j )
+		end
+	end
+--]]
 	self.world_width_tile = x
 	self.world_height_tile = y
 
@@ -33,7 +42,7 @@ function atlas:build_batch()
 
 		for y = -1 , disp.tile_height do
 			local j = disp:tile_pos( 'y' ) + y
-			k , l = self:tile_wrap_around( i , j )
+			local k , l = self:tile_wrap_around( i , j )
 
 			local type = self.world[k][l].type
 			local quad = rules:get_quad( type )
@@ -66,6 +75,17 @@ function atlas:get_tile( x , y , translate_pixel )
 		y = pixel_to_tile( y )
 	end
 	return self.world[ x ][ y ]
+end
+
+function atlas:set_tile( tile_type , x , y , object )
+	self.world[x][y] = tiles:new( 'Plain' , x , y )
+
+	if object == 'clear' then
+		self.world[x][y]:set_ocpied()
+
+	elseif object then
+		self.world[x][y]:set_ocpied( object )
+	end
 end
 
 function atlas:get_passable( x , y )

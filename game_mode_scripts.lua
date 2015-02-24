@@ -97,7 +97,7 @@ gs.name = "game_actual_scripts"
 
 			if player:purchase( temp_race.cost ) then
 				dialogue( player.name.." has created the race "..temp_race.name.."!" )
-				race_manager:add_new_race( temp_race , tile )
+				race_manager:add_new_race( temp_race , tile , player )
 				__:stop_making_race()
 
 			else
@@ -136,14 +136,18 @@ gs.name = "game_actual_scripts"
 				__:change_tree_flags( key )
 			else
 				__:change_tree_flags( is_escape_key(key) )
-				__:taken_action = powers:resolve( key , selected_tile , player )
+				if not __:player_took_action() then
+					taken_action = powers:resolve( key , selected_tile , player )
+				end
 			end
 		end
 
+		if taken_action then __:player_has_taken_action() end
 
-		if __:taken_action() then
+		if __:player_took_action() and key == 'return' then
 			__:end_player_turn()
 		end
+
 	end
 
 		--=====/ Helpers /===============

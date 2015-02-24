@@ -78,6 +78,12 @@ function gui:draw( scale , list_of_powers , name , eminence )
 	set_font( font_title ); set_color( 'black' )
 	lprint( name , self.x_choices , self.y_draw_point+4 )
 
+	if __:player_took_action() then
+		set_color( 'white' )
+		lprint( "Press 'enter' to end turn." , self.x_choices , 
+							self.y_create_life/2)
+	end
+
 	if self.selected_tile then
 		draw_tile_info( scale )
 	end
@@ -146,7 +152,8 @@ end
 
 	function gui:draw_race_creation()
 		set_color( 'grey' )
-		love.graphics.rectangle( 'fill' , self.x_create_life , 30 , self.x_create_life*2 , self.y_create_life )
+		love.graphics.rectangle( 'fill' , self.x_create_life , 30 ,
+					 		self.x_create_life*2 , self.y_create_life )
 		set_color( 'white' )
 
 		local x = self.x_create_life + self.margin
@@ -170,7 +177,7 @@ end
 
 			lprint( "Name: "..race.name , x_3 , y*4 );	lprint( "Cost: "..race.cost , x+xmod*7 , y*4 )
 			local draw_order = { "break","Attack","Defense","Projection","Will","Move","Profile","Skill","break","Industry","Reproduction",
-						"Boldness","Upkeep","Order","break","Mental","Cultural","Head","Torso","Limbs" }
+						"Boldness","Upkeep","Piety","break","Mental","Cultural","Head","Torso","Limbs" }
 			self:draw_toplevel_overview( race , x , y , draw_order , xmod )
 
 		elseif __:making_race_name() then

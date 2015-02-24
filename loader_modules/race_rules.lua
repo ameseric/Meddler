@@ -13,6 +13,22 @@
 
 ]]
 
+global_stats = {
+	Attack = 1
+	,Defense = 1
+	,Projection = 1
+	,Will = 1
+	,Move = 3
+	,Profile = 1
+	,Skill = 1
+
+	,Industry = 20
+	,Boldness = 20
+	,Piety = 20
+	,Reproduction = 20
+	,Upkeep = 2  
+}
+
 local a = {}
 
 
@@ -115,7 +131,7 @@ local a = {}
 			,Relaxed 	= { Industry=-1 , Reproduction=2 }
 			,Greedy 	= { Upkeep=-1 , Industry=1 }
 			,Focused 	= { Reproduction=-1 , Industry=2 }
-			,Pious 		= { Order=2 , Boldness=-1 }
+			,Pious 		= { Piety=2 , Boldness=-1 }
 			,Reserved 	= { Upkeep=-1 }
 		}
 	}
@@ -124,8 +140,8 @@ local a = {}
 	a.Cultural = {
 
 		Build = { --Social
-			Sacrificial = { sac={desc="Increases Eminence gained and halves Order penalty for Take-Life."} }
-			,Caste 		= { a={desc="All Order penalties halved."} }
+			Sacrificial = { sac={desc="Increases Eminence gained and halves Piety penalty for Take-Life."} }
+			,Caste 		= { a={desc="All Piety penalties halved."} }
 			,Scholars 	= { a={desc="Upgrades cheaper?"} }
 			,Nomadic 	= { building_move={desc="Buildings can move 1 tile per turn."} }
 			,Militant 	= { a={desc="10% military stat increase, Heavy units available at Towns."} }

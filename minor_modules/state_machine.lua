@@ -75,6 +75,7 @@ sm = {}
 	function sm:in_altertree() return flags._altertree end
 	function sm:in_taketree() return flags._taketree end
 	function sm:choosing_trees() return flags._choice end
+	function sm:player_took_action() return flags._taken_action end
 
 
 	--=====/ Toggles /=====
@@ -87,8 +88,11 @@ sm = {}
 		self:toggle( t=='a' , {"_altertree"} )
 	end
 
+	function sm:player_has_taken_action() flags._taken_action = true end
+
 	function sm:end_player_turn()
 		flags._player_turn = false
+		flags._taken_action = false
 		self:change_tree_flags( 'escape' )
 	end
 
@@ -122,7 +126,7 @@ sm = {}
 	end
 
 	function sm:stop_making_race()
-		self:toggle( true , {'_race_toplevel','_race_status'} )
+		self:toggle( true , {'_race_toplevel','_race_status','_taken_action'} )
 	end
 
 	function sm:start_making_race( race )

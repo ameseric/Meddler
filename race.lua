@@ -38,7 +38,7 @@ config = {
 
 	,Industry = 1
 	,Boldness = 0
-	,Order = 0
+	,Piety = 0
 	,Reproduction = 0
 	,Upkeep = 0
 
@@ -54,10 +54,6 @@ function race:new( config , tile , meddler )
 	setmetatable( o , self )
 	self.__index = self
 
-	if type(config) == 'number' then
-		generate_random_race( config )
-	end
-
 	o.unit_sprite = images.unit_sprites
 	o.buildings = {}
 	o.military = {}
@@ -69,23 +65,30 @@ function race:new( config , tile , meddler )
 	end
 	config = nil
 
-	o:new_structure( 'Village' , tile )
-	o.buildings[1]:give_command( {type='build unit', name='Citizen' , force=true , num=3} )
+	o:new_structure( 'Village' , tile , o )
+	local command = o:format_command( 'build' , 'unit' , 'Citizen' )
+	o.buildings[1]:give_command( command )
 
 	return o
 end
----=== Helpers =======
-	function generate_random_race( point_value )
-		local temp_stats = {}
 
+
+function race:draw()
+	for _,v in ipairs( self.buildings ) do
+		v:draw()
 	end
+
+	for _,v in ipairs( self.military ) do
+		v:draw()
+	end
+end
 
 function race:get_name()
 	return self.name
 end
 
-function race:new_structure( type , tile )
-	table.insert( self.buildings , structure:new( type , tile ) )
+function race:new_structure( type , tile , race )
+	table.insert( self.buildings , structure:new( type , tile , race ) )
 end
 
 function race:add_unit( unit )
@@ -114,22 +117,22 @@ function race:purchase( resources )
 	return true
 end
 
+function race:format_command( command_type , target_type , target )
+	local rules
 
-
-
-function race:draw()
-	for _,v in ipairs( self.buildings ) do
-		v:draw()
+	if target_type == 'unit' then
+		rules = unit_rules[ target ]
+	elseif target_type == 'structure' then
+		rules = struct_rules:get( target )
 	end
 
-	for _,v in ipairs( self.military ) do
-		v:draw()
-	end
+	return { type=command_type , target=target , cost=rules.cost , timer=rules.timer }
 end
+
 
 function race:update() --main AI logic block
 
-	update_structures() --decrement command timers
+	self:update_structures() --decrement command timers
 
 	--[[
 	local threats = check_for_threats() --check 10 tile radius around all structures, 4 around all units
@@ -138,12 +141,12 @@ function race:update() --main AI logic block
 	end
 	--]]
 
-	assign_building_projects() --consider adding exploration projects for citizens/calvary units
+	self:assign_building_projects() --consider adding exploration projects for citizens/calvary units
 
 	local resource_lock = false
-	assign_unit_production( resource_lock )
+	self:assign_unit_production( resource_lock )
 
-	update_units()
+	self:update_units()
 
 	return
 end
@@ -191,12 +194,12 @@ end
 
 	function race:assign_building_projects()
 
-		local sbp = get_structure_build_priority( #self.citizens )
+		local sbp = self:get_structure_build_priority( #self.citizens )
 
 		for i,build in ipairs( sbp ) do
 			if self:can_afford( build.cost ) then
 				for i,citizen in ipairs( self.citizens ) do
-					if citizen:give_command( {type='build' , target=build} ) then --if citizen accepts command, then move on
+					if citizen:give_command( build ) then --if citizen accepts command, then move on
 						self:purchase( build.cost )
 						break
 					end
@@ -207,12 +210,12 @@ end
 	--======/ Helpers /=========
 		function race:get_structure_build_priority( num )
 			local sbp = {}
-			local key = {mineral='Quarry',wood='Lumberyard',food='Farm'}
+			local key = { mineral='Quarry' , wood='Lumberyard' , food='Farm'}
 
 			for k,v in pairs( self.upkeep_base ) do
 				if v*2 > self[ k ] then
-					local name = key[k]
-					table.insert( sbp , { type=name , cost=struct_rules[name].cost } )  --stone/food/wood
+					local command = self:format_command( 'build' , 'structure' , key[k] )
+					table.insert( sbp , command )
 				end
 			end
 
@@ -227,11 +230,11 @@ end
 
 	function race:assign_unit_production() --TODO
 
-		local ubp = get_unit_build_priority()  --based on how many turns active, boldness, reproduction
+		local ubp = self:get_unit_build_priority()  --based on how many turns active, boldness, reproduction
 
 		for i,unit in ipairs( ubp ) do
 			for i,structure in ipairs( self.buildings ) do
-				if structure:give_command( {type='build',target=unit} ) then --if citizen accepts command, then move on
+				if structure:give_command( unit ) then --if citizen accepts command, then move on
 					break
 				end
 			end
@@ -240,7 +243,16 @@ end
 
 	--===/ Helper /======
 		function race:get_unit_build_priority()
-			--TODO
+
+			local ubp = {}
+
+			for i=1,1 do
+				local command = 
+					self:format_command( 'build' , 'unit' , 'Citizen' )
+				table.insert( ubp , command )
+			end
+
+			return ubp			
 		end
 
 

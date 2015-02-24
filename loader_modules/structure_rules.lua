@@ -3,53 +3,69 @@
 
 local structure_rules = {}
 
-local structure_rules.a = {
-	Village = {
-		cost = { mineral=5 , wood=10 }
+structure_rules.a = {
+	{
+		type = 'Village'
+		,cost = { mineral=5 , wood=10 }
 		,units={ 'Citizen' }
 		,stats={ life=10 , attack=0 }
+		,timer=1
 	}
 
-	,Town = {
-		cost = { mineral=10 , wood=20 }
+	,{
+		type = 'Town'
+		,cost = { mineral=10 , wood=20 }
 		,units={ 'Citizen' , 'LInfantry' , 'LCalvary'	}
 		,stats={ life=10 , attack=0 }
+		,timer=1
 	}
 
-	,City = {
-		cost = { mineral=5 , wood=10 }
+	,{
+		type = 'City'
+		,cost = { mineral=5 , wood=10 }
 		,units={ 'Citizen' , 'LInfantry' , 'LCalvary' }
 		,stats={ life=10 , attack=0 }
+		,timer=1
 	}
 
-	,Fortress = {
-		cost = { mineral=5 , wood=10 }
+	,{
+		type='Fortress'
+		,cost = { mineral=5 , wood=10 }
 		,units={ 'HInfantry' , 'HCalvary' }
 		,stats={ life=10 , attack=0 }
+		,timer=1
 	}
 
-	,Temple = {
-		cost = { mineral=5 , wood=10 }
+	,{
+		type = 'Temple'
+		,cost = { mineral=5 , wood=10 }
 		,units={ }--'Priest' , 'Mage' }
 		,stats={ life=10 , attack=0 }
+		,timer=1
 	}
 
-	,Quarry = {
-		cost = { wood=5 }
+	,{
+		type='Quarry'
+		,cost = { wood=5 }
 		,units={ }
 		,stats={ life=5 , attack=0 }
+		,timer=1
 	}
 
-	,Farm = {
-		cost = { wood=5 }
+	,{
+		type='Farm'
+		,cost = { wood=5 }
 		,units={ }
 		,stats={ life=5 , attack=0 }
+		,timer=1
 	}
 
-	,Lumberyard = {
-		cost = { mineral=5 }
+	,{
+		type='Lumberyard'
+		,cost = { mineral=5 }
 		,units={ }
 		,stats={ life=5 , attack=0 }
+		,timer=1
 	}
 
 }
@@ -57,14 +73,14 @@ local structure_rules.a = {
 
 structure_rules.total_set = {}
 
-function structure_rules:get_rules( type )
+function structure_rules:get( type )
+	print( "Called for " , type )
 	return self.total_set[ type ]
 end
 
 function structure_rules:get_quad( type )
 	return self.total_set[ type ].quad
 end
-
 
 local itr = 0
 for i , tile_tble in ipairs( structure_rules.a ) do

@@ -1,7 +1,7 @@
 --[[
 
 	Different functions relating to Meddler powers.
-
+--depends on race_rules
 ]]
 local default_race = {	
 	name = "None"
@@ -16,36 +16,31 @@ local default_race = {
 
 	,traits = {}
 
-	,Attack = 1
-	,Defense = 1
-	,Projection = 1
-	,Will = 1
-	,Move = 3
-	,Profile = 1
-	,Skill = 1
-
-	,Industry = 1
-	,Boldness = 0
-	,Order = 0
-	,Reproduction = 0
-	,Upkeep = 0
-
 	,head_sprite = nil
 	,limb_sprite = nil
 	,torso_sprite = nil
 }
+--load default stat values (loaded from race_rules.lua)
+for k,v in pairs( global_stats ) do
+	default_race[k] = v
+end
+
+
+
+
 
 local function Bless( tile , meddler )
 	if not tile then
 		dialogue( "lack_target" )
 		return false
 
-	elseif meddler:purchase( 4 ) then
+	elseif not meddler:purchase( 4 ) then
 		return false
 
 	else
 		tile.rate = math.ceil( tile.rate * 1.5 )
 		tile.timer = 4
+		dialogue("You have blessed a "..tile.type.."!")
 		return true
 	end
 end

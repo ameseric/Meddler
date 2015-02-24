@@ -119,6 +119,8 @@
 			y = y - disp.y_pix_pos
 		end
 
+		x , y = pwa( x , y )
+
 		if quad then
 			love.graphics.draw( image , quad , x , y , rotation , scale_x , scale_y )
 		else

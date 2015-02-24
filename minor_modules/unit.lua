@@ -41,10 +41,11 @@ function unit:new( race , type , tile )
 
 	u.race = race
 	u.type = type
+	print( u.type )
 	u.pixel_x = ttp( tile.x )
 	u.pixel_y = ttp( tile.y )
 	u.cost = {}
-	generate_unit_stats( u )
+	self:generate_unit_stats( u )
 
 	return u
 end
@@ -52,13 +53,17 @@ end
 	function unit:generate_unit_stats( u ) --look at unit_rules for values
 		
 		for category,values in pairs( unit_rules[ u.type ] ) do
-			for value_name,value in pairs( values ) do
-				if value < 1 and value > -1 then
-					u[ value_name ] = percent_inc( u[value_name] , value )
-				elseif category == 'stats' then
-					u[ value_name ] = value
-				else
-					u[ category ][ value_name ] = value
+			if type(values) == 'table' then
+				for value_name,value in pairs( values ) do
+
+					if value < 1 and value > -1 then
+						u[ value_name ] = percent_inc( u[value_name] , value )
+					elseif category == 'stats' then
+						u[ value_name ] = value
+					else
+						u[ category ][ value_name ] = value
+					end
+
 				end
 			end
 		end
@@ -79,6 +84,8 @@ end
 
 function unit:update()
 	--need to add "walking" here later, to move by pixel instead of tile
+	return end
+	--[[
 	if self.order then
 		if self.order.type == 'attack' then
 			local dist = scout:get_distance( self , self.order.target ) --not correct
@@ -92,5 +99,5 @@ function unit:update()
 		end
 	end
 end
-
+--]]
 return unit
