@@ -4,13 +4,11 @@ gui = {
 	gui_image = nil
 	,selected_tile = false
 	,tile = nil
-	,tileset = nil
 	,message_log = {}
 }
 
 function gui:setup( gui_image , tileset , width , height )
 	self.gui_image = gui_image
-	self.tileset = tileset
 
 	self.x_draw_point = width/8  --(width/4)
 	self.y_draw_point = ((height/12) * 9)
@@ -30,13 +28,11 @@ end
 
 ---==== Helpers =====
 	--====== Helpers ======
-		local function draw_tile_img_in_gui( x , y )
+		local function draw_tile_in_gui( x , y )
 			local quad = rules:get_quad( gui.tile.type )
-			set_color( 'white' )
-			love.graphics.draw( gui.tileset , quad , x , y , 0 , 2.8*window_factor , 2.8*window_factor )
+			love.graphics.draw( images.tileset , quad , x , y , 0 , 2.8*window_factor , 2.8*window_factor )
 		end
 		local function draw_tile_select( scale )
-			set_color( 'white' )
 			local tile_x , tile_y = gui.tile:get_draw_pos()
 			love.graphics.rectangle( 'line' , tile_x , tile_y , TS*scale , TS*scale )
 		end
@@ -45,12 +41,26 @@ end
 			lprint( gui.tile.move_cost .. " move cost" , x , gui.y_draw_point + gui.margin * 12 )
 			lprint( "+"..gui.tile.rate.." "..gui.tile.resource , x , gui.y_draw_point + gui.margin * 14 )
 		end
-	local function draw_tile_info( scale )
-		draw_tile_img_in_gui( gui.x_tile_info , gui.y_draw_point + gui.margin*4 )
+		local function draw_object_in_gui( object )
+
+
+	local function draw_selection_info( scale )
+		local object = self.selected_tile:get_resident()
+
+		set_color( 'white' )
+		draw_tile_in_gui( gui.x_tile_info , gui.y_draw_point + gui.margin*4 )
 		draw_tile_select( scale )
+
+		if object then
+			draw_object_in_gui( object )
+		end
 
 		set_color( 'black' ); set_font( font_med )
 		draw_main_gui_text( gui.x_tile_info )
+		if object then
+			draw_object_gui_text( object )
+		end
+
 	end
 
 	local function draw_dialogue()
@@ -85,7 +95,8 @@ function gui:draw( scale , list_of_powers , name , eminence )
 	end
 
 	if self.selected_tile then
-		draw_tile_info( scale )
+		--draw_tile_info( scale )
+		draw_selection_info( scale )
 	end
 
 	if __:is_player_turn() then
