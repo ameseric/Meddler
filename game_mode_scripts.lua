@@ -122,11 +122,11 @@ gs.name = "game_actual_scripts"
 			elseif key == '=' and scale < 4 then
 				change_scale( scale )
 
-			elseif key == ']' and window_factor < 1 then
-				window_factor = window_factor + 0.25
+			elseif key == ']' and WF < 1 then
+				WF = WF + 0.25
 				configure_screen_settings( true )
-			elseif key == '[' and window_factor > 0.25 then
-				window_factor = window_factor - 0.25
+			elseif key == '[' and WF > 0.25 then
+				WF = WF - 0.25
 				configure_screen_settings( true )
 
 			elseif key == 'p' then
@@ -168,18 +168,15 @@ gs.name = "game_actual_scripts"
 
 			function gs:update_race( race , new_choice , old_choice )
 				race.cost = race.cost + new_choice.cost - old_choice.cost
-				print( race.cost , new_choice.cost , old_choice.cost )
 				
 				if old_choice.effects then
 					for k , v in pairs( old_choice.effects ) do
 						race[ k ] = race[ k ] - v
-						print( k , v )
 					end
 				end
 
 				for k , v in pairs( new_choice.effects ) do
 					race[ k ] = race[ k ] + v
-					print( k , v )
 				end
 			end
 

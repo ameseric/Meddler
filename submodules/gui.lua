@@ -2,7 +2,6 @@
 
 gui = {
 	gui_image = nil
-	,selected_tile = false
 	,tile = nil
 	,message_log = {}
 }
@@ -17,7 +16,7 @@ function gui:setup( gui_image , tileset , width , height )
 
 	self.x_tile_info = 	self.x_draw_point + self.x_draw_point * 0.4
 	self.x_choices = 	self.x_draw_point * 3.75
-	self.x_unit_info = 	self.x_draw_point * 6
+	self.x_unit_info = 	self.x_draw_point * 5.3
 
 	self.x_create_life = (width/4)
 	self.y_create_life = (height/8)*7
@@ -30,35 +29,52 @@ end
 	--====== Helpers ======
 		local function draw_tile_in_gui( x , y )
 			local quad = rules:get_quad( gui.tile.type )
-			love.graphics.draw( images.tileset , quad , x , y , 0 , 2.8*window_factor , 2.8*window_factor )
+			ldraw( images.tileset , x , y , 2.8*WF , 2.8*WF , quad , true )
 		end
 		local function draw_tile_select( scale )
 			local tile_x , tile_y = gui.tile:get_draw_pos()
 			love.graphics.rectangle( 'line' , tile_x , tile_y , TS*scale , TS*scale )
 		end
-		local function draw_main_gui_text( x )
+		local function draw_tile_gui_text( x )
 			lprint( gui.tile.type , x , gui.y_draw_point + gui.margin * 10 )
 			lprint( gui.tile.move_cost .. " move cost" , x , gui.y_draw_point + gui.margin * 12 )
 			lprint( "+"..gui.tile.rate.." "..gui.tile.resource , x , gui.y_draw_point + gui.margin * 14 )
 		end
-		local function draw_object_in_gui( object )
+		local function draw_object_in_gui( object , x , y )
+			local rules = struct_rules:get( object.type )
+			local tileset
+
+			if rules then
+				tileset = images.structures
+				ldraw( tileset , x , y , 3.2*WF , 3.2*WF , rules.quad , true )
+			else
+				rules = unit_rules[ object.type ]
+				tileset = images.unit_sprites
+				ldraw( tileset , x , y , 3.2*WF , 3.2*WF , nil , true )
+			end
+
+		end
+		local function draw_object_gui_text( object , x )
+			lprint( object.type , x , gui.y_draw_point + gui.margin*10 )
+			--lprint( object.)
+		end
 
 
 	local function draw_selection_info( scale )
-		local object = self.selected_tile:get_resident()
+		local object = gui.tile:get_resident()
 
 		set_color( 'white' )
 		draw_tile_in_gui( gui.x_tile_info , gui.y_draw_point + gui.margin*4 )
 		draw_tile_select( scale )
 
 		if object then
-			draw_object_in_gui( object )
+			draw_object_in_gui( object , gui.x_unit_info , gui.y_draw_point + gui.margin*4 )
 		end
 
 		set_color( 'black' ); set_font( font_med )
-		draw_main_gui_text( gui.x_tile_info )
+		draw_tile_gui_text( gui.x_tile_info )
 		if object then
-			draw_object_gui_text( object )
+			draw_object_gui_text( object , gui.x_unit_info )
 		end
 
 	end
@@ -79,7 +95,7 @@ end
 
 function gui:draw( scale , list_of_powers , name , eminence )
 
-	love.graphics.draw( self.gui_image , self.x_draw_point , self.y_draw_point , 0 , 4*window_factor , 2.7*window_factor )
+	love.graphics.draw( self.gui_image , self.x_draw_point , self.y_draw_point , 0 , 4*WF , 2.7*WF )
 	set_font( font_med )
 	lprint( "Turn: "..turn_count , 10 , 10 )
 	lprint( "Eminence: "..eminence , 10 , 30 )
@@ -94,8 +110,7 @@ function gui:draw( scale , list_of_powers , name , eminence )
 							self.y_create_life/2)
 	end
 
-	if self.selected_tile then
-		--draw_tile_info( scale )
+	if self.tile then
 		draw_selection_info( scale )
 	end
 
@@ -327,9 +342,8 @@ end
 function gui:select( tile )
 
 	if self.tile == tile then
-		self.selected_tile = not self.selected_tile
+		self.tile = nil
 	else
-		self.selected_tile = true
 		self.tile = tile
 	end
 end

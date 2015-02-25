@@ -59,7 +59,7 @@ function structure:spawn_unit( type , num )
 
 	local adj_tiles = scout:get_adj_tiles( self.x , self.y )
 
-	if adj_tiles then
+	if #adj_tiles > 0 then
 		local spawn_point = adj_tiles[1]
 		local new_unit = unit:new( self.race , type , spawn_point )
 

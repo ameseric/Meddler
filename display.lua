@@ -29,8 +29,8 @@ local gui = require 'gui'
 	function display:setup( scale , gui_image , tileset )
 		local width , height = love.window.getDesktopDimensions()
 
-		width = math.floor( (width / ( TS * scale ))* window_factor )
-		height = math.floor( (height / ( TS * scale )) * window_factor )
+		width = math.floor( (width / ( TS * scale ))* WF )
+		height = math.floor( (height / ( TS * scale )) * WF )
 
 		self.tile_width = width
 		self.pix_width = tile_to_pixel( width )
@@ -45,7 +45,7 @@ local gui = require 'gui'
 
 	function display:move() --later, add velocity factor. Further over the cursor, faster movement. 1/2/3/4/5
 		local x , y = love.mouse.getPosition()
-		local step = 6
+		local step = 3
 		local move_reduction = 4
 		local old_x , old_y = self.x_pix_pos , self.y_pix_pos
 
@@ -54,15 +54,15 @@ local gui = require 'gui'
 			if pressed_x then self.x_pix_pos = self.x_pix_pos + math.floor(( x - pressed_x )/move_reduction ) end
 			if pressed_y then self.y_pix_pos = self.y_pix_pos + math.floor(( y - pressed_y )/move_reduction ) end
 		else
-			if x > (self.pix_width / 6)*5 then
+			if x > (self.pix_width / 10)*9 then
 				self.x_pix_pos = self.x_pix_pos + step
-			elseif x < (self.pix_width / 6) then
+			elseif x < (self.pix_width / 10) then
 				self.x_pix_pos = self.x_pix_pos - step
 			end
 
-			if y > (self.pix_height / 5)*4 then
+			if y > (self.pix_height / 10)*9 then
 				self.y_pix_pos = self.y_pix_pos + step
-			elseif y < (self.pix_height / 5) then
+			elseif y < (self.pix_height / 9) then
 				self.y_pix_pos = self.y_pix_pos - step
 			end
 
@@ -110,8 +110,8 @@ local gui = require 'gui'
 		gui:draw( scale , nil , player.name , player.eminence )
 	end
 
-	function display:gui_select( tile , x , y )
-		gui:select( tile , x , y )
+	function display:gui_select( tile )
+		gui:select( tile )
 	end
 
 	function display:gui_dialogue( text )

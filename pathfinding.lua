@@ -6,20 +6,14 @@ local path_finder = {}
 
 
 --======= Helpers ========
-	local function get_adj_tiles( current_pt , target_pt , history )
-		local x,y = current_pt.x,current_pt.y
-		local adj_tiles = {}
-
-		for j=-1,1,2 do
-			if atlas:get_passable( x , y+j ) then
-				table.insert( adj_tiles , { x=x , y=y+j } )
-			end
-			if atlas:get_passable( x+j , y ) then
-				table.insert( adj_tiles , { x=x+j , y=y } )
+	local function already_traveled( point , history )
+		local traveled = false
+		for i,v in ipairs( history ) do
+			if point.x == v.x and point.y == v.y then
+				traveled = true
 			end
 		end
-
-		return score_tiles( adj_tiles , target_pt , history )
+		return traveled
 	end
 
 	local function score_tiles( tile_array , target , history )
@@ -47,14 +41,20 @@ local path_finder = {}
 		return scored_array
 	end
 
-	local function already_traveled( point , history )
-		local traveled = false
-		for i,v in ipairs( history ) do
-			if point.x == v.x and point.y == v.y then
-				traveled = true
+	local function get_adj_tiles( current_pt , target_pt , history )
+		local x,y = current_pt.x,current_pt.y
+		local adj_tiles = {}
+
+		for j=-1,1,2 do
+			if atlas:get_passable( x , y+j , true ) then
+				table.insert( adj_tiles , { x=x , y=y+j } )
+			end
+			if atlas:get_passable( x+j , y , true ) then
+				table.insert( adj_tiles , { x=x+j , y=y } )
 			end
 		end
-		return traveled
+
+		return score_tiles( adj_tiles , target_pt , history )
 	end
 
 	local function root_setup( current_pt , target_pt )
@@ -62,8 +62,9 @@ local path_finder = {}
 		return 0 , {} , dist+(dist*0.35)
 	end
 
+--call with current {x,y} , target {x,y}
 function path_finder:find_path( current_pt , target_pt , prev_pts , depth , target_depth )
-	if not depth or not prev_pts or not target_depth then
+	if not ( depth and prev_pts and target_depth ) then
 		depth , prev_pts , target_depth = root_setup( current_pt , target_pt )
 	end
 
@@ -92,9 +93,21 @@ end
 
 
 
-
+--to clear confusion, pt1 is the TARGET, pt2 is the CURRENT POSITION
+--I know, it's weird.
 function path_finder:get_dist( pt1 , pt2 )
-	return math.abs( pt1.x - pt2.x ) + math.abs( pt1.y - pt2.y )
+	local result_norm = math.abs( pt1.x - pt2.x ) + math.abs( pt1.y - pt2.y )
+	local result_wrap = math.abs( (pt1.x - atlas.world_width_tile) - pt2.x )
+							+ math.abs( (pt1.y - atlas.world_height_tile) - (pt2.y) )
+	--print( atlas.world_width_tile , atlas.world_height_tile )
+	--print( pt1.x , pt1.y , pt2.x , pt2.y )
+	--print( result_norm , result_wrap )
+
+	if result_norm <= result_wrap then
+		return result_norm
+	else
+		return result_wrap
+	end
 end
 
 function path_finder:get_adj_tiles( x , y )

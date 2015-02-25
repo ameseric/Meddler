@@ -36,10 +36,10 @@
 	end
 
 	function set_fonts()
-		font_title = love.graphics.setNewFont( 	44 * window_factor )
-		font_large = love.graphics.setNewFont( 	36 * window_factor )
-		font_med = love.graphics.setNewFont( 	28 * window_factor )
-		font_small = love.graphics.setNewFont( 	24 * window_factor )
+		font_title = love.graphics.setNewFont( 	44 * WF )
+		font_large = love.graphics.setNewFont( 	36 * WF )
+		font_med = love.graphics.setNewFont( 	28 * WF )
+		font_small = love.graphics.setNewFont( 	24 * WF )
 	end
 
 	function is_escape_key( key )
@@ -54,6 +54,8 @@
 		if perform_disp_setup then
 			disp:setup( scale , images.gui_image , images.tileset )
 		end
+
+		print( (disp.tile_height+2) * (disp.tile_width+2) )
 
 		atlas:set_batch( images.tileset , (disp.tile_height+2) * (disp.tile_width+2) ) --extra 2 for buffer to show partial tiles
 

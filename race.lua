@@ -77,8 +77,10 @@ function race:draw()
 	for _,v in ipairs( self.buildings ) do
 		v:draw()
 	end
-
 	for _,v in ipairs( self.military ) do
+		v:draw()
+	end
+	for _,v in ipairs( self.citizens ) do
 		v:draw()
 	end
 end

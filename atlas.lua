@@ -12,16 +12,7 @@ atlas = {
 
 function atlas:set_world( world , x , y )
 	self.world = world
---[[]
-	for i=0,x-1 do
-		self.world[i] = {}
-		for j=0,y-1 do
-			print( i , j )
-			self.world[i][j] = tiles:new( world[i][j] , i , j )
-			--self.world[i][j] = tiles:new( 'Mountain' , i , j )
-		end
-	end
---]]
+	world = nil
 	self.world_width_tile = x
 	self.world_height_tile = y
 
@@ -67,13 +58,18 @@ function atlas:in_bounds( x , y )
 	end
 end
 
-function atlas:get_tile( x , y , translate_pixel )
+function atlas:get_tile( x , y , translate_pixel , wrap_tile )
 
 	if translate_pixel then
 		x , y = pwa( x + disp.x_pix_pos , y + disp.y_pix_pos )
 		x = pixel_to_tile( x )
 		y = pixel_to_tile( y )
 	end
+
+	if wrap_tile then
+		x , y = twa( x , y )
+	end
+
 	return self.world[ x ][ y ]
 end
 
@@ -88,8 +84,9 @@ function atlas:set_tile( tile_type , x , y , object )
 	end
 end
 
-function atlas:get_passable( x , y )
-	local tile = self:get_tile( x , y )
+function atlas:get_passable( x , y , wrap )
+	local tile = self:get_tile( x , y , nil , wrap )
+	--print( "Tried to get " , x , y )
 	return tile:passable()
 end
 
@@ -104,9 +101,20 @@ end
 	end
 
 	function atlas:tile_wrap_around( x , y )
-		x , y = ttp( x ) , ttp(y)
-		x , y = self:pixel_wrap_around( x , y )
-		x , y = ptt(x) , ptt(y)
+		local x_limit = self.world_width_tile
+		local y_limit = self.world_height_tile
+
+		if x >= x_limit then
+			x = x - x_limit
+		elseif x < 0 then
+			x = x_limit + x
+		end
+
+		if y >= y_limit then
+			y = y - y_limit
+		elseif y < 0 then
+			y = y_limit + y
+		end
 
 		return x , y
 	end

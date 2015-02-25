@@ -74,7 +74,6 @@ structure_rules.a = {
 structure_rules.total_set = {}
 
 function structure_rules:get( type )
-	print( "Called for " , type )
 	return self.total_set[ type ]
 end
 

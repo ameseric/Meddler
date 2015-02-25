@@ -9,8 +9,10 @@
 --]]
 
 --=========/ Globals /=========
+	--Tile Size NxN
 	TS = 32
-	window_factor = 0.75
+	--Window Factor
+	WF = 0.75
 
 	local world_width , world_height = 100 , 100
 	scale = 2
@@ -78,8 +80,9 @@
 		images , sounds = wrapper.images , wrapper.sounds
 
 		love.keyboard.setKeyRepeat( true )
-		configure_screen_settings( true ) --sets display, GUI, and fonts based on current window_factor
+		configure_screen_settings( true ) --sets display, GUI, and fonts based on current WF
 		__:start_game()
+
 	end
 
 
@@ -104,7 +107,15 @@
 			end
 
 		elseif __:at_game_actual() then
-			if __:just_started() then love.audio.play( sounds.bgm ) end			
+			if __:just_started() then
+				love.audio.play( sounds.bgm )
+
+				local dist = scout:find_path( {x=5,y=2} , {x=99,y=87} )
+				print( dist )
+				for i,v in ipairs( dist ) do
+					print( i , v.x , v.y )
+				end
+			end			
 			if __:is_player_turn() then
 				game_actual:race_creation_update( player , selected_tile )
 				if not __:making_race() then

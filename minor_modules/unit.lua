@@ -84,8 +84,7 @@ end
 
 function unit:update()
 	--need to add "walking" here later, to move by pixel instead of tile
-	return end
-	--[[
+	--[
 	if self.order then
 		if self.order.type == 'attack' then
 			local dist = scout:get_distance( self , self.order.target ) --not correct
@@ -96,6 +95,8 @@ function unit:update()
 				self:move()
 			end
 
+		elseif self.order.type == 'build' then
+			--stuff
 		end
 	end
 end
